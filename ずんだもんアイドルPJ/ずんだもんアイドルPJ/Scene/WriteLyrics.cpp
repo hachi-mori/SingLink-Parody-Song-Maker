@@ -1,31 +1,19 @@
 ﻿#include "WriteLyrics.hpp"
 
-// WriteLyrics::WriteLyrics (コンストラクタ) 
+// WriteLyrics::WriteLyrics (コンストラクタ)
 WriteLyrics::WriteLyrics(const InitData& init)
 	: IScene{ init }, m_textState{}
 {
 	m_textState.active = true;
 
 	talkLines = VOICEVOX::ExtractTalkUtterances(getData().vvprojPath);
+	m_problems = VOICEVOX::BuildTalkProblems(talkLines);
+	m_problemCount = m_problems.size();
 
-	// ===============================
-	// ここで 1〜5問目のお題を決める
-	//    - fontSize: フォントサイズ
-	//    - text    : 画面中央に表示するお題テキスト
-	// ===============================
-	m_topics = {
-		{ 100, U"① やすいおさかなは？" },
-		{ 90, U"② おいしいおさかなは？" },
-		{ 90, U"③ しゅんのおさかなは？" },
-		{ 100, U"④ すきなおさかなは？" },
-		{ 80, U"⑤ いまたべたいおさかなは？" },
-	};
-	// ※ ここを好きなテキスト＆サイズに書き換えて使う
-
-	if (!talkLines.isEmpty())
+	if (!m_problems.isEmpty())
 	{
 		currentIndex = 0;
-		m_currentTopic = talkLines[currentIndex]; // ← もう表示には使わないが残してOK
+		m_currentTopic = m_problems[currentIndex].questionText;
 		getData().solvedTasks.clear();
 		getData().finalRhymeMatchPercent = 0.0; // スコア機能は無効化
 	}
@@ -71,7 +59,7 @@ Array<String> WriteLyrics::splitSyllables(const String& text) const
 	return result;
 }
 
-// WriteLyrics::getVowel (母音取得ヘルパー関数) 
+// WriteLyrics::getVowel (母音取得ヘルパー関数)
 char WriteLyrics::getVowel(const String& syllable) const
 {
 	// 拗音（きゃ、しゅ、てょなど）は最後の母音、撥音/促音は N/Q
@@ -140,9 +128,36 @@ String WriteLyrics::replaceChoonWithVowel(const String& text) const
 	return result;
 }
 
+int32 WriteLyrics::decideQuestionFontSize(const String& questionText) const
+{
+	const size_t len = questionText.size();
+	if (len <= 8)
+	{
+		return 100;
+	}
+	if (len <= 10)
+	{
+		return 90;
+	}
+	return 80;
+}
+
+String WriteLyrics::makeQuestionDisplayText(size_t index, const String& questionText) const
+{
+	static const Array<String> kCircledNumbers = {
+		U"①", U"②", U"③", U"④", U"⑤", U"⑥", U"⑦", U"⑧", U"⑨", U"⑩",
+		U"⑪", U"⑫", U"⑬", U"⑭", U"⑮", U"⑯", U"⑰", U"⑱", U"⑲", U"⑳"
+	};
+
+	if (index < kCircledNumbers.size())
+	{
+		return kCircledNumbers[index] + U" " + questionText;
+	}
+	return U"{} {}"_fmt(index + 1, questionText);
+}
+
 void WriteLyrics::update()
 {
-
 	// 全体集計 + 遷移（韻スコアは使わない）
 	auto finalizeAndExit = [&]()
 		{
@@ -174,12 +189,20 @@ void WriteLyrics::update()
 		return; // カウントダウン中は何もしない
 	}
 
-	// talkLinesが空なら何もしない
-	if (talkLines.isEmpty())
+	if (m_problems.isEmpty())
 	{
 		Print << U"お題がありません。";
 		return;
 	}
+
+	if (currentIndex >= m_problemCount)
+	{
+		finalizeAndExit();
+		return;
+	}
+
+	const auto& problem = m_problems[currentIndex];
+	const size_t maxSyllables = Max<size_t>(2, problem.maxSyllableCount);
 
 	// カウントダウン
 	const int32 remaining = m_timeLimit - static_cast<int32>(m_timer.s());
@@ -187,16 +210,13 @@ void WriteLyrics::update()
 	// ── タイムアップ分岐 ──
 	if (remaining <= 0)
 	{
-		const Array<String> targetSyllables = splitSyllables(talkLines[currentIndex]);
-
-		// タイムアップ時も「現在のお題で要求されていた 2〜4 音節分」の「ら」で埋める
-		String autoAnswer(4, U'ら');
+		String autoAnswer(maxSyllables, U'ら');
 
 		m_errorMessage.clear();
 
 		getData().solvedTasks << SolvedTask{
-			.phrase = talkLines[currentIndex],
-			.syllables = targetSyllables,
+			.phrase = problem.baseTargetText,
+			.syllables = problem.targetSyllables,
 			.userInput = autoAnswer,
 			.userSyllables = splitSyllables(autoAnswer),
 			.score = 0.0,  // スコア機能は無効
@@ -206,9 +226,9 @@ void WriteLyrics::update()
 
 		++currentIndex;
 
-		if (currentIndex < talkLines.size())
+		if (currentIndex < m_problemCount)
 		{
-			m_currentTopic = talkLines[currentIndex];
+			m_currentTopic = m_problems[currentIndex].questionText;
 			m_textState.text.clear();
 			m_timer.restart();
 		}
@@ -255,19 +275,14 @@ void WriteLyrics::update()
 		Array<String> syllables2 = splitSyllables(normalizedText);
 		const size_t s = syllables2.size();
 
-		// 音節数チェック（2〜4音節のみ許可）
-		if (s < 2 || s > 4)
+		// 音節数チェック（2〜問題ごとの最大音節）
+		if (s < 2 || s > maxSyllables)
 		{
-			m_errorMessage = U"⚠️ 2〜4 音節で入力してください\n（いま "
-				+ Format(s) + U" 音節）";
+			m_errorMessage = U"⚠️ {}〜{} 音節で入力してください\n（いま {} 音節）"_fmt(
+				2, maxSyllables, s);
 			m_textState.active = true;
 			return;
 		}
-
-		// ここから「必ず4音節に変換」する処理
-		// 2音節: 最後の音節の母音を1音節として追加し、その後ろに「が」
-		// 3音節: 「が」を追加
-		// 4音節: 何もしない
 
 		// 母音 → ひらがな文字への変換ヘルパー
 		auto vowelToKana = [](char v)->String
@@ -279,69 +294,58 @@ void WriteLyrics::update()
 				case 'u': return U"ゥ";
 				case 'e': return U"ェ";
 				case 'o': return U"ォ";
-				case 'N': return U"ん"; // 念のため
+				case 'N': return U"ん";
 				case 'Q': return U"っ";
-				default:  return U"あ"; // デフォルト（ほぼ来ない想定）
+				default:  return U"あ";
 				}
 			};
 
 		String finalText = normalizedText;
 		Array<String> finalSyllables = syllables2;
 
-		if (s == 2)
+		if (s < maxSyllables)
 		{
+			const size_t remainingSlots = (maxSyllables - s);
+			const Array<String> particleSyllables = splitSyllables(problem.particleText);
+			const bool canAppendParticle =
+				(!problem.particleText.isEmpty())
+				&& (!particleSyllables.isEmpty())
+				&& (particleSyllables.size() <= remainingSlots);
+
 			const char v = getVowel(syllables2.back());
 			const String vowelKana = vowelToKana(v);
 
-			if (currentIndex <= 2)
-			{
-				// 1〜3問目 & 6問目以降：従来どおり「母音 + が」
-				finalText += vowelKana;
-				finalText += U"が";
+			auto appendVowelFills = [&](size_t fillCount)
+				{
+					for (size_t i = 0; i < fillCount; ++i)
+					{
+						finalText += vowelKana;
+						finalSyllables << vowelKana;
+					}
+				};
 
-				finalSyllables << vowelKana;
-				finalSyllables << U"が";
-			}
-			else // 4〜5問目 (currentIndex == 3 or 4)
+			if (canAppendParticle)
 			{
-				// 4〜5問目：母音をもう1つ追加（「が」は付けない）
-				finalText += vowelKana;
-				finalText += vowelKana;
-
-				finalSyllables << vowelKana;
-				finalSyllables << vowelKana;
+				const size_t needVowelFill = remainingSlots - particleSyllables.size();
+				appendVowelFills(needVowelFill);
+				finalText += problem.particleText;
+				for (const auto& syl : particleSyllables)
+				{
+					finalSyllables << syl;
+				}
 			}
-		}
-		else if (s == 3)
-		{
-			if (currentIndex <= 2 || currentIndex >= 5)
+			else
 			{
-				// 1〜3問目 & 6問目以降：従来どおり「が」を追加
-				finalText += U"が";
-				finalSyllables << U"が";
-			}
-			else // 4〜5問目
-			{
-				// 4〜5問目：末尾母音を1つ追加（「が」は付けない）
-				const char v = getVowel(syllables2.back());
-				const String vowelKana = vowelToKana(v);
-
-				finalText += vowelKana;
-				finalSyllables << vowelKana;
+				appendVowelFills(remainingSlots);
 			}
 		}
-		// s == 4 の場合は finalText / finalSyllables をそのまま使う
-
-		// ここに来た時点で finalSyllables.size() は必ず 4 になる
-
-		const Array<String> targetSyllables = splitSyllables(talkLines[currentIndex]);
 
 		// 韻スコアは使わないので、0 を入れておくだけ
 		getData().solvedTasks << SolvedTask{
-			.phrase = talkLines[currentIndex],
-			.syllables = targetSyllables,
-			.userInput = finalText,       // ← 4音節に変換後の文字列
-			.userSyllables = finalSyllables,  // ← 4音節の配列
+			.phrase = problem.baseTargetText,
+			.syllables = problem.targetSyllables,
+			.userInput = finalText,
+			.userSyllables = finalSyllables,
 			.score = 0.0,
 			.rhymeMatchPercent = 0.0,
 			.matchesCount = 0
@@ -354,9 +358,9 @@ void WriteLyrics::update()
 		++currentIndex;
 		m_timer.restart(); // タイマー再スタート
 
-		if (currentIndex < talkLines.size())
+		if (currentIndex < m_problemCount)
 		{
-			m_currentTopic = talkLines[currentIndex]; // 表示中お題を更新
+			m_currentTopic = m_problems[currentIndex].questionText; // 表示中お題を更新
 		}
 		else
 		{
@@ -402,24 +406,17 @@ void WriteLyrics::draw() const
 	frame.draw();
 
 	// お題を中央に大きく描画
-	if (currentIndex < m_topics.size())
+	if (currentIndex < m_problemCount)
 	{
-		// 1〜5問目: プログラム内で決めたお題を表示
-		const auto& topic = m_topics[currentIndex];
+		const auto& problem = m_problems[currentIndex];
+		const String displayText = makeQuestionDisplayText(currentIndex, problem.questionText);
+		const int32 fontSize = decideQuestionFontSize(problem.questionText);
 
-		m_font(topic.text)
-			.drawAt(topic.fontSize,
+		m_font(displayText)
+			.drawAt(fontSize,
 				Vec2{ Scene::Center().x, Scene::Center().y - 105 },
 				kogetyaColor);
 	}
-	else if (!talkLines.isEmpty() && currentIndex < talkLines.size())
-	{
-		// 6問目以降 or topics が足りない場合:
-		// これまで通り vvproj からのテキストを表示（保険）
-		m_font(talkLines[currentIndex])
-			.drawAt(Scene::Center().x, Scene::Center().y - 105, kogetyaColor);
-	}
-
 
 	// テキストボックスを下中央に配置
 	constexpr double textBoxWidth = 200.0;
@@ -439,11 +436,9 @@ void WriteLyrics::draw() const
 	}
 
 	// 残りお題カウンターを左上に表示
-	if (!talkLines.isEmpty())
+	if (m_problemCount > 0)
 	{
-		// 例: "1 / 3" のような形式
-		const String progressText = U"{} / {}"_fmt(currentIndex + 1, talkLines.size());
-
+		const String progressText = U"{} / {}"_fmt(currentIndex + 1, m_problemCount);
 		m_font(progressText).draw(62, Vec2{ 80, 120 }, kogetyaColor);
 	}
 
@@ -456,24 +451,7 @@ void WriteLyrics::draw() const
 	// 入力エラー表示（あれば）
 	if (!m_errorMessage.isEmpty())
 	{
-		// 位置や大きさは好みで微調整してOK
 		result_font(m_errorMessage)
 			.draw(22, Vec2{ 40, 480 }, Palette::Red);
-		// あるいは中央寄せにしたいなら：
-		// result_font(m_errorMessage).drawAt(22, Scene::Center().movedBy(0, 140), Palette::Red);
 	}
-	/*
-	// 直前のお題と回答を表示（2問目以降のみ）
-	if (currentIndex > 0)
-	{
-		const auto& prevTask = getData().solvedTasks[currentIndex - 1];
-		const double yBase = 520;
-
-		result_font(U"　　　前のお題：" + prevTask.phrase)
-			.draw(22, Vec2{ 40, yBase }, Palette::White);
-
-		result_font(U"　あなたの回答：" + prevTask.userInput)
-			.draw(22, Vec2{ 40, yBase + 30 }, Palette::Skyblue);
-	}
-	*/
 }

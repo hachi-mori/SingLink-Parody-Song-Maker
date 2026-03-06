@@ -38,6 +38,31 @@ namespace VOICEVOX
 			}
 			return 120.0;  // デフォルト
 		}
+
+		Array<String> SplitSyllablesForParody(const String& text)
+		{
+			const String smallKanaList = U"ゃゅょぁぃぅぇぉっャュョァィゥェォッ";
+			Array<String> result;
+
+			for (size_t i = 0; i < text.length(); ++i)
+			{
+				String s;
+				s += text[i];
+
+				if ((i + 1 < text.length()) && smallKanaList.includes(text[i + 1]))
+				{
+					s += text[i + 1];
+					++i;
+				}
+				result << s;
+			}
+			return result;
+		}
+
+		String BuildSyllableKey(const Array<String>& syllables)
+		{
+			return syllables.join(U"\x1F");
+		}
 	} // unnamed-namespace
 
 	// 音域調整テーブル（キャラ名 → スタイル名 → 音域調整値）
@@ -1241,15 +1266,80 @@ namespace VOICEVOX
 		return utterances;
 	}
 
+	ParsedTargetText ParseTargetText(const String& text)
+	{
+		ParsedTargetText out;
+		out.baseText = text;
+		out.particleText.clear();
+
+		const size_t open = text.indexOf(U'[');
+		if (open == String::npos)
+		{
+			return out;
+		}
+
+		const size_t close = text.indexOf(U']', open + 1);
+		if (close == String::npos || close <= open)
+		{
+			return out;
+		}
+
+		const String head = text.substr(0, open);
+		const String tail = text.substr(close + 1);
+		out.baseText = head + tail;
+		out.particleText = text.substr(open + 1, close - open - 1);
+		return out;
+	}
+
+	Array<TalkProblem> BuildTalkProblems(const Array<String>& talkLines)
+	{
+		Array<TalkProblem> problems;
+		if (talkLines.isEmpty())
+		{
+			return problems;
+		}
+
+		if ((talkLines.size() % 2) != 0)
+		{
+			Console << U"[BuildTalkProblems] talkLines が奇数件です: {}"_fmt(talkLines.size());
+			return problems;
+		}
+
+		const size_t n = (talkLines.size() / 2);
+		problems.reserve(n);
+
+		for (size_t i = 0; i < n; ++i)
+		{
+			const String& rawTarget = talkLines[i];
+			const String& question = talkLines[i + n];
+			const ParsedTargetText parsed = ParseTargetText(rawTarget);
+			const Array<String> targetSyllables = SplitSyllablesForParody(parsed.baseText);
+
+			TalkProblem p;
+			p.rawTargetText = rawTarget;
+			p.baseTargetText = parsed.baseText;
+			p.particleText = parsed.particleText;
+			p.questionText = question;
+			p.targetSyllables = targetSyllables;
+			p.maxSyllableCount = targetSyllables.size();
+			problems << p;
+		}
+
+		return problems;
+	}
+
 	// 音節列置き換え（1回だけ）
-	static void OverwriteSequenceOnce(
+	static bool OverwriteSequenceByOccurrence(
 		Array<String>& lyricsSeq,
 		const Array<String>& target,
-		const Array<String>& replacement
+		const Array<String>& replacement,
+		size_t occurrenceIndex
 	)
 	{
-		if (target.isEmpty()) return;
-		if (target.size() != replacement.size()) return;
+		if (target.isEmpty()) return false;
+		if (target.size() != replacement.size()) return false;
+
+		size_t matchedCount = 0;
 
 		for (size_t start = 0; start + target.size() <= lyricsSeq.size(); ++start)
 		{
@@ -1265,13 +1355,19 @@ namespace VOICEVOX
 
 			if (match)
 			{
-				for (size_t k = 0; k < target.size(); ++k)
+				if (matchedCount == occurrenceIndex)
 				{
-					lyricsSeq[start + k] = replacement[k];
+					for (size_t k = 0; k < target.size(); ++k)
+					{
+						lyricsSeq[start + k] = replacement[k];
+					}
+					return true;
 				}
-				break;
+				++matchedCount;
 			}
 		}
+
+		return false;
 	}
 
 	// vvproj の歌詞を替え歌の歌詞に置き換える
@@ -1387,13 +1483,28 @@ namespace VOICEVOX
 			//-------------------------------------
 			// 替え歌置き換えを適用
 			//-------------------------------------
+			HashTable<String, size_t> consumedOccurrenceCount;
 			for (const auto& task : solvedTasks)
 			{
-				OverwriteSequenceOnce(
+				if (task.syllables.isEmpty())
+				{
+					continue;
+				}
+				if (task.syllables.size() != task.userSyllables.size())
+				{
+					continue;
+				}
+
+				const String key = BuildSyllableKey(task.syllables);
+				const size_t occurrence = consumedOccurrenceCount[key];
+				if (OverwriteSequenceByOccurrence(
 					lyricsSeq,
 					task.syllables,
-					task.userSyllables
-				);
+					task.userSyllables,
+					occurrence))
+				{
+					consumedOccurrenceCount[key] = occurrence + 1;
+				}
 			}
 
 			//-------------------------------------

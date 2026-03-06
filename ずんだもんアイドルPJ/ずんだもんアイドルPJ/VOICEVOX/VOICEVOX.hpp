@@ -4,6 +4,22 @@
 
 namespace VOICEVOX
 {
+	struct ParsedTargetText
+	{
+		String baseText;
+		String particleText;
+	};
+
+	struct TalkProblem
+	{
+		String rawTargetText;
+		String baseTargetText;
+		String particleText;
+		String questionText;
+		Array<String> targetSyllables;
+		size_t maxSyllableCount = 0;
+	};
+
 	struct Singer
 	{
 		String name;
@@ -85,6 +101,12 @@ namespace VOICEVOX
 
 	// vvproj(talk) から発話テキストを抽出する
 	Array<String> ExtractTalkUtterances(const FilePath& vvprojPath);
+
+	// 範囲指定テキスト（例: さかな[が]）をベース語と助詞に分解する
+	ParsedTargetText ParseTargetText(const String& text);
+
+	// talkLines を前半=範囲指定 / 後半=問題文で問題セット化する
+	Array<TalkProblem> BuildTalkProblems(const Array<String>& talkLines);
 
 	// 替え歌の歌詞を vvproj に適用する
 	JSON ApplyParodyLyrics(
