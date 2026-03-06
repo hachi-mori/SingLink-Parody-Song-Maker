@@ -114,6 +114,13 @@ namespace VOICEVOX
 		const Array<SolvedTask>& solvedTasks
 	);
 
+	// Result 表示用の歌詞を生成する
+	// 仕様: 原曲歌詞（休符で改行）から範囲指定語を削除し、ユーザー入力（補完前）を差し込む
+	String BuildResultDisplayLyrics(
+		const FilePath& vvprojPath,
+		const Array<SolvedTask>& solvedTasks
+	);
+
 	// vvproj(song) から歌詞テキストを抽出する
 	Array<String> ExtractSongLyrics(const FilePath& vvprojPath);
 

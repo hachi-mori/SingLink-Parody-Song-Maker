@@ -161,13 +161,10 @@ void WriteLyrics::update()
 	// 全体集計 + 遷移（韻スコアは使わない）
 	auto finalizeAndExit = [&]()
 		{
-			// ここでは歌詞の再構成だけ行う
-			String reconstructedLyrics;
-			for (const auto& task : getData().solvedTasks)
-			{
-				reconstructedLyrics += task.userInput + U"\n";
-			}
-			getData().fullLyrics = reconstructedLyrics;
+			getData().fullLyrics = VOICEVOX::BuildResultDisplayLyrics(
+				getData().vvprojPath,
+				getData().solvedTasks
+			);
 
 			// スコア機能は無効なので 0 固定
 			getData().finalRhymeMatchPercent = 0.0;

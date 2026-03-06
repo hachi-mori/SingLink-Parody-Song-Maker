@@ -63,6 +63,23 @@ namespace VOICEVOX
 		{
 			return syllables.join(U"\x1F");
 		}
+
+		Array<size_t> FindAllSubstringStarts(const String& text, const String& pattern)
+		{
+			Array<size_t> starts;
+			if (pattern.isEmpty())
+			{
+				return starts;
+			}
+
+			size_t pos = 0;
+			while ((pos = text.indexOf(pattern, pos)) != String::npos)
+			{
+				starts << pos;
+				pos += pattern.size();
+			}
+			return starts;
+		}
 	} // unnamed-namespace
 
 	// 音域調整テーブル（キャラ名 → スタイル名 → 音域調整値）
@@ -1554,6 +1571,167 @@ namespace VOICEVOX
 		}
 
 		return modified;
+	}
+
+	String BuildResultDisplayLyrics(
+		const FilePath& vvprojPath,
+		const Array<SolvedTask>& solvedTasks
+	)
+	{
+		const JSON src = JSON::Load(vvprojPath);
+		if (!src || !src.contains(U"song") || !src[U"song"].isObject())
+		{
+			Console << U"[BuildResultDisplayLyrics] song セクションが無効";
+			return U"";
+		}
+
+		const JSON& song = src[U"song"];
+		if (!song.contains(U"tracks") || !song[U"tracks"].isObject())
+		{
+			Console << U"[BuildResultDisplayLyrics] song.tracks が無効";
+			return U"";
+		}
+
+		JSON track;
+		bool ok = false;
+
+		if (song.contains(U"trackOrder") && song[U"trackOrder"].isArray() && (song[U"trackOrder"].size() > 0))
+		{
+			const String key = song[U"trackOrder"][0].getOr<String>(U"");
+			if (!key.isEmpty() && song[U"tracks"].contains(key) && song[U"tracks"][key].isObject())
+			{
+				track = song[U"tracks"][key];
+				ok = true;
+			}
+		}
+		if (!ok)
+		{
+			for (auto&& [__, tr] : song[U"tracks"])
+			{
+				if (tr.isObject())
+				{
+					track = tr;
+					ok = true;
+				}
+				break;
+			}
+		}
+		if (!ok || !track.contains(U"notes") || !track[U"notes"].isArray())
+		{
+			Console << U"[BuildResultDisplayLyrics] 有効な track / notes が見つかりません";
+			return U"";
+		}
+
+		Array<JSON> notes;
+		for (auto&& n : track[U"notes"].arrayView())
+		{
+			notes << n;
+		}
+		std::sort(notes.begin(), notes.end(),
+			[](const JSON& a, const JSON& b)
+			{
+				const int64 ap = a[U"position"].getOpt<int64>().value_or(0);
+				const int64 bp = b[U"position"].getOpt<int64>().value_or(0);
+				return ap < bp;
+			});
+
+		String originalLyrics;
+		int64 prevEnd = -1;
+		for (const auto& n : notes)
+		{
+			const int64 pos = n[U"position"].getOpt<int64>().value_or(0);
+			const int64 dur = n[U"duration"].getOpt<int64>().value_or(0);
+
+			if (prevEnd >= 0 && pos - prevEnd > 0)
+			{
+				originalLyrics += U"\n";
+			}
+
+			if (const auto lyr = n[U"lyric"].getOpt<String>())
+			{
+				if (!lyr->isEmpty())
+				{
+					originalLyrics += *lyr;
+				}
+			}
+
+			prevEnd = pos + dur;
+		}
+
+		if (originalLyrics.isEmpty())
+		{
+			return originalLyrics;
+		}
+
+		struct ReplacementEvent
+		{
+			size_t start = 0;
+			size_t end = 0;
+			String replacement;
+		};
+
+		HashTable<String, Array<size_t>> occurrenceStartsByTarget;
+		HashTable<String, size_t> consumedOccurrenceCount;
+		Array<ReplacementEvent> events;
+		events.reserve(solvedTasks.size());
+
+		for (const auto& task : solvedTasks)
+		{
+			if (task.phrase.isEmpty())
+			{
+				continue;
+			}
+
+			const String& target = task.phrase;
+			if (!occurrenceStartsByTarget.contains(target))
+			{
+				occurrenceStartsByTarget.emplace(target, FindAllSubstringStarts(originalLyrics, target));
+			}
+
+			const auto it = occurrenceStartsByTarget.find(target);
+			if (it == occurrenceStartsByTarget.end())
+			{
+				continue;
+			}
+
+			const Array<size_t>& starts = it->second;
+			const size_t occurrence = consumedOccurrenceCount[target];
+			if (occurrence >= starts.size())
+			{
+				continue;
+			}
+
+			const size_t start = starts[occurrence];
+			events << ReplacementEvent{
+				.start = start,
+				.end = start + target.size(),
+				.replacement = task.userInput
+			};
+			consumedOccurrenceCount[target] = occurrence + 1;
+		}
+
+		std::sort(events.begin(), events.end(),
+			[](const ReplacementEvent& a, const ReplacementEvent& b)
+			{
+				return a.start < b.start;
+			});
+
+		String displayLyrics;
+		size_t cursor = 0;
+		for (const auto& e : events)
+		{
+			if (e.start < cursor || e.end > originalLyrics.size())
+			{
+				continue;
+			}
+
+			displayLyrics += originalLyrics.substr(cursor, e.start - cursor);
+			displayLyrics += e.replacement;
+			cursor = e.end;
+		}
+		displayLyrics += originalLyrics.substr(cursor);
+
+		return displayLyrics;
 	}
 
 	/// @brief VOICEVOX の .vvproj から 歌唱用の歌詞列を取り出します。

@@ -140,6 +140,7 @@
 - `SolvedTask.userInput` は「ユーザーが入力した文字列（補完前）」を保持する。
 - 置換で使う最終音節列は `SolvedTask.userSyllables` に保持する。
 - これにより、Result 画面の入力表示はユーザー入力基準を維持しつつ、song 置換は補完後音節列で正しく実行できる。
+- Result 表示用歌詞は「原曲歌詞（休符で改行）から範囲指定テキストを削除し、`userInput` を差し込んだ文字列」を使う。
 
 ## 7. 置換アルゴリズム仕様（ApplyParodyLyrics 側）
 
