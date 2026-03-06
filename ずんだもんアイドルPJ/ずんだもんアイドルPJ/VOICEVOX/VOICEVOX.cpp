@@ -1286,8 +1286,8 @@ namespace VOICEVOX
 
 		const String head = text.substr(0, open);
 		const String tail = text.substr(close + 1);
-		out.baseText = head + tail;
 		out.particleText = text.substr(open + 1, close - open - 1);
+		out.baseText = head + out.particleText + tail;
 		return out;
 	}
 

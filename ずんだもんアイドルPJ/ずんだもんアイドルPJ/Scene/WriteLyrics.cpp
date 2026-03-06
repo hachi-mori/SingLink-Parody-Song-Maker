@@ -243,6 +243,7 @@ void WriteLyrics::update()
 	if (m_textState.enterKey)
 	{
 		m_textState.enterKey = false;
+		const String originalInputText = m_textState.text;
 
 		// ひらがな判定
 		if (!isHiraganaOnly(m_textState.text))
@@ -289,11 +290,11 @@ void WriteLyrics::update()
 			{
 				switch (v)
 				{
-				case 'a': return U"ァ";
-				case 'i': return U"ィ";
-				case 'u': return U"ゥ";
-				case 'e': return U"ェ";
-				case 'o': return U"ォ";
+				case 'a': return U"あ";
+				case 'i': return U"い";
+				case 'u': return U"う";
+				case 'e': return U"え";
+				case 'o': return U"お";
 				case 'N': return U"ん";
 				case 'Q': return U"っ";
 				default:  return U"あ";
@@ -344,7 +345,7 @@ void WriteLyrics::update()
 		getData().solvedTasks << SolvedTask{
 			.phrase = problem.baseTargetText,
 			.syllables = problem.targetSyllables,
-			.userInput = finalText,
+			.userInput = originalInputText,
 			.userSyllables = finalSyllables,
 			.score = 0.0,
 			.rhymeMatchPercent = 0.0,
