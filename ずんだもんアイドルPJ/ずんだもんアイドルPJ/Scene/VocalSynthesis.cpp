@@ -43,18 +43,6 @@ VocalSynthesis::VocalSynthesis(const InitData& init)
 		getData().solvedTasks
 	);
 
-	// 歌詞差し替え済み JSON (parodyVV) を一時保存
-	FilePath tmpPath = U"tmp/tmp_parody_" + FileSystem::BaseName(getData().vvprojPath) + U".vvproj";
-	parodyVV.save(tmpPath);
-
-	// 全歌詞を取得
-	auto allLyricMoras = VOICEVOX::ExtractSongLyrics(tmpPath);
-
-	// そのまま連結して 1 本の歌詞に
-	String full = allLyricMoras.join(U"");   // モーラ連結
-	//Console << U"最終歌詞: " + full;
-	getData().fullLyrics = full; // 共有データへ保存
-
 	// 一時vvproj
 	FilePath vvTmp = U"tmp/tmp_modified_" + base + U"_track" + Format(i + 1) + U".vvproj";
 	parodyVV.save(vvTmp);

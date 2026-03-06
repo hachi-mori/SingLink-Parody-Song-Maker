@@ -1328,18 +1328,16 @@ namespace VOICEVOX
 		return problems;
 	}
 
-	// 音節列置き換え（1回だけ）
-	static bool OverwriteSequenceByOccurrence(
-		Array<String>& lyricsSeq,
-		const Array<String>& target,
-		const Array<String>& replacement,
-		size_t occurrenceIndex
+	static Array<size_t> FindSequenceOccurrenceStarts(
+		const Array<String>& lyricsSeq,
+		const Array<String>& target
 	)
 	{
-		if (target.isEmpty()) return false;
-		if (target.size() != replacement.size()) return false;
-
-		size_t matchedCount = 0;
+		Array<size_t> starts;
+		if (target.isEmpty())
+		{
+			return starts;
+		}
 
 		for (size_t start = 0; start + target.size() <= lyricsSeq.size(); ++start)
 		{
@@ -1352,22 +1350,33 @@ namespace VOICEVOX
 					break;
 				}
 			}
-
 			if (match)
 			{
-				if (matchedCount == occurrenceIndex)
-				{
-					for (size_t k = 0; k < target.size(); ++k)
-					{
-						lyricsSeq[start + k] = replacement[k];
-					}
-					return true;
-				}
-				++matchedCount;
+				starts << start;
 			}
 		}
+		return starts;
+	}
 
-		return false;
+	static bool OverwriteSequenceAt(
+		Array<String>& lyricsSeq,
+		size_t start,
+		const Array<String>& replacement
+	)
+	{
+		if (replacement.isEmpty())
+		{
+			return false;
+		}
+		if (start + replacement.size() > lyricsSeq.size())
+		{
+			return false;
+		}
+		for (size_t k = 0; k < replacement.size(); ++k)
+		{
+			lyricsSeq[start + k] = replacement[k];
+		}
+		return true;
 	}
 
 	// vvproj の歌詞を替え歌の歌詞に置き換える
@@ -1483,6 +1492,8 @@ namespace VOICEVOX
 			//-------------------------------------
 			// 替え歌置き換えを適用
 			//-------------------------------------
+			const Array<String> originalLyricsSeq = lyricsSeq;
+			HashTable<String, Array<size_t>> occurrenceStartsByKey;
 			HashTable<String, size_t> consumedOccurrenceCount;
 			for (const auto& task : solvedTasks)
 			{
@@ -1496,12 +1507,30 @@ namespace VOICEVOX
 				}
 
 				const String key = BuildSyllableKey(task.syllables);
+				if (!occurrenceStartsByKey.contains(key))
+				{
+					occurrenceStartsByKey.emplace(
+						key,
+						FindSequenceOccurrenceStarts(originalLyricsSeq, task.syllables)
+					);
+				}
+
+				const auto occurrenceIt = occurrenceStartsByKey.find(key);
+				if (occurrenceIt == occurrenceStartsByKey.end())
+				{
+					continue;
+				}
+				const Array<size_t>& starts = occurrenceIt->second;
 				const size_t occurrence = consumedOccurrenceCount[key];
-				if (OverwriteSequenceByOccurrence(
+				if (occurrence >= starts.size())
+				{
+					continue;
+				}
+
+				if (OverwriteSequenceAt(
 					lyricsSeq,
-					task.syllables,
-					task.userSyllables,
-					occurrence))
+					starts[occurrence],
+					task.userSyllables))
 				{
 					consumedOccurrenceCount[key] = occurrence + 1;
 				}
