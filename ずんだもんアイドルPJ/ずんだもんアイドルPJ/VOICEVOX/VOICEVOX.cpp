@@ -64,6 +64,24 @@ namespace VOICEVOX
 			return syllables.join(U"\x1F");
 		}
 
+		const HashTable<String, String> kLyricDisplayCorrection = {
+			{ U"ワ", U"は" }, { U"ヲ", U"を" }, { U"ヘ", U"へ" },
+			{ U"ヴ", U"ブ" }, { U"シェ", U"しぇ" }, { U"ティ", U"てぃ" },
+			{ U"ディ", U"でぃ" }, { U"チェ", U"ちぇ" }, { U"ウィ", U"うぃ" },
+			{ U"クヮ", U"くぁ" }, { U"グヮ", U"ぐぁ" },
+			{ U"ァ", U"" }, { U"ィ", U"" }, { U"ゥ", U"" }, { U"ェ", U"" }, { U"ォ", U"" },
+			{ U"ア", U"ー" }, { U"イ", U"ー" }, { U"ウ", U"ー" }, { U"エ", U"ー" }, { U"オ", U"ー" }
+		};
+
+		String CorrectLyricForDisplay(const String& lyric)
+		{
+			if (const auto it = kLyricDisplayCorrection.find(lyric); it != kLyricDisplayCorrection.end())
+			{
+				return it->second;
+			}
+			return lyric;
+		}
+
 		Array<size_t> FindAllSubstringStarts(const String& text, const String& pattern)
 		{
 			Array<size_t> starts;
@@ -1635,6 +1653,9 @@ namespace VOICEVOX
 				return ap < bp;
 			});
 
+		const Array<String> talkLines = VOICEVOX::ExtractTalkUtterances(vvprojPath);
+		const Array<TalkProblem> problems = VOICEVOX::BuildTalkProblems(talkLines);
+
 		String originalLyrics;
 		int64 prevEnd = -1;
 		for (const auto& n : notes)
@@ -1651,7 +1672,7 @@ namespace VOICEVOX
 			{
 				if (!lyr->isEmpty())
 				{
-					originalLyrics += *lyr;
+					originalLyrics += CorrectLyricForDisplay(*lyr);
 				}
 			}
 
@@ -1675,8 +1696,52 @@ namespace VOICEVOX
 		Array<ReplacementEvent> events;
 		events.reserve(solvedTasks.size());
 
-		for (const auto& task : solvedTasks)
+		auto buildDisplayInput = [&](size_t taskIndex, const SolvedTask& task)->String
+			{
+				String display = task.userInput;
+				if (taskIndex >= problems.size())
+				{
+					return display;
+				}
+
+				const String& particle = problems[taskIndex].particleText;
+				if (particle.isEmpty())
+				{
+					return display;
+				}
+				if (problems[taskIndex].maxSyllableCount == 0)
+				{
+					return display;
+				}
+
+				const size_t inputSyllableCount = SplitSyllablesForParody(task.userInput).size();
+				if (inputSyllableCount >= problems[taskIndex].maxSyllableCount)
+				{
+					return display;
+				}
+
+				const Array<String> particleSyllables = SplitSyllablesForParody(particle);
+				if (particleSyllables.isEmpty() || task.userSyllables.size() < particleSyllables.size())
+				{
+					return display;
+				}
+
+				const size_t suffixStart = task.userSyllables.size() - particleSyllables.size();
+				for (size_t i = 0; i < particleSyllables.size(); ++i)
+				{
+					if (task.userSyllables[suffixStart + i] != particleSyllables[i])
+					{
+						return display;
+					}
+				}
+
+				display += particle;
+				return display;
+			};
+
+		for (size_t taskIndex = 0; taskIndex < solvedTasks.size(); ++taskIndex)
 		{
+			const auto& task = solvedTasks[taskIndex];
 			if (task.phrase.isEmpty())
 			{
 				continue;
@@ -1705,7 +1770,7 @@ namespace VOICEVOX
 			events << ReplacementEvent{
 				.start = start,
 				.end = start + target.size(),
-				.replacement = task.userInput
+				.replacement = buildDisplayInput(taskIndex, task)
 			};
 			consumedOccurrenceCount[target] = occurrence + 1;
 		}
@@ -1801,16 +1866,6 @@ namespace VOICEVOX
 				return ap < bp;
 			});
 
-		// 発音補正マップ
-		static const HashTable<String, String> kLyricCorrection = {
-			{ U"ワ", U"は" }, { U"ヲ", U"を" }, { U"ヘ", U"へ" },
-			{ U"ヴ", U"ブ" }, { U"シェ", U"しぇ" }, { U"ティ", U"てぃ" },
-			{ U"ディ", U"でぃ" }, { U"チェ", U"ちぇ" }, { U"ウィ", U"うぃ" },
-			{ U"クヮ", U"くぁ" }, { U"グヮ", U"ぐぁ" },
-			{ U"ァ", U"" }, { U"ィ", U"" }, { U"ゥ", U"" }, { U"ェ", U"" }, { U"ォ", U"" },
-			{ U"ア", U"ー" }, { U"イ", U"ー" }, { U"ウ", U"ー" }, { U"エ", U"ー" }, { U"オ", U"ー" }
-		};
-
 		// 歌詞＋休符検出
 		int64 prevEnd = -1; // 前ノートの終了位置
 		for (auto&& n : notes)
@@ -1829,15 +1884,7 @@ namespace VOICEVOX
 			{
 				if (!lyr->isEmpty())
 				{
-					// find() で対応
-					if (auto it = kLyricCorrection.find(*lyr); it != kLyricCorrection.end())
-					{
-						lyrics << it->second;
-					}
-					else
-					{
-						lyrics << *lyr;
-					}
+					lyrics << CorrectLyricForDisplay(*lyr);
 				}
 			}
 

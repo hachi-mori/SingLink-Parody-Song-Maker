@@ -115,7 +115,8 @@ namespace VOICEVOX
 	);
 
 	// Result 表示用の歌詞を生成する
-	// 仕様: 原曲歌詞（休符で改行）から範囲指定語を削除し、ユーザー入力（補完前）を差し込む
+	// 仕様: 原曲歌詞（休符で改行）から範囲指定語を削除し、入力を差し込む
+	// 助詞付与された問題は表示を「入力+助詞」にする
 	String BuildResultDisplayLyrics(
 		const FilePath& vvprojPath,
 		const Array<SolvedTask>& solvedTasks
