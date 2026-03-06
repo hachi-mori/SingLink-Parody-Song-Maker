@@ -4,9 +4,11 @@
 
 namespace VOICEVOX
 {
-	struct Singer {
+	struct Singer
+	{
 		String name;
-		struct Style {
+		struct Style
+		{
 			String name;
 			int32 id;
 		};

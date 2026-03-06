@@ -5,11 +5,9 @@
 class Result : public App::Scene
 {
 public:
-
 	Result(const InitData& init);
 
 	void update() override;
-
 	void draw() const override;
 
 private:
@@ -38,13 +36,13 @@ private:
 	mutable Array<int32> delays4;
 	Array<Texture> textures4;
 
-	const FilePath fontpath = Resource(U"Texture/Futehodo-MaruGothic.ttf");
-	Font m_font{ FontMethod::MSDF, 60 , fontpath };
-	Color kogetyaColor = { 134,79,9 };
-	Color goldColor = { 243,174,6 };
+	const FilePath fontPath = Resource(U"Texture/Futehodo-MaruGothic.ttf");
+	Font m_font{ FontMethod::MSDF, 60, fontPath };
+	Color kogetyaColor{ 134, 79, 9 };
+	Color goldColor{ 243, 174, 6 };
 
 	Texture titleButton{ Resource(U"Texture/assets/button/title.png") };
 	double titleButtonScale = 1.0;
 	Vec2 titleButtonCenter = Scene::Center().movedBy(-850, 420);
-	SizeF titleButtonSize = titleButton.size() * (titleButtonScale - 0.05);	// 画像スケールから少しだけ小さくする
+	SizeF titleButtonSize = titleButton.size() * (titleButtonScale - 0.05); // 画像スケールから少しだけ小さくする
 };

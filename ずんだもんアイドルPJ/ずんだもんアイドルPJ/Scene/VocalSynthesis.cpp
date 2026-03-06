@@ -34,8 +34,8 @@ VocalSynthesis::VocalSynthesis(const InitData& init)
 	const String singerName = U"ずんだもん";
 	getData().SingingNames << singerName;
 	const int i = 0; // ずんだもん1人のときのインデックス
-	const int32  spkID = 3003;	// ずんだもん（ノーマル）
-	const int32  talkSpkID = spkID - 3000;
+	const int32 spkID = 3003; // ずんだもん（ノーマル）
+	const int32 talkSpkID = spkID - 3000;
 
 	// 歌詞差し替えした vvproj を作って保存
 	JSON parodyVV = VOICEVOX::ApplyParodyLyrics(
@@ -52,7 +52,7 @@ VocalSynthesis::VocalSynthesis(const InitData& init)
 
 	// そのまま連結して 1 本の歌詞に
 	String full = allLyricMoras.join(U"");   // モーラ連結
-	//Console << U"🎵 最終歌詞: " + full;
+	//Console << U"最終歌詞: " + full;
 	getData().fullLyrics = full; // 共有データへ保存
 
 	// 一時vvproj
@@ -72,13 +72,14 @@ VocalSynthesis::VocalSynthesis(const InitData& init)
 	m_scorePath = score;
 	m_baseName = base;
 
-	// ✅ 非同期タスクとして合成を実行
+	// 非同期タスクとして合成を実行
 	m_isLoading = true;
 	m_timer.restart();
 
-	m_task = Async([=]() {
-		return VOICEVOX::SynthesizeFromJSONFileWrapperSplit(score, songwav, spkID, getData().baseURL, 2500, keyShift);
-	});
+	m_task = Async([=]()
+		{
+			return VOICEVOX::SynthesizeFromJSONFileWrapperSplit(score, songwav, spkID, getData().baseURL, 2500, keyShift);
+		});
 }
 
 void VocalSynthesis::update()
@@ -91,14 +92,14 @@ void VocalSynthesis::update()
 
 		if (success)
 		{
-			// 🎵 音声と伴奏をロード
+			// 音声と伴奏をロード
 			Audio songAudio{ m_songWavPath, Loop::Yes };
 			FileSystem::Remove(m_scorePath);
 			Audio inst{ U"Inst/" + m_baseName + U".mp3", Loop::Yes };
 
 			//Console << U"「" + m_baseName + U"」の再生準備が完了しました。";
 
-			// ✅ 共有データへ保存
+			// 共有データへ保存
 			getData().charCount = 1;
 			getData().SingerNames = { U"ずんだもん" };
 			getData().StyleNames = { U"ノーマル" };
@@ -116,8 +117,7 @@ void VocalSynthesis::update()
 
 void VocalSynthesis::draw() const
 {
-
-	//GIFアニメーションの描画
+	// GIFアニメーションの描画
 	ClearPrint();
 
 	// フレーム数
@@ -138,5 +138,5 @@ void VocalSynthesis::draw() const
 
 	textures[frameIndex].drawAt(Scene::Center());
 
-	m_font(U"ずんだもん が おうた を\n\nれんしゅう しているよ").drawAt(60, Scene::Center().x,Scene::Center().y-200, kogetyaColor);
+	m_font(U"ずんだもん が おうた を\n\nれんしゅう しているよ").drawAt(60, Scene::Center().x, Scene::Center().y - 200, kogetyaColor);
 }

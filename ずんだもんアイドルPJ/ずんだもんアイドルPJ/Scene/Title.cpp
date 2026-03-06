@@ -14,14 +14,14 @@ Title::Title(const InitData& init)
 	if (monitors.isEmpty() || currentMonitorIndex >= monitors.size())
 	{
 		Print << U"[Error] モニタ情報の取得に失敗しました。";
-		System::Exit();  // または安全なデフォルト動作
+		System::Exit(); // または安全なデフォルト動作
 	}
 
 	const auto& monitor = monitors[currentMonitorIndex];
 
-	// ✅ 正しいモニタの表示領域サイズを使用
 	const Size monitorSize = monitor.displayRect.size;
 	const Size targetSize{ 1920, 1080 };
+
 	// 想定よりモニタが小さい場合のみフルスクリーン化
 	if (monitorSize.x <= targetSize.x || monitorSize.y <= targetSize.y)
 	{
@@ -37,46 +37,48 @@ void Title::initVVProjList()
 	{
 		if (FileSystem::Extension(path) == U"vvproj")
 		{
-			vvprojNames << FileSystem::BaseName(path);
+			vvProjNames << FileSystem::BaseName(path);
 		}
 	}
 
-	listBoxStateVV = ListBoxState{ vvprojNames };
+	vvProjListBoxState = ListBoxState{ vvProjNames };
 }
 
-void Title::checkVVVersion() {
+void Title::checkVVVersion()
+{
 	getData().baseURL = urlBox.text;
 	const String version = VOICEVOX::GetEngineVersion(getData().baseURL, 1s);
 
 	if (version == U"(接続エラー)")
 	{
-		connectToVoiceVoxText = U"VOICEVOX：接続できていないのだ...";
+		voiceVoxStatusText = U"VOICEVOX：接続できていないのだ...";
 	}
-	else if (version < okVersion)
+	else if (version < supportedVersion)
 	{
-		connectToVoiceVoxText = U"VOICEVOX：バージョンが古いかもなのだ～";
+		voiceVoxStatusText = U"VOICEVOX：バージョンが古いかもなのだ～";
 	}
-	else {
-		connectToVoiceVoxText = U"VOICEVOX：OKなのだ！";
+	else
+	{
+		voiceVoxStatusText = U"VOICEVOX：OKなのだ！";
 	}
 }
 
 void Title::update()
 {
-	if (listBoxStateVV.selectedItemIndex)
+	if (vvProjListBoxState.selectedItemIndex)
 	{
-		selectedVVProjPath = U"Score/" + vvprojNames[*listBoxStateVV.selectedItemIndex] + U".vvproj";
+		selectedVvProjPath = U"Score/" + vvProjNames[*vvProjListBoxState.selectedItemIndex] + U".vvproj";
 	}
 
 	if (ButtonAt(startButtonCenter, startButtonSize))
 	{
-		if (selectedVVProjPath)  // 中身があるか確認！
+		if (selectedVvProjPath) // 中身があるか確認
 		{
-			getData().vvprojPath = *selectedVVProjPath;
-			getData().songTitle = FileSystem::BaseName(*selectedVVProjPath);
+			getData().vvprojPath = *selectedVvProjPath;
+			getData().songTitle = FileSystem::BaseName(*selectedVvProjPath);
 			getData().baseURL = urlBox.text;
 			const String version = VOICEVOX::GetEngineVersion(getData().baseURL, 1s);
-			// Print << U"🎤 VOICEVOX Engine Version: " << version;
+
 			// VOICEVOX の接続状態とバージョンを確認
 			if (version == U"(接続エラー)")
 			{
@@ -94,11 +96,11 @@ void Title::update()
 					return;
 				}
 			}
-			else if (version < okVersion)
+			else if (version < supportedVersion)
 			{
 				const String msg = U"VOICEVOXのバージョンが動作保証バージョンよりも古いため、"
 					U"正常に動作しない可能性があります。\n\n"
-					U"動作保証バージョン：" + okVersion + U" 以降\n"
+					U"動作保証バージョン：" + supportedVersion + U" 以降\n"
 					U"現在のバージョン：" + version + U"\n\n"
 					U"このままゲームを開始しますか？";
 
@@ -131,7 +133,6 @@ void Title::update()
 	{
 		changeScene(U"Credit", 0.3s);
 	}
-
 }
 
 void Title::draw() const
@@ -140,7 +141,7 @@ void Title::draw() const
 
 	logo.scaled(0.81).drawAt(Scene::Center().x, Scene::Center().y - 50);
 
-	SimpleGUI::ListBoxAt(listBoxStateVV, Vec2{ Scene::Center().x + 2, Scene::Center().y + 208 }, 440, 238);
+	SimpleGUI::ListBoxAt(vvProjListBoxState, Vec2{ Scene::Center().x + 2, Scene::Center().y + 208 }, 440, 238);
 
 	frame.scaled(1.1).drawAt(Scene::Center().x, Scene::Center().y + 80);
 
@@ -149,12 +150,13 @@ void Title::draw() const
 	howtoplayButton.scaled(howtoplayButtonScale).drawAt(howtoplayButtonCenter);
 	creditButton.scaled(creditButtonScale).drawAt(creditButtonCenter);
 
-	if (selectVVProjFlag) {
+	if (selectVVProjFlag)
+	{
 		m_font(U"←きょくをえらんでね！").drawAt(40, Scene::Center().movedBy(460, 140), kogetyaColor);
 	}
 
-	m_font(connectToVoiceVoxText).draw(20, Vec2{20,50}, kogetyaColor);
-	
+	m_font(voiceVoxStatusText).draw(20, Vec2{ 20, 50 }, kogetyaColor);
+
 	// フォーカス状態の前回値を取得（TextBox 描画の前に！）
 	urlBoxPrevious = urlBox.active;
 
@@ -162,21 +164,22 @@ void Title::draw() const
 	SimpleGUI::TextBoxAt(urlBox, Vec2{ 160, 110 }, 300);
 
 	// ↓ここで状態の変化を検出
-	if (urlBoxPrevious && (urlBox.active == false))
+	if (urlBoxPrevious && not urlBox.active)
 	{
 		getData().baseURL = urlBox.text;
 		const String version = VOICEVOX::GetEngineVersion(getData().baseURL, 1s);
 
 		if (version == U"(接続エラー)")
 		{
-			connectToVoiceVoxText = U"VOICEVOX：接続できていないのだ...";
+			voiceVoxStatusText = U"VOICEVOX：接続できていないのだ...";
 		}
-		else if (version < okVersion)
+		else if (version < supportedVersion)
 		{
-			connectToVoiceVoxText = U"VOICEVOX：バージョンが古いかもなのだ～";
+			voiceVoxStatusText = U"VOICEVOX：バージョンが古いかもなのだ～";
 		}
-		else {
-			connectToVoiceVoxText = U"VOICEVOX：OKなのだ！";
+		else
+		{
+			voiceVoxStatusText = U"VOICEVOX：OKなのだ！";
 		}
 	}
 }

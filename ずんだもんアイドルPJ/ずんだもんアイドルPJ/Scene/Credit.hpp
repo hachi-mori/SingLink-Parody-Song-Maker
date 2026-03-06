@@ -5,11 +5,9 @@
 class Credit : public App::Scene
 {
 public:
-
 	Credit(const InitData& init);
 
 	void update() override;
-
 	void draw() const override;
 
 private:

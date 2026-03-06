@@ -2,12 +2,11 @@
 # include <Siv3D.hpp>
 
 // 中心座標とサイズでボタンを描画して、クリック判定を返す
-
 inline bool ButtonAt(const Vec2& center, const SizeF& size, const ColorF& color = ColorF{ 0.9, 0.8, 0.6 })
 {
-	const Vec2 leftTop = (center - size / 2.0);              // ✅ doubleで計算
-	const RectF rect{ leftTop, size };                      // ✅ RectFを使う
-	const RoundRect roundRect = rect.rounded(6.0);          // ✅ doubleで角丸半径
+	const Vec2 leftTop = (center - size / 2.0);
+	const RectF rect{ leftTop, size };
+	const RoundRect roundRect = rect.rounded(6.0);
 
 	if (rect.mouseOver())
 	{
@@ -28,7 +27,7 @@ struct SolvedTask
 	Array<String> userSyllables;    // 入力の音節リスト
 	double score = 0.0;             // スコア
 	double rhymeMatchPercent = 0.0; // 韻一致率（パーセンテージ）
-	size_t matchesCount = 0;        // 👈 【追加】個別のお題で一致した音韻の数
+	size_t matchesCount = 0;        // 個別のお題で一致した音韻の数
 };
 
 // 共有するデータ
@@ -60,9 +59,9 @@ struct GameData
 
 	Array<SolvedTask> solvedTasks; // 成功した結果を保持
 
-	double finalRhymeMatchPercent = 100.0; // 👈 【追加】楽曲を通しての最終一致率
+	double finalRhymeMatchPercent = 100.0; // 楽曲を通しての最終一致率
 
-	String fullLyrics; // 🎵 【追加】全ての替え歌をまとめた最終歌詞
+	String fullLyrics; // 全ての替え歌をまとめた最終歌詞
 
 	URL baseURL = U"http://localhost:50021";
 };

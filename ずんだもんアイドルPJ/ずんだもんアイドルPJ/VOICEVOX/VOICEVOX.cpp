@@ -82,11 +82,13 @@ namespace VOICEVOX
 							const String& style)
 	{
 		auto itSinger = kKeyAdjustmentTable.find(singer);
-		if (itSinger != kKeyAdjustmentTable.end()) {
+		if (itSinger != kKeyAdjustmentTable.end())
+		{
 			const auto& styleTable = itSinger->second;
 
 			auto itStyle = styleTable.find(style);
-			if (itStyle != styleTable.end()) {
+			if (itStyle != styleTable.end())
+			{
 				return itStyle->second;
 			}
 		}
@@ -133,7 +135,10 @@ namespace VOICEVOX
 								int semitone)
 	{
 		JSON q = JSON::Load(inPath);
-		if (!q) return false;
+		if (not q)
+		{
+			return false;
+		}
 
 		const double ratio = std::pow(2.0, semitone / 12.0);
 
@@ -586,7 +591,11 @@ namespace VOICEVOX
 			size_t cur = 0;
 			for (auto&& [__, tr] : song[U"tracks"])
 			{
-				if (cur == index) { outTrack = tr; return true; }
+				if (cur == index)
+				{
+					outTrack = tr;
+					return true;
+				}
 				++cur;
 			}
 			return false;
@@ -875,7 +884,11 @@ namespace VOICEVOX
 					int64 prevEnd = rows.front().pos + rows.front().dur;
 
 					// 先頭ノートの歌詞
-					if (rows.front().hasLyric) { text += rows.front().lyr; appendedLyric = true; }
+					if (rows.front().hasLyric)
+					{
+						text += rows.front().lyr;
+						appendedLyric = true;
+					}
 
 					for (size_t i = 1; i < rows.size(); ++i)
 					{
@@ -889,7 +902,11 @@ namespace VOICEVOX
 						}
 
 						// 現在ノートの歌詞（空はスキップ）
-						if (cur.hasLyric) { text += cur.lyr; appendedLyric = true; }
+						if (cur.hasLyric)
+						{
+							text += cur.lyr;
+							appendedLyric = true;
+						}
 
 						// 次のための終端更新
 						prevEnd = Max(prevEnd, cur.pos + cur.dur);
@@ -940,14 +957,23 @@ namespace VOICEVOX
 			if (song[U"trackOrder"].isArray() && (talkTrackIndex < song[U"trackOrder"].size()))
 			{
 				const String key = song[U"trackOrder"][talkTrackIndex].getString();
-				if (song[U"tracks"][key].isObject()) { track = song[U"tracks"][key]; found = true; }
+				if (song[U"tracks"][key].isObject())
+				{
+					track = song[U"tracks"][key];
+					found = true;
+				}
 			}
 			if (!found)
 			{
 				size_t cur = 0;
 				for (auto&& [__, tr] : song[U"tracks"])
 				{
-					if (cur == talkTrackIndex) { track = tr; found = true; break; }
+					if (cur == talkTrackIndex)
+					{
+						track = tr;
+						found = true;
+						break;
+					}
 					++cur;
 				}
 			}
@@ -1399,13 +1425,15 @@ namespace VOICEVOX
 
 		// JSON読み込み
 		const JSON src = JSON::Load(vvprojPath);
-		if (!src || !src.contains(U"song") || !src[U"song"].isObject()) {
+		if (!src || !src.contains(U"song") || !src[U"song"].isObject())
+		{
 			Console << U"[ExtractSongLyrics] song セクションが無効";
 			return lyrics;
 		}
 
 		const JSON& song = src[U"song"];
-		if (!song.contains(U"tracks") || !song[U"tracks"].isObject()) {
+		if (!song.contains(U"tracks") || !song[U"tracks"].isObject())
+		{
 			Console << U"[ExtractSongLyrics] song.tracks が無効";
 			return lyrics;
 		}
@@ -1414,34 +1442,46 @@ namespace VOICEVOX
 		JSON track;
 		bool ok = false;
 
-		if (song.contains(U"trackOrder") && song[U"trackOrder"].isArray() && (song[U"trackOrder"].size() > 0)) {
+		if (song.contains(U"trackOrder") && song[U"trackOrder"].isArray() && (song[U"trackOrder"].size() > 0))
+		{
 			const String key = song[U"trackOrder"][0].getOr<String>(U"");
-			if (!key.isEmpty() && song[U"tracks"].contains(key) && song[U"tracks"][key].isObject()) {
+			if (!key.isEmpty() && song[U"tracks"].contains(key) && song[U"tracks"][key].isObject())
+			{
 				track = song[U"tracks"][key];
 				ok = true;
 			}
 		}
-		if (!ok) {
-			for (auto&& [__, tr] : song[U"tracks"]) {
-				if (tr.isObject()) { track = tr; ok = true; }
+		if (not ok)
+		{
+			for (auto&& [__, tr] : song[U"tracks"])
+			{
+				if (tr.isObject())
+				{
+					track = tr;
+					ok = true;
+				}
 				break;
 			}
 		}
-		if (!ok || !track.contains(U"notes") || !track[U"notes"].isArray()) {
+		if (!ok || !track.contains(U"notes") || !track[U"notes"].isArray())
+		{
 			Console << U"[ExtractSongLyrics] 有効な track / notes が見つかりません";
 			return lyrics;
 		}
 
 		// notesをposition昇順で並べ替え
 		Array<JSON> notes;
-		for (auto&& n : track[U"notes"].arrayView()) {
+		for (auto&& n : track[U"notes"].arrayView())
+		{
 			notes << n;
 		}
-		std::sort(notes.begin(), notes.end(), [](const JSON& a, const JSON& b) {
-			const int64 ap = a[U"position"].getOpt<int64>().value_or(0);
-			const int64 bp = b[U"position"].getOpt<int64>().value_or(0);
-			return ap < bp;
-		});
+		std::sort(notes.begin(), notes.end(),
+			[](const JSON& a, const JSON& b)
+			{
+				const int64 ap = a[U"position"].getOpt<int64>().value_or(0);
+				const int64 bp = b[U"position"].getOpt<int64>().value_or(0);
+				return ap < bp;
+			});
 
 		// 発音補正マップ
 		static const HashTable<String, String> kLyricCorrection = {
@@ -1449,11 +1489,11 @@ namespace VOICEVOX
 			{ U"ヴ", U"ブ" }, { U"シェ", U"しぇ" }, { U"ティ", U"てぃ" },
 			{ U"ディ", U"でぃ" }, { U"チェ", U"ちぇ" }, { U"ウィ", U"うぃ" },
 			{ U"クヮ", U"くぁ" }, { U"グヮ", U"ぐぁ" },
-			{ U"ァ", U""}, { U"ィ", U""}, { U"ゥ", U""}, { U"ェ", U""}, { U"ォ", U""},
-			{ U"ア", U"ー"}, { U"イ", U"ー"}, { U"ウ", U"ー"}, { U"エ", U"ー"}, { U"オ", U"ー"}
+			{ U"ァ", U"" }, { U"ィ", U"" }, { U"ゥ", U"" }, { U"ェ", U"" }, { U"ォ", U"" },
+			{ U"ア", U"ー" }, { U"イ", U"ー" }, { U"ウ", U"ー" }, { U"エ", U"ー" }, { U"オ", U"ー" }
 		};
 
-		// 🎵 歌詞＋休符検出
+		// 歌詞＋休符検出
 		int64 prevEnd = -1; // 前ノートの終了位置
 		for (auto&& n : notes)
 		{
@@ -1471,7 +1511,7 @@ namespace VOICEVOX
 			{
 				if (!lyr->isEmpty())
 				{
-					// ✅ find() で対応
+					// find() で対応
 					if (auto it = kLyricCorrection.find(*lyr); it != kLyricCorrection.end())
 					{
 						lyrics << it->second;
@@ -1497,7 +1537,11 @@ namespace VOICEVOX
 
 		while (!task.isReady())
 		{
-			if (timeout <= sw) { task.cancel(); return U"(接続エラー)"; }
+			if (timeout <= sw)
+			{
+				task.cancel();
+				return U"(接続エラー)";
+			}
 			System::Sleep(1ms);
 		}
 		if (!task.getResponse().isOK())

@@ -5,15 +5,12 @@
 class VocalSynthesis : public App::Scene
 {
 public:
-
 	VocalSynthesis(const InitData& init);
 
 	void update() override;
-
 	void draw() const override;
 
 private:
-
 	// キャラクター上限
 	static constexpr size_t kMaxCharacters = 5;
 
@@ -27,7 +24,7 @@ private:
 
 	mutable FilePath m_songWavPath;
 	mutable FilePath m_scorePath;
-	mutable  String m_baseName;
+	mutable String m_baseName;
 
 	// GIF アニメーション画像を開く
 	const AnimatedGIFReader gif{ Resource(U"Texture/assets/loding_background.gif") };
@@ -35,7 +32,7 @@ private:
 	Array<int32> delays;
 	Array<Texture> textures;
 
-	const FilePath fontpath = Resource(U"Texture/Futehodo-MaruGothic.ttf" );
-	Font m_font{ FontMethod::MSDF, 60 , fontpath };
-	Color kogetyaColor = { 134,79,9 };
+	const FilePath fontPath = Resource(U"Texture/Futehodo-MaruGothic.ttf");
+	Font m_font{ FontMethod::MSDF, 60, fontPath };
+	Color kogetyaColor{ 134, 79, 9 };
 };

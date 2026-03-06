@@ -3,12 +3,12 @@
 Story::Story(const InitData& init)
 	: IScene{ init }
 {
-	
 }
 
 void Story::update()
 {
-	if (MouseL.down()) {
+	if (MouseL.down())
+	{
 		changeScene(U"Title", 0.3s);
 	}
 	Cursor::RequestStyle(CursorStyle::Hand);

@@ -14,7 +14,7 @@ Result::Result(const InitData& init)
 	}
 	else
 	{
-		Console << U"⚠️ songAudio が空です。";
+		Console << U"songAudio が空です。";
 	}
 
 	// 各フレームの画像と、次のフレームへのディレイ（ミリ秒）をロードする
@@ -26,7 +26,7 @@ Result::Result(const InitData& init)
 	}
 	else
 	{
-		Console << U"⚠️ gif1 (zunda_singing.gif) の読み込みに失敗しました";
+		Console << U"gif1 (zunda_singing.gif) の読み込みに失敗しました";
 	}
 	// 2️ 晴れ
 	if (gif2.read(images2, delays2))
@@ -36,13 +36,12 @@ Result::Result(const InitData& init)
 	}
 	else
 	{
-		Console << U"⚠️ gif2 (result_sunny.gif) の読み込みに失敗しました";
+		Console << U"gif2 (result_sunny.gif) の読み込みに失敗しました";
 	}
 }
 
 void Result::update()
 {
-
 	if (ButtonAt(titleButtonCenter, titleButtonSize))
 	{
 		getData().instAudio.stop();
@@ -59,11 +58,11 @@ void Result::draw() const
 
 	// スコアに応じたアニメーション表示
 
-		if (!textures2.isEmpty())
-		{
-			size_t frameIndex2 = AnimatedGIFReader::GetFrameIndex(t, delays2);
-			textures2[frameIndex2].drawAt(Scene::Center());
-		}
+	if (!textures2.isEmpty())
+	{
+		size_t frameIndex2 = AnimatedGIFReader::GetFrameIndex(t, delays2);
+		textures2[frameIndex2].drawAt(Scene::Center());
+	}
 
 	// スコアに応じたキャラクター表示ではなく毎回固定表示
 	if (!textures.isEmpty())
@@ -76,9 +75,9 @@ void Result::draw() const
 	// --- スコアなど ---
 	m_font(U"オリジナルおさかなソング")
 		.drawAt(70, Scene::Center().movedBy(450, -250), goldColor);
-	m_font(getData().songTitle+U"の曲で作った").drawAt(50, Scene::Center().movedBy(450, -420), goldColor);
+	m_font(getData().songTitle + U"の曲で作った").drawAt(50, Scene::Center().movedBy(450, -420), goldColor);
 
-	// --- 🎵 歌詞の色付き描画（字間調整つき） ---
+	// --- 歌詞の色付き描画（字間調整つき） ---
 	const ColorF normalColor = kogetyaColor;
 	const ColorF userColor = kogetyaColor;
 	const double fontSize = 50;
@@ -91,7 +90,7 @@ void Result::draw() const
 
 	for (const auto& line : lines)
 	{
-		// 🔍 まずユーザー入力箇所の範囲を全て列挙
+		// まずユーザー入力箇所の範囲を全て列挙
 		Array<std::pair<size_t, size_t>> coloredRanges; // (開始, 終了)
 		for (const auto& task : getData().solvedTasks)
 		{

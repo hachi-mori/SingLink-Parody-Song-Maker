@@ -5,11 +5,9 @@
 class Story : public App::Scene
 {
 public:
-
 	Story(const InitData& init);
 
 	void update() override;
-
 	void draw() const override;
 
 private:

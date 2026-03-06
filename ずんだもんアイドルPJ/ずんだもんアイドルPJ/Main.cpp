@@ -28,15 +28,36 @@ void Main()
 
 	while (System::Update())
 	{
-		// 🔴 デバッグ用：数字キーでシーンを切り替え
-		if (Key1.down() || KeyNum1.down()) { manager.changeScene(U"VocalSynthesis"); }
-		if (Key2.down() || KeyNum2.down()) { manager.changeScene(U"WriteLyrics"); }
-		if (Key3.down() || KeyNum3.down()) { manager.changeScene(U"Title"); }
-		if (Key4.down() || KeyNum4.down()) { manager.changeScene(U"Result"); }
-		if (Key5.down() || KeyNum5.down()) { manager.changeScene(U"Story"); }
-		if (Key6.down() || KeyNum6.down()) { manager.changeScene(U"Howtoplay"); }
-		if (Key7.down() || KeyNum7.down()) { manager.changeScene(U"Credit"); }
-		
+		// デバッグ用：数字キーでシーンを切り替え
+		if (Key1.down() || KeyNum1.down())
+		{
+			manager.changeScene(U"VocalSynthesis");
+		}
+		if (Key2.down() || KeyNum2.down())
+		{
+			manager.changeScene(U"WriteLyrics");
+		}
+		if (Key3.down() || KeyNum3.down())
+		{
+			manager.changeScene(U"Title");
+		}
+		if (Key4.down() || KeyNum4.down())
+		{
+			manager.changeScene(U"Result");
+		}
+		if (Key5.down() || KeyNum5.down())
+		{
+			manager.changeScene(U"Story");
+		}
+		if (Key6.down() || KeyNum6.down())
+		{
+			manager.changeScene(U"Howtoplay");
+		}
+		if (Key7.down() || KeyNum7.down())
+		{
+			manager.changeScene(U"Credit");
+		}
+
 		if (not manager.update())
 		{
 			break;

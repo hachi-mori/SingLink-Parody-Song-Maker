@@ -9,7 +9,7 @@ WriteLyrics::WriteLyrics(const InitData& init)
 	talkLines = VOICEVOX::ExtractTalkUtterances(getData().vvprojPath);
 
 	// ===============================
-	// 🎯 ここで 1〜5問目のお題を決める
+	// ここで 1〜5問目のお題を決める
 	//    - fontSize: フォントサイズ
 	//    - text    : 画面中央に表示するお題テキスト
 	// ===============================
@@ -26,19 +26,6 @@ WriteLyrics::WriteLyrics(const InitData& init)
 	{
 		currentIndex = 0;
 		m_currentTopic = talkLines[currentIndex]; // ← もう表示には使わないが残してOK
-		getData().solvedTasks.clear();
-		getData().finalRhymeMatchPercent = 0.0; // スコア機能は無効化
-	}
-	else
-	{
-		m_currentTopic = U"お題がありません";
-	}
-
-	if (!talkLines.isEmpty())
-	{
-		currentIndex = 0;
-		// 🔽 お題とは無関係に、2〜4 音節のどれかをターゲットにする
-		m_currentTopic = talkLines[currentIndex]; // 🎯 最初のお題を保持
 		getData().solvedTasks.clear();
 		getData().finalRhymeMatchPercent = 0.0; // スコア機能は無効化
 	}
@@ -119,7 +106,7 @@ bool WriteLyrics::isHiraganaOnly(const String& text) const
 	return true;
 }
 
-// 🎵 「ー」を直前の母音（あいうえお）に変換
+// 「ー」を直前の母音（あいうえお）に変換
 String WriteLyrics::replaceChoonWithVowel(const String& text) const
 {
 	String result;
@@ -156,7 +143,7 @@ String WriteLyrics::replaceChoonWithVowel(const String& text) const
 void WriteLyrics::update()
 {
 
-	// ✅ 全体集計 + 遷移（韻スコアは使わない）
+	// 全体集計 + 遷移（韻スコアは使わない）
 	auto finalizeAndExit = [&]()
 		{
 			// ここでは歌詞の再構成だけ行う
@@ -190,7 +177,7 @@ void WriteLyrics::update()
 	// talkLinesが空なら何もしない
 	if (talkLines.isEmpty())
 	{
-		Print << U"⚠️ お題がありません。";
+		Print << U"お題がありません。";
 		return;
 	}
 
@@ -202,7 +189,7 @@ void WriteLyrics::update()
 	{
 		const Array<String> targetSyllables = splitSyllables(talkLines[currentIndex]);
 
-		// 🔽 タイムアップ時も「現在のお題で要求されていた 2〜4 音節分」の「ら」で埋める
+		// タイムアップ時も「現在のお題で要求されていた 2〜4 音節分」の「ら」で埋める
 		String autoAnswer(4, U'ら');
 
 		m_errorMessage.clear();
@@ -227,7 +214,7 @@ void WriteLyrics::update()
 		}
 		else
 		{
-			// ✅ 最後のお題がタイムアップでも集計してから遷移
+			// 最後のお題がタイムアップでも集計してから遷移
 			finalizeAndExit();
 		}
 		return;
@@ -237,7 +224,7 @@ void WriteLyrics::update()
 	{
 		m_textState.enterKey = false;
 
-		// ✅ ひらがな判定
+		// ひらがな判定
 		if (!isHiraganaOnly(m_textState.text))
 		{
 			m_errorMessage = U"⚠️ ひらがなのみで入力してください";
@@ -245,7 +232,7 @@ void WriteLyrics::update()
 			return; // ← 処理を中断（送信しない）
 		}
 
-		// ✅ 先頭が長音ならエラー
+		// 先頭が長音ならエラー
 		if (!m_textState.text.isEmpty() && m_textState.text.front() == U'ー')
 		{
 			m_errorMessage = U"⚠️ 言葉の先頭を「ー」から始めることはできません";
@@ -253,7 +240,7 @@ void WriteLyrics::update()
 			return;
 		}
 
-		// ✅ 促音「っ」が含まれていたらエラー
+		// 促音「っ」が含まれていたらエラー
 		if (m_textState.text.includes(U'っ'))
 		{
 			m_errorMessage = U"⚠️ 「っ」を入力することはできません";
@@ -261,14 +248,14 @@ void WriteLyrics::update()
 			return;
 		}
 
-		// ✅ 「ー」を直前の母音に変換
+		// 「ー」を直前の母音に変換
 		String normalizedText = replaceChoonWithVowel(m_textState.text);
 
 		// 音節分割
 		Array<String> syllables2 = splitSyllables(normalizedText);
 		const size_t s = syllables2.size();
 
-		// 🔽 音節数チェック（2〜4音節のみ許可）
+		// 音節数チェック（2〜4音節のみ許可）
 		if (s < 2 || s > 4)
 		{
 			m_errorMessage = U"⚠️ 2〜4 音節で入力してください\n（いま "
@@ -277,7 +264,7 @@ void WriteLyrics::update()
 			return;
 		}
 
-		// 🔽 ここから「必ず4音節に変換」する処理
+		// ここから「必ず4音節に変換」する処理
 		// 2音節: 最後の音節の母音を1音節として追加し、その後ろに「が」
 		// 3音節: 「が」を追加
 		// 4音節: 何もしない
@@ -308,7 +295,7 @@ void WriteLyrics::update()
 
 			if (currentIndex <= 2)
 			{
-				// 🎲 1〜3問目 & 6問目以降：従来どおり「母音 + が」
+				// 1〜3問目 & 6問目以降：従来どおり「母音 + が」
 				finalText += vowelKana;
 				finalText += U"が";
 
@@ -317,7 +304,7 @@ void WriteLyrics::update()
 			}
 			else // 4〜5問目 (currentIndex == 3 or 4)
 			{
-				// 🎯 4〜5問目：母音をもう1つ追加（「が」は付けない）
+				// 4〜5問目：母音をもう1つ追加（「が」は付けない）
 				finalText += vowelKana;
 				finalText += vowelKana;
 
@@ -329,13 +316,13 @@ void WriteLyrics::update()
 		{
 			if (currentIndex <= 2 || currentIndex >= 5)
 			{
-				// 🎲 1〜3問目 & 6問目以降：従来どおり「が」を追加
+				// 1〜3問目 & 6問目以降：従来どおり「が」を追加
 				finalText += U"が";
 				finalSyllables << U"が";
 			}
 			else // 4〜5問目
 			{
-				// 🎯 4〜5問目：末尾母音を1つ追加（「が」は付けない）
+				// 4〜5問目：末尾母音を1つ追加（「が」は付けない）
 				const char v = getVowel(syllables2.back());
 				const String vowelKana = vowelToKana(v);
 
@@ -349,7 +336,7 @@ void WriteLyrics::update()
 
 		const Array<String> targetSyllables = splitSyllables(talkLines[currentIndex]);
 
-		// ✅ 韻スコアは使わないので、0 を入れておくだけ
+		// 韻スコアは使わないので、0 を入れておくだけ
 		getData().solvedTasks << SolvedTask{
 			.phrase = talkLines[currentIndex],
 			.syllables = targetSyllables,
@@ -360,7 +347,7 @@ void WriteLyrics::update()
 			.matchesCount = 0
 		};
 
-		// 🎉 エラーは解消されたので消す
+		// エラーは解消されたので消す
 		m_errorMessage.clear();
 
 		// 次のお題へ
@@ -369,7 +356,7 @@ void WriteLyrics::update()
 
 		if (currentIndex < talkLines.size())
 		{
-			m_currentTopic = talkLines[currentIndex]; // 🎯 表示中お題を更新
+			m_currentTopic = talkLines[currentIndex]; // 表示中お題を更新
 		}
 		else
 		{
@@ -414,7 +401,7 @@ void WriteLyrics::draw() const
 
 	frame.draw();
 
-	// 🎯 お題を中央に大きく描画
+	// お題を中央に大きく描画
 	if (currentIndex < m_topics.size())
 	{
 		// 1〜5問目: プログラム内で決めたお題を表示
@@ -434,7 +421,7 @@ void WriteLyrics::draw() const
 	}
 
 
-	// 💬 テキストボックスを下中央に配置
+	// テキストボックスを下中央に配置
 	constexpr double textBoxWidth = 200.0;
 	constexpr double yPos = 594.0;
 	const double xPos = (Scene::Width() - textBoxWidth) / 2.0;
@@ -451,7 +438,7 @@ void WriteLyrics::draw() const
 		SimpleGUI::TextBox(m_textState, textBoxPos, textBoxWidth);
 	}
 
-	// 🧮 残りお題カウンターを左上に表示
+	// 残りお題カウンターを左上に表示
 	if (!talkLines.isEmpty())
 	{
 		// 例: "1 / 3" のような形式
@@ -460,13 +447,13 @@ void WriteLyrics::draw() const
 		m_font(progressText).draw(62, Vec2{ 80, 120 }, kogetyaColor);
 	}
 
-	// ⏰ カウントダウン（右上）
+	// カウントダウン（右上）
 	const int32 remaining = Max(0, m_timeLimit - static_cast<int32>(m_timer.s()));
 	const String timeText = U"{}"_fmt(remaining);
 	const Vec2 pos{ Scene::Width() - 155, 145 };
 	m_font(timeText).drawAt(97, pos, (remaining <= 3 ? Palette::Red : kogetyaColor));
 
-	// ❗ 入力エラー表示（あれば）
+	// 入力エラー表示（あれば）
 	if (!m_errorMessage.isEmpty())
 	{
 		// 位置や大きさは好みで微調整してOK
@@ -476,7 +463,7 @@ void WriteLyrics::draw() const
 		// result_font(m_errorMessage).drawAt(22, Scene::Center().movedBy(0, 140), Palette::Red);
 	}
 	/*
-	// 🔁 直前のお題と回答を表示（2問目以降のみ）
+	// 直前のお題と回答を表示（2問目以降のみ）
 	if (currentIndex > 0)
 	{
 		const auto& prevTask = getData().solvedTasks[currentIndex - 1];

@@ -13,11 +13,12 @@ public:
 	void draw() const override;
 
 private:
+	Array<String> vvProjNames;
+	mutable ListBoxState vvProjListBoxState;
+	Optional<FilePath> selectedVvProjPath;
 
-	Array<String> vvprojNames;
-	mutable ListBoxState listBoxStateVV;
-	Optional<FilePath> selectedVVProjPath;
 	void initVVProjList();
+
 	Texture background{ Resource(U"Texture/assets/title_background.png") };
 	Texture logo{ Resource(U"Texture/assets/title_logo.png") };
 	Texture frame{ Resource(U"Texture/assets/title_frame_w_trans.png") };
@@ -45,13 +46,13 @@ private:
 	mutable bool gameStartFlag = false;
 	mutable bool selectVVProjFlag = false;
 
-	const FilePath fontpath = Resource(U"Texture/Futehodo-MaruGothic.ttf");
-	Font m_font{ FontMethod::MSDF, 40 , fontpath };
-	Color kogetyaColor = { 134,79,9 };
+	const FilePath fontPath = Resource(U"Texture/Futehodo-MaruGothic.ttf");
+	Font m_font{ FontMethod::MSDF, 40, fontPath };
+	Color kogetyaColor{ 134, 79, 9 };
 
 	mutable TextEditState urlBox;
-	String okVersion = U"0.25.0";
-	mutable String connectToVoiceVoxText;
+	String supportedVersion = U"0.25.0";
+	mutable String voiceVoxStatusText;
 	void checkVVVersion();
 
 	mutable bool urlBoxPrevious = false;

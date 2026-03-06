@@ -3,12 +3,12 @@
 Howtoplay::Howtoplay(const InitData& init)
 	: IScene{ init }
 {
-	
 }
 
 void Howtoplay::update()
 {
-	if (MouseL.down()) {
+	if (MouseL.down())
+	{
 		changeScene(U"Title", 0.3s);
 	}
 	Cursor::RequestStyle(CursorStyle::Hand);
