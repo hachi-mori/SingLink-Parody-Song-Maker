@@ -1778,7 +1778,8 @@ namespace VOICEVOX
 					}
 				}
 
-				display += particle;
+				// 表示上は助詞側にも同じ表示補正（例: オ -> ー）を適用する
+				display += CorrectTextForDisplay(particle);
 				return display;
 			};
 
