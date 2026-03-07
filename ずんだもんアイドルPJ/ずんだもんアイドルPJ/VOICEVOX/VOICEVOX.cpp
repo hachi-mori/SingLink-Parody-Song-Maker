@@ -82,6 +82,49 @@ namespace VOICEVOX
 			return lyric;
 		}
 
+		String CorrectTextForDisplay(const String& text)
+		{
+			String out;
+			size_t i = 0;
+
+			while (i < text.size())
+			{
+				size_t matchedLen = 0;
+				String matchedValue;
+
+				for (const auto& [from, to] : kLyricDisplayCorrection)
+				{
+					const size_t len = from.size();
+					if (len == 0 || (i + len) > text.size())
+					{
+						continue;
+					}
+					if (text.substr(i, len) != from)
+					{
+						continue;
+					}
+					if (len > matchedLen)
+					{
+						matchedLen = len;
+						matchedValue = to;
+					}
+				}
+
+				if (matchedLen > 0)
+				{
+					out += matchedValue;
+					i += matchedLen;
+				}
+				else
+				{
+					out += text[i];
+					++i;
+				}
+			}
+
+			return out;
+		}
+
 		Array<size_t> FindAllSubstringStarts(const String& text, const String& pattern)
 		{
 			Array<size_t> starts;
@@ -1747,7 +1790,11 @@ namespace VOICEVOX
 				continue;
 			}
 
-			const String& target = task.phrase;
+			const String target = CorrectTextForDisplay(task.phrase);
+			if (target.isEmpty())
+			{
+				continue;
+			}
 			if (!occurrenceStartsByTarget.contains(target))
 			{
 				occurrenceStartsByTarget.emplace(target, FindAllSubstringStarts(originalLyrics, target));
