@@ -4,6 +4,16 @@ namespace
 {
 	Optional<FilePath> ResolveInstPath(const String& baseName)
 	{
+		if (baseName == U"ハッピーバースデー")
+		{
+			const FilePath happyBirthDayResourcePath = Resource(U"Inst/HappyBirthday.wav");
+
+			if (FileSystem::Exists(happyBirthDayResourcePath))
+			{
+				return happyBirthDayResourcePath;
+			}
+		}
+
 		const Array<FilePath> candidates =
 		{
 			Resource(U"Score/" + baseName + U".wav"),
