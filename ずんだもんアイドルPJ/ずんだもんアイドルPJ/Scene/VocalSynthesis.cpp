@@ -34,6 +34,7 @@ VocalSynthesis::VocalSynthesis(const InitData& init)
 	const String singerName = U"ずんだもん";
 	getData().SingingNames << singerName;
 	const int i = 0; // ずんだもん1人のときのインデックス
+	getData().songTrackName = VOICEVOX::GetVVProjTrackName(getData().vvprojPath, i);
 	const int32 spkID = 3003; // ずんだもん（ノーマル）
 	const int32 talkSpkID = spkID - 3000;
 

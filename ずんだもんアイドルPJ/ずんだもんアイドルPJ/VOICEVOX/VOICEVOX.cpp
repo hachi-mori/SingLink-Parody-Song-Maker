@@ -334,6 +334,60 @@ namespace VOICEVOX
 		return song[U"tracks"].size();
 	}
 
+	/// @brief VOICEVOX プロジェクトファイル（.vvproj）の指定トラック名を取得します。
+	/// @param vvprojPath VOICEVOXプロジェクトファイルのパス
+	/// @param trackIndex 取得するトラックのインデックス（0～）
+	/// @return トラック名。取得に失敗した場合は空文字を返します。
+	String GetVVProjTrackName(const FilePath& vvprojPath, size_t trackIndex)
+	{
+		const JSON src = JSON::Load(vvprojPath);
+		const JSON& song = src[U"song"];
+
+		if (!song || !song[U"tracks"].isObject())
+		{
+			return U"";
+		}
+
+		JSON track;
+		bool found = false;
+
+		if (song[U"trackOrder"].isArray()
+			&& (trackIndex < song[U"trackOrder"].size()))
+		{
+			const String key = song[U"trackOrder"][trackIndex].getString();
+			if (song[U"tracks"][key].isObject())
+			{
+				track = song[U"tracks"][key];
+				found = true;
+			}
+		}
+
+		if (!found)
+		{
+			size_t cur = 0;
+			for (auto&& [__, tr] : song[U"tracks"])
+			{
+				if (cur == trackIndex)
+				{
+					if (tr.isObject())
+					{
+						track = tr;
+						found = true;
+					}
+					break;
+				}
+				++cur;
+			}
+		}
+
+		if (!found)
+		{
+			return U"";
+		}
+
+		return track[U"name"].getOr<String>(U"");
+	}
+
 	/// @brief VOICEVOX プロジェクトファイル（.vvproj）から指定トラックを抽出し、song スコア JSON に変換して保存します。
 	/// @param vvprojPath 入力の VOICEVOX プロジェクトファイルのパス
 	/// @param outJsonPath 出力（変換後）の song スコア JSON ファイルのパス

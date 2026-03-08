@@ -52,6 +52,9 @@ namespace VOICEVOX
 	// vvproj のトラック数を取得する（trackOrder があればそのサイズ）
 	size_t GetVVProjTrackCount(const FilePath& vvprojPath);
 
+	// vvproj(song) の指定トラック名を取得する（trackOrder 優先）
+	String GetVVProjTrackName(const FilePath& vvprojPath, size_t trackIndex = 0);
+
 	// vvproj(song) の指定トラックを Score JSON に変換して保存する（frame_length 付き）
 	[[nodiscard]]
 	bool ConvertVVProjToScoreJSON(const FilePath& vvprojPath,

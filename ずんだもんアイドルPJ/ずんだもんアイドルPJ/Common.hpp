@@ -47,6 +47,7 @@ struct GameData
 	// 楽曲タイトルなど
 	FilePath vvprojPath;
 	String songTitle;
+	String songTrackName;
 
 	// 再生に関する情報
 	Array<double> talkStartSecs;

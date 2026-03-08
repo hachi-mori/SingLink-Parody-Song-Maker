@@ -76,6 +76,7 @@ void Title::update()
 		{
 			getData().vvprojPath = *selectedVvProjPath;
 			getData().songTitle = FileSystem::BaseName(*selectedVvProjPath);
+			getData().songTrackName.clear();
 			getData().baseURL = urlBox.text;
 			const String version = VOICEVOX::GetEngineVersion(getData().baseURL, 1s);
 

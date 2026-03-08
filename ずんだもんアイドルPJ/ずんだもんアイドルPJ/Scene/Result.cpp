@@ -73,7 +73,10 @@ void Result::draw() const
 	frame.drawAt(Scene::Center().movedBy(80, 0));
 	titleButton.scaled(titleButtonScale).drawAt(titleButtonCenter);
 	// --- スコアなど ---
-	m_font(U"オリジナルおさかなソング")
+	const String displayTrackName = getData().songTrackName.isEmpty()
+		? (getData().songTitle.isEmpty() ? U"オリジナルおさかなソング" : getData().songTitle)
+		: getData().songTrackName;
+	m_font(displayTrackName)
 		.drawAt(70, Scene::Center().movedBy(450, -250), goldColor);
 	m_font(getData().songTitle + U"の曲で作った").drawAt(50, Scene::Center().movedBy(450, -420), goldColor);
 
