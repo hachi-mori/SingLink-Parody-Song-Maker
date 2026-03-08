@@ -1,5 +1,29 @@
 ﻿# include "VocalSynthesis.hpp"
 
+namespace
+{
+	Optional<FilePath> ResolveInstPath(const String& baseName)
+	{
+		const Array<FilePath> candidates =
+		{
+			Resource(U"Score/" + baseName + U".wav"),
+			Resource(U"Score/" + baseName + U".mp3"),
+			U"Inst/" + baseName + U".wav",
+			U"Inst/" + baseName + U".mp3",
+		};
+
+		for (const auto& path : candidates)
+		{
+			if (FileSystem::Exists(path))
+			{
+				return path;
+			}
+		}
+
+		return none;
+	}
+}
+
 VocalSynthesis::VocalSynthesis(const InitData& init)
 	: IScene{ init }
 {
@@ -85,19 +109,18 @@ void VocalSynthesis::update()
 			Audio songAudio{ m_songWavPath, Loop::Yes };
 			FileSystem::Remove(m_scorePath);
 			Audio inst;
-			const FilePath instWavPath = U"Inst/" + m_baseName + U".wav";
-			const FilePath instMp3Path = U"Inst/" + m_baseName + U".mp3";
-			if (FileSystem::Exists(instWavPath))
+
+			if (const auto instPath = ResolveInstPath(m_baseName))
 			{
-				inst = Audio{ instWavPath, Loop::Yes };
-			}
-			else if (FileSystem::Exists(instMp3Path))
-			{
-				inst = Audio{ instMp3Path, Loop::Yes };
+				inst = Audio{ *instPath, Loop::Yes };
 			}
 			else
 			{
-				Console << U"伴奏ファイルが見つかりません: " << instWavPath << U" / " << instMp3Path;
+				Console << U"伴奏ファイルが見つかりません: "
+					<< Resource(U"Score/" + m_baseName + U".wav") << U" / "
+					<< Resource(U"Score/" + m_baseName + U".mp3") << U" / "
+					<< U"Inst/" + m_baseName + U".wav" << U" / "
+					<< U"Inst/" + m_baseName + U".mp3";
 			}
 
 			//Console << U"「" + m_baseName + U"」の再生準備が完了しました。";
