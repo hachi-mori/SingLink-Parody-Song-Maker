@@ -84,7 +84,21 @@ void VocalSynthesis::update()
 			// 音声と伴奏をロード
 			Audio songAudio{ m_songWavPath, Loop::Yes };
 			FileSystem::Remove(m_scorePath);
-			Audio inst{ U"Inst/" + m_baseName + U".mp3", Loop::Yes };
+			Audio inst;
+			const FilePath instWavPath = U"Inst/" + m_baseName + U".wav";
+			const FilePath instMp3Path = U"Inst/" + m_baseName + U".mp3";
+			if (FileSystem::Exists(instWavPath))
+			{
+				inst = Audio{ instWavPath, Loop::Yes };
+			}
+			else if (FileSystem::Exists(instMp3Path))
+			{
+				inst = Audio{ instMp3Path, Loop::Yes };
+			}
+			else
+			{
+				Console << U"伴奏ファイルが見つかりません: " << instWavPath << U" / " << instMp3Path;
+			}
 
 			//Console << U"「" + m_baseName + U"」の再生準備が完了しました。";
 
