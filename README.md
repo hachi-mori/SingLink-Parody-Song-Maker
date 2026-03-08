@@ -52,3 +52,10 @@
 ### 入力のポイント
 - ひらがなで入力してください
 - 名前は短めにするとテンポよくまとまります
+
+### スクリーンショット
+<img width="1922" height="1112" alt="image" src="https://github.com/user-attachments/assets/9c9a551f-0367-42fe-b321-693c5aaafe2a" />
+<img width="1922" height="1112" alt="image" src="https://github.com/user-attachments/assets/e1889cce-122f-40b7-9202-fe35dce13fbb" />
+<img width="1922" height="1112" alt="image" src="https://github.com/user-attachments/assets/87959018-bcc9-4fe4-b3fd-e4673aa3c541" />
+
+
