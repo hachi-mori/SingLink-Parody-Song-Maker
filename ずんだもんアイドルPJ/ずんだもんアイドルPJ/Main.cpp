@@ -31,7 +31,7 @@ void Main()
 		// デバッグ用：数字キーでシーンを切り替え
 		if (Key1.down() || KeyNum1.down())
 		{
-			manager.changeScene(U"VocalSynthesis");
+			manager.changeScene(U"Title");
 		}
 		if (Key2.down() || KeyNum2.down())
 		{
@@ -39,7 +39,7 @@ void Main()
 		}
 		if (Key3.down() || KeyNum3.down())
 		{
-			manager.changeScene(U"Title");
+			manager.changeScene(U"VocalSynthesis");
 		}
 		if (Key4.down() || KeyNum4.down())
 		{
