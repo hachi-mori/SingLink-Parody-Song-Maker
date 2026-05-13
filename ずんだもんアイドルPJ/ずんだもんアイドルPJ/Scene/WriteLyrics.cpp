@@ -514,7 +514,7 @@ void WriteLyrics::update()
 		constexpr double optionWidth = 260.0;
 		constexpr double optionHeight = 86.0;
 		constexpr double optionGap = 38.0;
-		constexpr double optionY = 828.0;
+		constexpr double optionY = 796.0;
 		const double startX = Scene::Center().x - ((optionWidth * 3.0 + optionGap * 2.0) / 2.0);
 
 		for (size_t i = 0; i < m_quizOptions.size(); ++i)
@@ -727,7 +727,7 @@ void WriteLyrics::draw() const
 		constexpr double optionWidth = 260.0;
 		constexpr double optionHeight = 86.0;
 		constexpr double optionGap = 38.0;
-		constexpr double optionY = 828.0;
+		constexpr double optionY = 796.0;
 		const double startX = Scene::Center().x - ((optionWidth * 3.0 + optionGap * 2.0) / 2.0);
 
 		for (size_t i = 0; i < m_quizOptions.size(); ++i)
