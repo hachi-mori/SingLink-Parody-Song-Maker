@@ -20,6 +20,13 @@ private:
 		String group;
 	};
 
+	struct OnomatopoeiaEntry
+	{
+		String word;
+		String reading;
+		String answer;
+	};
+
 	mutable TextEditState m_textState;
 	String m_message;
 	Vec2 m_debugPos; // デバッグ文字の位置
@@ -41,6 +48,12 @@ private:
 	void prepareQuizChoices();
 	void submitAnswer(const String& displayText, const String& readingText);
 	Array<VerbEntry> findVerbEntries(const String& group, size_t maxSyllables, bool sameGroup) const;
+	void loadOnomatopoeiaDictionary();
+	void prepareOnomatopoeiaProblems();
+	void prepareOnomatopoeiaChoices();
+	void submitOnomatopoeiaAnswer(const String& answerText);
+	Array<String> makePlaceholderSyllables(const String& syllable, size_t count) const;
+	String buildOnomatopoeiaResultLyrics() const;
 
 	const FilePath fontPath = Resource(U"Texture/Futehodo-MaruGothic.ttf");
 	Font m_font{ FontMethod::MSDF, 180, fontPath };
@@ -68,4 +81,8 @@ private:
 	size_t m_correctOptionIndex = 0;
 	bool m_quizMode = false;
 	bool m_isVerbQuizSong = false;
+	bool m_isOnomatopoeiaQuizSong = false;
+	Array<OnomatopoeiaEntry> m_onimatopoeiaEntries;
+	Array<OnomatopoeiaEntry> m_onimatopoeiaProblems;
+	Array<String> m_onimatopoeiaOptions;
 };

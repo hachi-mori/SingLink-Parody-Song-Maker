@@ -458,11 +458,19 @@ namespace VOICEVOX
 		{
 			const int64 pos = note[U"position"].get<int64>();
 			const int64 dur = note[U"duration"].get<int64>();
-			const int   midi = note[U"noteNumber"].get<int>();
-			const String lyr = note[U"lyric"].getString();
 
 			if (const int64 gap = pos - prevEnd; gap > 0)
 				putRest(CalcFrameLen(gap, bpm, tpqn, carry));
+
+			if (note[U"notelen"].getOpt<String>().value_or(U"") == U"R")
+			{
+				putRest(CalcFrameLen(dur, bpm, tpqn, carry));
+				prevEnd = pos + dur;
+				continue;
+			}
+
+			const int   midi = note[U"noteNumber"].get<int>();
+			const String lyr = note[U"lyric"].getString();
 
 			JSON n;
 			n[U"frame_length"] = CalcFrameLen(dur, bpm, tpqn, carry);
@@ -1633,7 +1641,14 @@ namespace VOICEVOX
 				{
 					continue;
 				}
-				if (task.syllables.size() != task.userSyllables.size())
+				if (task.restPadding)
+				{
+					if (task.userSyllables.isEmpty() || task.userSyllables.size() > task.syllables.size())
+					{
+						continue;
+					}
+				}
+				else if (task.syllables.size() != task.userSyllables.size())
 				{
 					continue;
 				}
@@ -1659,10 +1674,41 @@ namespace VOICEVOX
 					continue;
 				}
 
-				if (OverwriteSequenceAt(
-					lyricsSeq,
-					starts[occurrence],
-					task.userSyllables))
+				const size_t start = starts[occurrence];
+				bool replaced = false;
+				if (task.restPadding)
+				{
+					for (size_t k = 0; k < task.syllables.size(); ++k)
+					{
+						const size_t lyricIndex = start + k;
+						if (lyricIndex >= lyricsSeq.size() || lyricIndex >= noteIndexMap.size())
+						{
+							continue;
+						}
+
+						const size_t noteIndex = noteIndexMap[lyricIndex];
+						if (k < task.userSyllables.size())
+						{
+							lyricsSeq[lyricIndex] = task.userSyllables[k];
+						}
+						else
+						{
+							lyricsSeq[lyricIndex].clear();
+							noteList[noteIndex][U"lyric"] = U"";
+							noteList[noteIndex][U"notelen"] = U"R";
+						}
+					}
+					replaced = true;
+				}
+				else
+				{
+					replaced = OverwriteSequenceAt(
+						lyricsSeq,
+						start,
+						task.userSyllables);
+				}
+
+				if (replaced)
 				{
 					consumedOccurrenceCount[key] = occurrence + 1;
 				}

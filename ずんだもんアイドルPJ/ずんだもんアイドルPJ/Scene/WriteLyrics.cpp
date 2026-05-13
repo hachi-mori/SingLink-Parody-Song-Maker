@@ -6,22 +6,40 @@ WriteLyrics::WriteLyrics(const InitData& init)
 {
 	m_textState.active = true;
 	m_isVerbQuizSong = (getData().songTitle == U"動詞グループ");
+	m_isOnomatopoeiaQuizSong = (getData().songTitle == U"オノマトペ");
 	if (m_isVerbQuizSong)
 	{
 		loadVerbDictionary();
 	}
+	if (m_isOnomatopoeiaQuizSong)
+	{
+		loadOnomatopoeiaDictionary();
+		prepareOnomatopoeiaProblems();
+	}
 
-	talkLines = VOICEVOX::ExtractTalkUtterances(getData().vvprojPath);
-	m_problems = VOICEVOX::BuildTalkProblems(talkLines);
-	m_problemCount = m_problems.size();
+	if (!m_isOnomatopoeiaQuizSong)
+	{
+		talkLines = VOICEVOX::ExtractTalkUtterances(getData().vvprojPath);
+		m_problems = VOICEVOX::BuildTalkProblems(talkLines);
+		m_problemCount = m_problems.size();
+	}
 
-	if (!m_problems.isEmpty())
+	if (m_problemCount > 0)
 	{
 		currentIndex = 0;
-		m_currentTopic = m_problems[currentIndex].questionText;
+		m_currentTopic = m_isOnomatopoeiaQuizSong
+			? U"{}のオノマトペは？"_fmt(m_onimatopoeiaProblems[currentIndex].word)
+			: m_problems[currentIndex].questionText;
 		getData().solvedTasks.clear();
 		getData().finalRhymeMatchPercent = 0.0; // スコア機能は無効化
-		prepareQuizChoices();
+		if (m_isOnomatopoeiaQuizSong)
+		{
+			prepareOnomatopoeiaChoices();
+		}
+		else
+		{
+			prepareQuizChoices();
+		}
 	}
 	else
 	{
@@ -220,6 +238,84 @@ void WriteLyrics::loadVerbDictionary()
 	}
 }
 
+void WriteLyrics::loadOnomatopoeiaDictionary()
+{
+	const Array<FilePath> candidates = {
+		Resource(U"Dict/オノマトペ.csv"),
+		U"Dict/オノマトペ.csv",
+		U"App/Dict/オノマトペ.csv",
+		U"ずんだもんアイドルPJ/App/Dict/オノマトペ.csv",
+		U"ずんだもんアイドルPJ/ずんだもんアイドルPJ/App/Dict/オノマトペ.csv"
+	};
+
+	Optional<FilePath> dictPath;
+	for (const auto& path : candidates)
+	{
+		if (FileSystem::Exists(path))
+		{
+			dictPath = path;
+			break;
+		}
+	}
+
+	if (!dictPath)
+	{
+		Console << U"[WriteLyrics] オノマトペ辞書が見つかりません: Dict/オノマトペ.csv";
+		return;
+	}
+
+	TextReader reader{ *dictPath };
+	if (!reader)
+	{
+		Console << U"[WriteLyrics] オノマトペ辞書を開けません: " << *dictPath;
+		return;
+	}
+
+	String line;
+	while (reader.readLine(line))
+	{
+		const Array<String> fields = line.split(U',');
+		if (fields.size() < 3)
+		{
+			continue;
+		}
+
+		const String word = fields[0].trimmed();
+		const String reading = fields[1].trimmed();
+		const String answer = fields[2].trimmed();
+
+		const size_t readingSyllableCount = splitSyllables(replaceChoonWithVowel(reading)).size();
+		const size_t answerSyllableCount = splitSyllables(replaceChoonWithVowel(answer)).size();
+
+		if (!word.isEmpty() && !reading.isEmpty() && !answer.isEmpty()
+			&& readingSyllableCount <= 8
+			&& answerSyllableCount <= 6)
+		{
+			m_onimatopoeiaEntries << OnomatopoeiaEntry{ word, reading, answer };
+		}
+	}
+}
+
+void WriteLyrics::prepareOnomatopoeiaProblems()
+{
+	m_onimatopoeiaProblems.clear();
+	if (m_onimatopoeiaEntries.isEmpty())
+	{
+		return;
+	}
+
+	Array<OnomatopoeiaEntry> entries = m_onimatopoeiaEntries;
+	Shuffle(entries);
+
+	const size_t count = Min<size_t>(3, entries.size());
+	for (size_t i = 0; i < count; ++i)
+	{
+		m_onimatopoeiaProblems << entries[i];
+	}
+
+	m_problemCount = m_onimatopoeiaProblems.size();
+}
+
 Optional<String> WriteLyrics::parseQuestionVerbGroup(const String& questionText) const
 {
 	if (questionText.includes(U"Ⅰ") || questionText.includes(U"1") || questionText.includes(U"一"))
@@ -319,6 +415,128 @@ void WriteLyrics::prepareQuizChoices()
 	}
 
 	m_quizMode = true;
+}
+
+void WriteLyrics::prepareOnomatopoeiaChoices()
+{
+	m_quizMode = false;
+	m_onimatopoeiaOptions.clear();
+	m_correctOptionIndex = 0;
+
+	if (!m_isOnomatopoeiaQuizSong || currentIndex >= m_onimatopoeiaProblems.size())
+	{
+		return;
+	}
+
+	if (m_onimatopoeiaEntries.size() < 3)
+	{
+		m_errorMessage = U"オノマトペ辞書の選択肢が足りません";
+		return;
+	}
+
+	const String correct = m_onimatopoeiaProblems[currentIndex].answer;
+	Array<String> wrongAnswers;
+	for (const auto& entry : m_onimatopoeiaEntries)
+	{
+		if (entry.answer != correct && !wrongAnswers.includes(entry.answer))
+		{
+			wrongAnswers << entry.answer;
+		}
+	}
+
+	if (wrongAnswers.size() < 2)
+	{
+		m_errorMessage = U"オノマトペ辞書の選択肢が足りません";
+		return;
+	}
+
+	Shuffle(wrongAnswers);
+	m_onimatopoeiaOptions << correct;
+	m_onimatopoeiaOptions << wrongAnswers[0];
+	m_onimatopoeiaOptions << wrongAnswers[1];
+	Shuffle(m_onimatopoeiaOptions);
+
+	for (size_t i = 0; i < m_onimatopoeiaOptions.size(); ++i)
+	{
+		if (m_onimatopoeiaOptions[i] == correct)
+		{
+			m_correctOptionIndex = i;
+			break;
+		}
+	}
+
+	m_quizMode = true;
+}
+
+Array<String> WriteLyrics::makePlaceholderSyllables(const String& syllable, size_t count) const
+{
+	Array<String> syllables;
+	for (size_t i = 0; i < count; ++i)
+	{
+		syllables << syllable;
+	}
+	return syllables;
+}
+
+String WriteLyrics::buildOnomatopoeiaResultLyrics() const
+{
+	String lyrics;
+	for (size_t i = 0; i < m_onimatopoeiaProblems.size(); ++i)
+	{
+		if (i > 0)
+		{
+			lyrics += U"\n";
+		}
+		lyrics += U"{}　{}"_fmt(m_onimatopoeiaProblems[i].word, m_onimatopoeiaProblems[i].answer);
+	}
+	return lyrics;
+}
+
+void WriteLyrics::submitOnomatopoeiaAnswer(const String& answerText)
+{
+	if (currentIndex >= m_onimatopoeiaProblems.size())
+	{
+		return;
+	}
+
+	const auto& problem = m_onimatopoeiaProblems[currentIndex];
+	getData().solvedTasks << SolvedTask{
+		.phrase = U"",
+		.syllables = makePlaceholderSyllables(U"ラ", 8),
+		.userInput = problem.word,
+		.userSyllables = splitSyllables(replaceChoonWithVowel(problem.reading)),
+		.restPadding = true,
+		.score = 0.0,
+		.rhymeMatchPercent = 0.0,
+		.matchesCount = 0
+	};
+
+	getData().solvedTasks << SolvedTask{
+		.phrase = U"",
+		.syllables = makePlaceholderSyllables(U"ル", 6),
+		.userInput = answerText,
+		.userSyllables = splitSyllables(replaceChoonWithVowel(answerText)),
+		.restPadding = true,
+		.score = 0.0,
+		.rhymeMatchPercent = 0.0,
+		.matchesCount = 0
+	};
+
+	m_errorMessage.clear();
+	++currentIndex;
+	m_timer.restart();
+
+	if (currentIndex < m_problemCount)
+	{
+		m_currentTopic = U"{}のオノマトペは？"_fmt(m_onimatopoeiaProblems[currentIndex].word);
+		prepareOnomatopoeiaChoices();
+	}
+	else
+	{
+		getData().fullLyrics = buildOnomatopoeiaResultLyrics();
+		getData().finalRhymeMatchPercent = 0.0;
+		changeScene(U"VocalSynthesis", 0.3s);
+	}
 }
 
 void WriteLyrics::submitAnswer(const String& displayText, const String& readingText)
@@ -457,7 +675,7 @@ void WriteLyrics::update()
 		return; // カウントダウン中は何もしない
 	}
 
-	if (m_problems.isEmpty())
+	if (m_problemCount == 0)
 	{
 		Print << U"お題がありません。";
 		return;
@@ -469,15 +687,20 @@ void WriteLyrics::update()
 		return;
 	}
 
-	const auto& problem = m_problems[currentIndex];
-	const size_t maxSyllables = Max<size_t>(2, problem.maxSyllableCount);
-
 	// カウントダウン
 	const int32 remaining = m_timeLimit - static_cast<int32>(m_timer.s());
 
 	// ── タイムアップ分岐 ──
 	if (remaining <= 0)
 	{
+		if (m_isOnomatopoeiaQuizSong)
+		{
+			submitOnomatopoeiaAnswer(m_onimatopoeiaProblems[currentIndex].answer);
+			return;
+		}
+
+		const auto& problem = m_problems[currentIndex];
+		const size_t maxSyllables = Max<size_t>(2, problem.maxSyllableCount);
 		String autoAnswer(maxSyllables, U'ら');
 
 		m_errorMessage.clear();
@@ -516,8 +739,9 @@ void WriteLyrics::update()
 		constexpr double optionGap = 38.0;
 		constexpr double optionY = 772.0;
 		const double startX = Scene::Center().x - ((optionWidth * 3.0 + optionGap * 2.0) / 2.0);
+		const size_t optionCount = m_isOnomatopoeiaQuizSong ? m_onimatopoeiaOptions.size() : m_quizOptions.size();
 
-		for (size_t i = 0; i < m_quizOptions.size(); ++i)
+		for (size_t i = 0; i < optionCount; ++i)
 		{
 			const RectF buttonRect{ Vec2{ startX + i * (optionWidth + optionGap), optionY }, SizeF{ optionWidth, optionHeight } };
 			const bool selected = buttonRect.leftClicked()
@@ -532,15 +756,27 @@ void WriteLyrics::update()
 
 			if (i != m_correctOptionIndex)
 			{
-				m_errorMessage = U"ざんねん！\n問題のグループに合う動詞を選んでね";
+				m_errorMessage = m_isOnomatopoeiaQuizSong
+					? U"ざんねん！\nぴったりのオノマトペを選んでね"
+					: U"ざんねん！\n問題のグループに合う動詞を選んでね";
 				return;
 			}
 
-			submitAnswer(m_quizOptions[i].word, m_quizOptions[i].reading);
+			if (m_isOnomatopoeiaQuizSong)
+			{
+				submitOnomatopoeiaAnswer(m_onimatopoeiaOptions[i]);
+			}
+			else
+			{
+				submitAnswer(m_quizOptions[i].word, m_quizOptions[i].reading);
+			}
 			return;
 		}
 		return;
 	}
+
+	const auto& problem = m_problems[currentIndex];
+	const size_t maxSyllables = Max<size_t>(2, problem.maxSyllableCount);
 
 	if (m_textState.enterKey)
 	{
@@ -729,8 +965,9 @@ void WriteLyrics::draw() const
 		constexpr double optionGap = 38.0;
 		constexpr double optionY = 772.0;
 		const double startX = Scene::Center().x - ((optionWidth * 3.0 + optionGap * 2.0) / 2.0);
+		const size_t optionCount = m_isOnomatopoeiaQuizSong ? m_onimatopoeiaOptions.size() : m_quizOptions.size();
 
-		for (size_t i = 0; i < m_quizOptions.size(); ++i)
+		for (size_t i = 0; i < optionCount; ++i)
 		{
 			const RectF buttonRect{ Vec2{ startX + i * (optionWidth + optionGap), optionY }, SizeF{ optionWidth, optionHeight } };
 			const ColorF fillColor = buttonRect.mouseOver() ? ColorF{ 1.0, 0.9, 0.58 } : ColorF{ 0.98, 0.82, 0.46 };
@@ -743,10 +980,19 @@ void WriteLyrics::draw() const
 			buttonRect.rounded(12).draw(fillColor);
 			buttonRect.rounded(12).drawFrame(4, 0, kogetyaColor);
 
-			const String optionText = U"{}  {}"_fmt(i + 1, m_quizOptions[i].word);
+			const String optionText = m_isOnomatopoeiaQuizSong
+				? U"{}  {}"_fmt(i + 1, m_onimatopoeiaOptions[i])
+				: U"{}  {}"_fmt(i + 1, m_quizOptions[i].word);
 			const int32 optionFontSize = (optionText.size() <= 5) ? 40 : 34;
-			m_font(m_quizOptions[i].reading).drawAt(24, buttonRect.center().movedBy(0, -30), kogetyaColor);
-			m_font(optionText).drawAt(optionFontSize, buttonRect.center().movedBy(0, 18), kogetyaColor);
+			if (m_isOnomatopoeiaQuizSong)
+			{
+				m_font(optionText).drawAt(optionFontSize, buttonRect.center(), kogetyaColor);
+			}
+			else
+			{
+				m_font(m_quizOptions[i].reading).drawAt(24, buttonRect.center().movedBy(0, -30), kogetyaColor);
+				m_font(optionText).drawAt(optionFontSize, buttonRect.center().movedBy(0, 18), kogetyaColor);
+			}
 		}
 	}
 	else
