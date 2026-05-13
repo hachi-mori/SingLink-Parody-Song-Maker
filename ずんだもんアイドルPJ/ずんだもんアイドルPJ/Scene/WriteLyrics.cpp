@@ -240,6 +240,7 @@ Optional<String> WriteLyrics::parseQuestionVerbGroup(const String& questionText)
 Array<WriteLyrics::VerbEntry> WriteLyrics::findVerbEntries(const String& group, size_t maxSyllables, bool sameGroup) const
 {
 	Array<VerbEntry> entries;
+	const size_t moraLimit = Min<size_t>(maxSyllables, 4);
 
 	for (const auto& entry : m_verbEntries)
 	{
@@ -249,7 +250,7 @@ Array<WriteLyrics::VerbEntry> WriteLyrics::findVerbEntries(const String& group, 
 		}
 
 		const size_t syllableCount = splitSyllables(replaceChoonWithVowel(entry.reading)).size();
-		if (2 <= syllableCount && syllableCount <= maxSyllables)
+		if (2 <= syllableCount && syllableCount <= moraLimit)
 		{
 			entries << entry;
 		}
@@ -510,9 +511,15 @@ void WriteLyrics::update()
 
 	if (m_quizMode)
 	{
+		constexpr double optionWidth = 260.0;
+		constexpr double optionHeight = 86.0;
+		constexpr double optionGap = 38.0;
+		constexpr double optionY = 828.0;
+		const double startX = Scene::Center().x - ((optionWidth * 3.0 + optionGap * 2.0) / 2.0);
+
 		for (size_t i = 0; i < m_quizOptions.size(); ++i)
 		{
-			const RectF buttonRect{ Vec2{ Scene::Center().x - 280.0, 478.0 + i * 115.0 }, SizeF{ 560, 84 } };
+			const RectF buttonRect{ Vec2{ startX + i * (optionWidth + optionGap), optionY }, SizeF{ optionWidth, optionHeight } };
 			const bool selected = buttonRect.leftClicked()
 				|| (i == 0 && Key1.down())
 				|| (i == 1 && Key2.down())
@@ -717,9 +724,15 @@ void WriteLyrics::draw() const
 
 	if (m_quizMode)
 	{
+		constexpr double optionWidth = 260.0;
+		constexpr double optionHeight = 86.0;
+		constexpr double optionGap = 38.0;
+		constexpr double optionY = 828.0;
+		const double startX = Scene::Center().x - ((optionWidth * 3.0 + optionGap * 2.0) / 2.0);
+
 		for (size_t i = 0; i < m_quizOptions.size(); ++i)
 		{
-			const RectF buttonRect{ Vec2{ Scene::Center().x - 280.0, 478.0 + i * 115.0 }, SizeF{ 560, 84 } };
+			const RectF buttonRect{ Vec2{ startX + i * (optionWidth + optionGap), optionY }, SizeF{ optionWidth, optionHeight } };
 			const ColorF fillColor = buttonRect.mouseOver() ? ColorF{ 1.0, 0.9, 0.58 } : ColorF{ 0.98, 0.82, 0.46 };
 
 			if (buttonRect.mouseOver())
@@ -731,7 +744,8 @@ void WriteLyrics::draw() const
 			buttonRect.rounded(12).drawFrame(4, 0, kogetyaColor);
 
 			const String optionText = U"{}  {}"_fmt(i + 1, m_quizOptions[i].word);
-			m_font(optionText).drawAt(48, buttonRect.center(), kogetyaColor);
+			const int32 optionFontSize = (optionText.size() <= 5) ? 40 : 34;
+			m_font(optionText).drawAt(optionFontSize, buttonRect.center(), kogetyaColor);
 		}
 	}
 	else
