@@ -83,6 +83,26 @@ Array<String> WriteLyrics::splitSyllables(const String& text) const
 	return result;
 }
 
+Array<String> WriteLyrics::splitOnomatopoeiaMoras(const String& text) const
+{
+	const String smallKanaList = U"ゃゅょぁぃぅぇぉャュョァィゥェォ";
+	Array<String> result;
+
+	for (size_t i = 0; i < text.length(); ++i)
+	{
+		String s;
+		s += text[i];
+
+		if ((i + 1 < text.length()) && smallKanaList.includes(text[i + 1]))
+		{
+			s += text[i + 1];
+			++i;
+		}
+		result << s;
+	}
+	return result;
+}
+
 // WriteLyrics::getVowel (母音取得ヘルパー関数)
 char WriteLyrics::getVowel(const String& syllable) const
 {
@@ -284,8 +304,8 @@ void WriteLyrics::loadOnomatopoeiaDictionary()
 		const String reading = fields[1].trimmed();
 		const String answer = fields[2].trimmed();
 
-		const size_t readingSyllableCount = splitSyllables(replaceChoonWithVowel(reading)).size();
-		const size_t answerSyllableCount = splitSyllables(replaceChoonWithVowel(answer)).size();
+		const size_t readingSyllableCount = splitOnomatopoeiaMoras(replaceChoonWithVowel(reading)).size();
+		const size_t answerSyllableCount = splitOnomatopoeiaMoras(replaceChoonWithVowel(answer)).size();
 
 		if (!word.isEmpty() && !reading.isEmpty() && !answer.isEmpty()
 			&& readingSyllableCount <= 8
@@ -504,7 +524,7 @@ void WriteLyrics::submitOnomatopoeiaAnswer(const String& answerText)
 		.phrase = U"",
 		.syllables = makePlaceholderSyllables(U"ラ", 8),
 		.userInput = problem.word,
-		.userSyllables = splitSyllables(replaceChoonWithVowel(problem.reading)),
+		.userSyllables = splitOnomatopoeiaMoras(replaceChoonWithVowel(problem.reading)),
 		.restPadding = true,
 		.score = 0.0,
 		.rhymeMatchPercent = 0.0,
@@ -515,7 +535,7 @@ void WriteLyrics::submitOnomatopoeiaAnswer(const String& answerText)
 		.phrase = U"",
 		.syllables = makePlaceholderSyllables(U"ル", 6),
 		.userInput = answerText,
-		.userSyllables = splitSyllables(replaceChoonWithVowel(answerText)),
+		.userSyllables = splitOnomatopoeiaMoras(replaceChoonWithVowel(answerText)),
 		.restPadding = true,
 		.score = 0.0,
 		.rhymeMatchPercent = 0.0,

@@ -33,6 +33,7 @@ private:
 	Texture frame{ Resource(U"Texture/assets/game_frame.png") };
 	Texture background{ Resource(U"Texture/assets/result_background.png") };
 	Array<String> splitSyllables(const String& text) const;
+	Array<String> splitOnomatopoeiaMoras(const String& text) const;
 	Array<String> talkLines;
 	Array<VOICEVOX::TalkProblem> m_problems;
 	size_t m_problemCount = 0;
