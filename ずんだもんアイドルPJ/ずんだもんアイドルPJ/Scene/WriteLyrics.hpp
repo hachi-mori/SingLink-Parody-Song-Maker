@@ -13,6 +13,13 @@ public:
 	void draw() const override;
 
 private:
+	struct VerbEntry
+	{
+		String word;
+		String reading;
+		String group;
+	};
+
 	mutable TextEditState m_textState;
 	String m_message;
 	Vec2 m_debugPos; // デバッグ文字の位置
@@ -29,6 +36,11 @@ private:
 	String replaceChoonWithVowel(const String& text) const; // 長音記号置換関数
 	int32 decideQuestionFontSize(const String& questionText) const;
 	String makeQuestionDisplayText(size_t index, const String& questionText) const;
+	void loadVerbDictionary();
+	Optional<String> parseQuestionVerbGroup(const String& questionText) const;
+	void prepareQuizChoices();
+	void submitAnswer(const String& displayText, const String& readingText);
+	Array<VerbEntry> findVerbEntries(const String& group, size_t maxSyllables, bool sameGroup) const;
 
 	const FilePath fontPath = Resource(U"Texture/Futehodo-MaruGothic.ttf");
 	Font m_font{ FontMethod::MSDF, 180, fontPath };
@@ -51,4 +63,8 @@ private:
 	double m_countdownDuration = 5.0; // カウントダウン時間（秒）
 
 	String m_errorMessage; // 入力エラー表示用メッセージ
+	Array<VerbEntry> m_verbEntries;
+	Array<VerbEntry> m_quizOptions;
+	size_t m_correctOptionIndex = 0;
+	bool m_quizMode = false;
 };

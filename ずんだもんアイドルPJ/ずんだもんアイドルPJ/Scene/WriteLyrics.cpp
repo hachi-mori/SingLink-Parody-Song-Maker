@@ -5,6 +5,7 @@ WriteLyrics::WriteLyrics(const InitData& init)
 	: IScene{ init }, m_textState{}
 {
 	m_textState.active = true;
+	loadVerbDictionary();
 
 	talkLines = VOICEVOX::ExtractTalkUtterances(getData().vvprojPath);
 	m_problems = VOICEVOX::BuildTalkProblems(talkLines);
@@ -16,6 +17,7 @@ WriteLyrics::WriteLyrics(const InitData& init)
 		m_currentTopic = m_problems[currentIndex].questionText;
 		getData().solvedTasks.clear();
 		getData().finalRhymeMatchPercent = 0.0; // スコア機能は無効化
+		prepareQuizChoices();
 	}
 	else
 	{
@@ -77,6 +79,11 @@ char WriteLyrics::getVowel(const String& syllable) const
 	if (lastChar == U"う" || lastChar == U"く" || lastChar == U"す" || lastChar == U"つ" || lastChar == U"ぬ" || lastChar == U"ふ" || lastChar == U"む" || lastChar == U"ゆ" || lastChar == U"る" || lastChar == U"ぐ" || lastChar == U"ず" || lastChar == U"づ" || lastChar == U"ぶ" || lastChar == U"ぷ" || lastChar == U"ぅ" || lastChar == U"ゅ") return 'u';
 	if (lastChar == U"え" || lastChar == U"け" || lastChar == U"せ" || lastChar == U"て" || lastChar == U"ね" || lastChar == U"へ" || lastChar == U"め" || lastChar == U"れ" || lastChar == U"ゑ" || lastChar == U"げ" || lastChar == U"ぜ" || lastChar == U"で" || lastChar == U"べ" || lastChar == U"ぺ" || lastChar == U"ぇ") return 'e';
 	if (lastChar == U"お" || lastChar == U"こ" || lastChar == U"そ" || lastChar == U"と" || lastChar == U"の" || lastChar == U"ほ" || lastChar == U"も" || lastChar == U"よ" || lastChar == U"ろ" || lastChar == U"を" || lastChar == U"ご" || lastChar == U"ぞ" || lastChar == U"ど" || lastChar == U"ぼ" || lastChar == U"ぽ" || lastChar == U"ぉ" || lastChar == U"ょ") return 'o';
+	if (lastChar == U"ア" || lastChar == U"カ" || lastChar == U"サ" || lastChar == U"タ" || lastChar == U"ナ" || lastChar == U"ハ" || lastChar == U"マ" || lastChar == U"ヤ" || lastChar == U"ラ" || lastChar == U"ワ" || lastChar == U"ガ" || lastChar == U"ザ" || lastChar == U"ダ" || lastChar == U"バ" || lastChar == U"パ" || lastChar == U"ァ" || lastChar == U"ャ") return 'a';
+	if (lastChar == U"イ" || lastChar == U"キ" || lastChar == U"シ" || lastChar == U"チ" || lastChar == U"ニ" || lastChar == U"ヒ" || lastChar == U"ミ" || lastChar == U"リ" || lastChar == U"ヰ" || lastChar == U"ギ" || lastChar == U"ジ" || lastChar == U"ヂ" || lastChar == U"ビ" || lastChar == U"ピ" || lastChar == U"ィ") return 'i';
+	if (lastChar == U"ウ" || lastChar == U"ク" || lastChar == U"ス" || lastChar == U"ツ" || lastChar == U"ヌ" || lastChar == U"フ" || lastChar == U"ム" || lastChar == U"ユ" || lastChar == U"ル" || lastChar == U"グ" || lastChar == U"ズ" || lastChar == U"ヅ" || lastChar == U"ブ" || lastChar == U"プ" || lastChar == U"ゥ" || lastChar == U"ュ") return 'u';
+	if (lastChar == U"エ" || lastChar == U"ケ" || lastChar == U"セ" || lastChar == U"テ" || lastChar == U"ネ" || lastChar == U"ヘ" || lastChar == U"メ" || lastChar == U"レ" || lastChar == U"ヱ" || lastChar == U"ゲ" || lastChar == U"ゼ" || lastChar == U"デ" || lastChar == U"ベ" || lastChar == U"ペ" || lastChar == U"ェ") return 'e';
+	if (lastChar == U"オ" || lastChar == U"コ" || lastChar == U"ソ" || lastChar == U"ト" || lastChar == U"ノ" || lastChar == U"ホ" || lastChar == U"モ" || lastChar == U"ヨ" || lastChar == U"ロ" || lastChar == U"ヲ" || lastChar == U"ゴ" || lastChar == U"ゾ" || lastChar == U"ド" || lastChar == U"ボ" || lastChar == U"ポ" || lastChar == U"ォ" || lastChar == U"ョ") return 'o';
 
 	// ひらがな・カタカナ以外の文字（漢字や句読点など）が入ってきた場合のデフォルト
 	return 'X'; // 不明な母音として扱う
@@ -156,6 +163,230 @@ String WriteLyrics::makeQuestionDisplayText(size_t index, const String& question
 	return U"{} {}"_fmt(index + 1, questionText);
 }
 
+void WriteLyrics::loadVerbDictionary()
+{
+	TextReader reader{ Resource(U"Dict/Verb.csv") };
+	if (!reader)
+	{
+		Console << U"[WriteLyrics] 動詞辞書が見つかりません: Dict/Verb.csv";
+		return;
+	}
+
+	String line;
+	while (reader.readLine(line))
+	{
+		const Array<String> fields = line.split(U',');
+		if (fields.size() < 5)
+		{
+			continue;
+		}
+
+		const String word = fields[1].trimmed();
+		const String reading = fields[2].trimmed();
+		const String group = fields[4].trimmed();
+
+		if (!word.isEmpty() && !reading.isEmpty() && group.includes(U"動詞"))
+		{
+			m_verbEntries << VerbEntry{ word, reading, group };
+		}
+	}
+}
+
+Optional<String> WriteLyrics::parseQuestionVerbGroup(const String& questionText) const
+{
+	if (questionText.includes(U"Ⅰ") || questionText.includes(U"1") || questionText.includes(U"一"))
+	{
+		return U"動詞1類";
+	}
+	if (questionText.includes(U"Ⅱ") || questionText.includes(U"2") || questionText.includes(U"二"))
+	{
+		return U"動詞2類";
+	}
+	if (questionText.includes(U"Ⅲ") || questionText.includes(U"3") || questionText.includes(U"三"))
+	{
+		return U"動詞3類";
+	}
+	return none;
+}
+
+Array<WriteLyrics::VerbEntry> WriteLyrics::findVerbEntries(const String& group, size_t maxSyllables, bool sameGroup) const
+{
+	Array<VerbEntry> entries;
+
+	for (const auto& entry : m_verbEntries)
+	{
+		if ((entry.group == group) != sameGroup)
+		{
+			continue;
+		}
+
+		const size_t syllableCount = splitSyllables(replaceChoonWithVowel(entry.reading)).size();
+		if (2 <= syllableCount && syllableCount <= maxSyllables)
+		{
+			entries << entry;
+		}
+	}
+
+	return entries;
+}
+
+void WriteLyrics::prepareQuizChoices()
+{
+	m_quizMode = false;
+	m_quizOptions.clear();
+	m_correctOptionIndex = 0;
+
+	if (currentIndex >= m_problemCount)
+	{
+		return;
+	}
+
+	const auto& problem = m_problems[currentIndex];
+	const Optional<String> targetGroup = parseQuestionVerbGroup(problem.questionText);
+	if (!targetGroup)
+	{
+		return;
+	}
+
+	const size_t maxSyllables = Max<size_t>(2, problem.maxSyllableCount);
+	Array<VerbEntry> correctEntries = findVerbEntries(*targetGroup, maxSyllables, true);
+	Array<VerbEntry> wrongEntries = findVerbEntries(*targetGroup, maxSyllables, false);
+
+	if (correctEntries.isEmpty() || wrongEntries.size() < 2)
+	{
+		m_errorMessage = U"動詞辞書の選択肢が足りません";
+		return;
+	}
+
+	Shuffle(correctEntries);
+	Shuffle(wrongEntries);
+
+	const VerbEntry correct = correctEntries.front();
+	m_quizOptions << correct;
+	m_quizOptions << wrongEntries[0];
+	m_quizOptions << wrongEntries[1];
+	Shuffle(m_quizOptions);
+
+	for (size_t i = 0; i < m_quizOptions.size(); ++i)
+	{
+		if (m_quizOptions[i].word == correct.word
+			&& m_quizOptions[i].reading == correct.reading
+			&& m_quizOptions[i].group == correct.group)
+		{
+			m_correctOptionIndex = i;
+			break;
+		}
+	}
+
+	m_quizMode = true;
+}
+
+void WriteLyrics::submitAnswer(const String& displayText, const String& readingText)
+{
+	if (currentIndex >= m_problemCount)
+	{
+		return;
+	}
+
+	const auto& problem = m_problems[currentIndex];
+	const size_t maxSyllables = Max<size_t>(2, problem.maxSyllableCount);
+	const String normalizedText = replaceChoonWithVowel(readingText);
+
+	Array<String> finalSyllables = splitSyllables(normalizedText);
+	String finalText = normalizedText;
+	const size_t s = finalSyllables.size();
+
+	if (s < 2 || s > maxSyllables)
+	{
+		m_errorMessage = U"選択した言葉の音節数が合いません";
+		return;
+	}
+
+	auto vowelToKana = [](char v)->String
+		{
+			switch (v)
+			{
+			case 'a': return U"あ";
+			case 'i': return U"い";
+			case 'u': return U"う";
+			case 'e': return U"え";
+			case 'o': return U"お";
+			case 'N': return U"ん";
+			case 'Q': return U"っ";
+			default:  return U"あ";
+			}
+		};
+
+	if (s < maxSyllables)
+	{
+		const size_t remainingSlots = (maxSyllables - s);
+		const Array<String> particleSyllables = splitSyllables(problem.particleText);
+		const bool canAppendParticle =
+			(!problem.particleText.isEmpty())
+			&& (!particleSyllables.isEmpty())
+			&& (particleSyllables.size() <= remainingSlots);
+
+		const char v = getVowel(finalSyllables.back());
+		const String vowelKana = vowelToKana(v);
+
+		auto appendVowelFills = [&](size_t fillCount)
+			{
+				for (size_t i = 0; i < fillCount; ++i)
+				{
+					finalText += vowelKana;
+					finalSyllables << vowelKana;
+				}
+			};
+
+		if (canAppendParticle)
+		{
+			const size_t needVowelFill = remainingSlots - particleSyllables.size();
+			appendVowelFills(needVowelFill);
+			finalText += problem.particleText;
+			for (const auto& syl : particleSyllables)
+			{
+				finalSyllables << syl;
+			}
+		}
+		else
+		{
+			appendVowelFills(remainingSlots);
+		}
+	}
+
+	getData().solvedTasks << SolvedTask{
+		.phrase = problem.baseTargetText,
+		.syllables = problem.targetSyllables,
+		.userInput = displayText,
+		.userSyllables = finalSyllables,
+		.score = 0.0,
+		.rhymeMatchPercent = 0.0,
+		.matchesCount = 0
+	};
+
+	m_errorMessage.clear();
+	++currentIndex;
+	m_timer.restart();
+
+	if (currentIndex < m_problemCount)
+	{
+		m_currentTopic = m_problems[currentIndex].questionText;
+		prepareQuizChoices();
+	}
+	else
+	{
+		getData().fullLyrics = VOICEVOX::BuildResultDisplayLyrics(
+			getData().vvprojPath,
+			getData().solvedTasks
+		);
+		getData().finalRhymeMatchPercent = 0.0;
+		changeScene(U"VocalSynthesis", 0.3s);
+	}
+
+	m_textState.text.clear();
+	m_textState.active = true;
+}
+
 void WriteLyrics::update()
 {
 	// 全体集計 + 遷移（韻スコアは使わない）
@@ -227,12 +458,40 @@ void WriteLyrics::update()
 		{
 			m_currentTopic = m_problems[currentIndex].questionText;
 			m_textState.text.clear();
+			prepareQuizChoices();
 			m_timer.restart();
 		}
 		else
 		{
 			// 最後のお題がタイムアップでも集計してから遷移
 			finalizeAndExit();
+		}
+		return;
+	}
+
+	if (m_quizMode)
+	{
+		for (size_t i = 0; i < m_quizOptions.size(); ++i)
+		{
+			const RectF buttonRect{ Vec2{ Scene::Center().x - 280.0, 478.0 + i * 115.0 }, SizeF{ 560, 84 } };
+			const bool selected = buttonRect.leftClicked()
+				|| (i == 0 && Key1.down())
+				|| (i == 1 && Key2.down())
+				|| (i == 2 && Key3.down());
+
+			if (!selected)
+			{
+				continue;
+			}
+
+			if (i != m_correctOptionIndex)
+			{
+				m_errorMessage = U"ざんねん！問題のグループに合う動詞を選んでね";
+				return;
+			}
+
+			submitAnswer(m_quizOptions[i].word, m_quizOptions[i].reading);
+			return;
 		}
 		return;
 	}
@@ -359,6 +618,7 @@ void WriteLyrics::update()
 		if (currentIndex < m_problemCount)
 		{
 			m_currentTopic = m_problems[currentIndex].questionText; // 表示中お題を更新
+			prepareQuizChoices();
 		}
 		else
 		{
@@ -416,21 +676,43 @@ void WriteLyrics::draw() const
 				kogetyaColor);
 	}
 
-	// テキストボックスを下中央に配置
-	constexpr double textBoxWidth = 200.0;
-	constexpr double yPos = 594.0;
-	const double xPos = (Scene::Width() - textBoxWidth) / 2.0;
-	const Vec2 textBoxPos{ xPos, yPos };
-
-	// --- スケーリング係数 ---
-	const double scale = 4.0;
-
-	// --- マウス入力と描画に同じスケールを適用 ---
+	if (m_quizMode)
 	{
-		const Transformer2D transformer(Mat3x2::Scale(scale, Scene::Center()), TransformCursor::Yes);
+		for (size_t i = 0; i < m_quizOptions.size(); ++i)
+		{
+			const RectF buttonRect{ Vec2{ Scene::Center().x - 280.0, 478.0 + i * 115.0 }, SizeF{ 560, 84 } };
+			const ColorF fillColor = buttonRect.mouseOver() ? ColorF{ 1.0, 0.9, 0.58 } : ColorF{ 0.98, 0.82, 0.46 };
 
-		// スケールが適用された範囲で描画＆マウス操作
-		SimpleGUI::TextBox(m_textState, textBoxPos, textBoxWidth);
+			if (buttonRect.mouseOver())
+			{
+				Cursor::RequestStyle(CursorStyle::Hand);
+			}
+
+			buttonRect.rounded(12).draw(fillColor);
+			buttonRect.rounded(12).drawFrame(4, 0, kogetyaColor);
+
+			const String optionText = U"{}  {}"_fmt(i + 1, m_quizOptions[i].word);
+			m_font(optionText).drawAt(48, buttonRect.center(), kogetyaColor);
+		}
+	}
+	else
+	{
+		// テキストボックスを下中央に配置
+		constexpr double textBoxWidth = 200.0;
+		constexpr double yPos = 594.0;
+		const double xPos = (Scene::Width() - textBoxWidth) / 2.0;
+		const Vec2 textBoxPos{ xPos, yPos };
+
+		// --- スケーリング係数 ---
+		const double scale = 4.0;
+
+		// --- マウス入力と描画に同じスケールを適用 ---
+		{
+			const Transformer2D transformer(Mat3x2::Scale(scale, Scene::Center()), TransformCursor::Yes);
+
+			// スケールが適用された範囲で描画＆マウス操作
+			SimpleGUI::TextBox(m_textState, textBoxPos, textBoxWidth);
+		}
 	}
 
 	// 残りお題カウンターを左上に表示
