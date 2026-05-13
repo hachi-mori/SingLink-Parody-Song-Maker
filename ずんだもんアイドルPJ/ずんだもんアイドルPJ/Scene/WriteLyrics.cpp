@@ -512,9 +512,9 @@ void WriteLyrics::update()
 	if (m_quizMode)
 	{
 		constexpr double optionWidth = 260.0;
-		constexpr double optionHeight = 86.0;
+		constexpr double optionHeight = 116.0;
 		constexpr double optionGap = 38.0;
-		constexpr double optionY = 796.0;
+		constexpr double optionY = 772.0;
 		const double startX = Scene::Center().x - ((optionWidth * 3.0 + optionGap * 2.0) / 2.0);
 
 		for (size_t i = 0; i < m_quizOptions.size(); ++i)
@@ -725,9 +725,9 @@ void WriteLyrics::draw() const
 	if (m_quizMode)
 	{
 		constexpr double optionWidth = 260.0;
-		constexpr double optionHeight = 86.0;
+		constexpr double optionHeight = 116.0;
 		constexpr double optionGap = 38.0;
-		constexpr double optionY = 796.0;
+		constexpr double optionY = 772.0;
 		const double startX = Scene::Center().x - ((optionWidth * 3.0 + optionGap * 2.0) / 2.0);
 
 		for (size_t i = 0; i < m_quizOptions.size(); ++i)
@@ -745,7 +745,8 @@ void WriteLyrics::draw() const
 
 			const String optionText = U"{}  {}"_fmt(i + 1, m_quizOptions[i].word);
 			const int32 optionFontSize = (optionText.size() <= 5) ? 40 : 34;
-			m_font(optionText).drawAt(optionFontSize, buttonRect.center(), kogetyaColor);
+			m_font(m_quizOptions[i].reading).drawAt(24, buttonRect.center().movedBy(0, -30), kogetyaColor);
+			m_font(optionText).drawAt(optionFontSize, buttonRect.center().movedBy(0, 18), kogetyaColor);
 		}
 	}
 	else
