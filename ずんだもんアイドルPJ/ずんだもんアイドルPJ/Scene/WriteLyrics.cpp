@@ -775,6 +775,11 @@ void WriteLyrics::update()
 		return;
 	}
 
+	if (m_isOnomatopoeiaQuizSong)
+	{
+		return;
+	}
+
 	const auto& problem = m_problems[currentIndex];
 	const size_t maxSyllables = Max<size_t>(2, problem.maxSyllableCount);
 
@@ -938,19 +943,23 @@ void WriteLyrics::draw() const
 	// アニメーションの経過時間
 	double t = Scene::Time();
 
-	// 経過時間と各フレームのディレイに基づいて、何番目のフレームを描けばよいかを計算する
-	size_t frameIndex = AnimatedGIFReader::GetFrameIndex(t, delays);
-
-	textures[frameIndex].drawAt(Scene::Center());
+	if (!textures.isEmpty() && !delays.isEmpty())
+	{
+		// 経過時間と各フレームのディレイに基づいて、何番目のフレームを描けばよいかを計算する
+		size_t frameIndex = AnimatedGIFReader::GetFrameIndex(t, delays);
+		textures[frameIndex].drawAt(Scene::Center());
+	}
 
 	frame.draw();
 
 	// お題を中央に大きく描画
 	if (currentIndex < m_problemCount)
 	{
-		const auto& problem = m_problems[currentIndex];
-		const String displayText = makeQuestionDisplayText(currentIndex, problem.questionText);
-		const int32 fontSize = decideQuestionFontSize(problem.questionText);
+		const String questionText = m_isOnomatopoeiaQuizSong
+			? m_currentTopic
+			: m_problems[currentIndex].questionText;
+		const String displayText = makeQuestionDisplayText(currentIndex, questionText);
+		const int32 fontSize = decideQuestionFontSize(questionText);
 
 		m_font(displayText)
 			.drawAt(fontSize,
@@ -1018,7 +1027,7 @@ void WriteLyrics::draw() const
 	// 残りお題カウンターを左上に表示
 	if (m_problemCount > 0)
 	{
-		const String progressText = U"{} / {}"_fmt(currentIndex + 1, m_problemCount);
+		const String progressText = U"{} / {}"_fmt(Min(currentIndex + 1, m_problemCount), m_problemCount);
 		m_font(progressText).draw(62, Vec2{ 80, 120 }, kogetyaColor);
 	}
 
