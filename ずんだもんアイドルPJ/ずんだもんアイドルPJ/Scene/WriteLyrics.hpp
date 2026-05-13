@@ -67,4 +67,5 @@ private:
 	Array<VerbEntry> m_quizOptions;
 	size_t m_correctOptionIndex = 0;
 	bool m_quizMode = false;
+	bool m_isVerbQuizSong = false;
 };

@@ -5,7 +5,11 @@ WriteLyrics::WriteLyrics(const InitData& init)
 	: IScene{ init }, m_textState{}
 {
 	m_textState.active = true;
-	loadVerbDictionary();
+	m_isVerbQuizSong = (getData().songTitle == U"動詞グループ");
+	if (m_isVerbQuizSong)
+	{
+		loadVerbDictionary();
+	}
 
 	talkLines = VOICEVOX::ExtractTalkUtterances(getData().vvprojPath);
 	m_problems = VOICEVOX::BuildTalkProblems(talkLines);
@@ -165,10 +169,34 @@ String WriteLyrics::makeQuestionDisplayText(size_t index, const String& question
 
 void WriteLyrics::loadVerbDictionary()
 {
-	TextReader reader{ Resource(U"Dict/Verb.csv") };
-	if (!reader)
+	const Array<FilePath> candidates = {
+		Resource(U"Dict/Verb.csv"),
+		U"Dict/Verb.csv",
+		U"App/Dict/Verb.csv",
+		U"ずんだもんアイドルPJ/App/Dict/Verb.csv",
+		U"ずんだもんアイドルPJ/ずんだもんアイドルPJ/App/Dict/Verb.csv"
+	};
+
+	Optional<FilePath> dictPath;
+	for (const auto& path : candidates)
+	{
+		if (FileSystem::Exists(path))
+		{
+			dictPath = path;
+			break;
+		}
+	}
+
+	if (!dictPath)
 	{
 		Console << U"[WriteLyrics] 動詞辞書が見つかりません: Dict/Verb.csv";
+		return;
+	}
+
+	TextReader reader{ *dictPath };
+	if (!reader)
+	{
+		Console << U"[WriteLyrics] 動詞辞書を開けません: " << *dictPath;
 		return;
 	}
 
@@ -236,8 +264,19 @@ void WriteLyrics::prepareQuizChoices()
 	m_quizOptions.clear();
 	m_correctOptionIndex = 0;
 
+	if (!m_isVerbQuizSong)
+	{
+		return;
+	}
+
 	if (currentIndex >= m_problemCount)
 	{
+		return;
+	}
+
+	if (m_verbEntries.isEmpty())
+	{
+		m_errorMessage = U"動詞辞書を読み込めませんでした";
 		return;
 	}
 
