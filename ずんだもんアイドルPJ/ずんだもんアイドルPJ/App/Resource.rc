@@ -152,6 +152,7 @@ Resource(Texture/assets/button/restart.png)
 Resource(Texture/assets/button/start.png)
 Resource(Texture/assets/button/story.png)
 Resource(Texture/Futehodo-MaruGothic.ttf)
+Resource(Inst/HappyBirthday.wav)
 
 /*examples
 

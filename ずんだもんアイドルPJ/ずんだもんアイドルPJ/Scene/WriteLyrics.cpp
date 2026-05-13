@@ -501,6 +501,9 @@ Array<String> WriteLyrics::makePlaceholderSyllables(const String& syllable, size
 String WriteLyrics::buildOnomatopoeiaResultLyrics() const
 {
 	String lyrics;
+	// 前置歌詞を追加
+	lyrics += U"にほんごのおのまとぺ\n";
+
 	for (size_t i = 0; i < m_onimatopoeiaProblems.size(); ++i)
 	{
 		if (i > 0)
@@ -509,6 +512,9 @@ String WriteLyrics::buildOnomatopoeiaResultLyrics() const
 		}
 		lyrics += U"{}　{}"_fmt(m_onimatopoeiaProblems[i].word, m_onimatopoeiaProblems[i].answer);
 	}
+
+	// 後置歌詞を追加
+	lyrics += U"\n\nうたってたくさんべんきょー";
 	return lyrics;
 }
 
