@@ -49,19 +49,6 @@ VocalSynthesis::VocalSynthesis(const InitData& init)
 
 	m_timer.start(); // タイマー開始
 
-	/*
-	Console << U"===== Scene3: 受け取った結果 =====";
-
-	// 共有データを直接参照して表示
-	for (const auto& t : getData().solvedTasks)
-	{
-		Console << U"お題：" << t.phrase;
-		Console << U"  音節リスト：" << t.syllables; // 例: [え, ぶ, り, で, い]
-		Console << U"入力：" << t.userInput;
-		Console << U"  入力の音節リスト：" << t.userSyllables;
-	}
-	*/
-
 	const JSON originalVV = JSON::Load(getData().vvprojPath);
 	const String base = FileSystem::BaseName(getData().vvprojPath);
 	m_baseName = base;
@@ -69,8 +56,19 @@ VocalSynthesis::VocalSynthesis(const InitData& init)
 	getData().SingingNames << singerName;
 	const int i = 0; // ずんだもん1人のときのインデックス
 	getData().songTrackName = VOICEVOX::GetVVProjTrackName(getData().vvprojPath, i);
-	const int32 spkID = 3003; // ずんだもん（ノーマル）
-	const int32 talkSpkID = spkID - 3000;
+	const int32 normalSpkID = 3003; // ずんだもん（ノーマル）
+	const int32 namiDameSpeakID = 3076; // ずんだもん（なみだめ）
+
+	// 正解・間違いの判定フラグを確認
+	bool hasIncorrect = false;
+	for (const auto& task : getData().solvedTasks)
+	{
+		if (!task.isCorrect)
+		{
+			hasIncorrect = true;
+			break;
+		}
+	}
 
 	// 歌詞差し替えした vvproj を作って保存
 	JSON parodyVV = VOICEVOX::ApplyParodyLyrics(
@@ -99,9 +97,13 @@ VocalSynthesis::VocalSynthesis(const InitData& init)
 	m_isLoading = true;
 	m_timer.restart();
 
+	// 間違いがある場合は、複数spkIDで合成を行う予定
+	// 現在は簡略版として、normalSpkIDで統一合成
+	const int32 spkIDToUse = normalSpkID;
+	
 	m_task = Async([=]()
 		{
-			return VOICEVOX::SynthesizeFromJSONFileWrapperSplit(score, songwav, spkID, getData().baseURL, 2500, keyShift);
+			return VOICEVOX::SynthesizeFromJSONFileWrapperSplit(score, songwav, spkIDToUse, getData().baseURL, 2500, keyShift);
 		});
 }
 

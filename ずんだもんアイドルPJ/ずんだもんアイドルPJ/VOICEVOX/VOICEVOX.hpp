@@ -117,6 +117,14 @@ namespace VOICEVOX
 		const Array<SolvedTask>& solvedTasks
 	);
 
+	// 正解と間違いを区別して、複数のvvprojを返す
+	// 返り値: { "correct": correctVV, "incorrect": incorrectVV }
+	// オノマトペでの使用想定
+	JSON ApplyParodyLyricsWithCorrectness(
+		const JSON& vvprojOriginal,
+		const Array<SolvedTask>& solvedTasks
+	);
+
 	// Result 表示用の歌詞を生成する
 	// 仕様: 原曲歌詞（休符で改行）から範囲指定語を削除し、入力を差し込む
 	// 助詞付与された問題は表示を「入力+助詞」にする

@@ -501,8 +501,6 @@ Array<String> WriteLyrics::makePlaceholderSyllables(const String& syllable, size
 String WriteLyrics::buildOnomatopoeiaResultLyrics() const
 {
 	String lyrics;
-	// 前置歌詞を追加
-	lyrics += U"にほんごのおのまとぺ\n";
 
 	for (size_t i = 0; i < m_onimatopoeiaProblems.size(); ++i)
 	{
@@ -513,8 +511,8 @@ String WriteLyrics::buildOnomatopoeiaResultLyrics() const
 		lyrics += U"{}　{}"_fmt(m_onimatopoeiaProblems[i].word, m_onimatopoeiaProblems[i].answer);
 	}
 
-	// 後置歌詞を追加
-	lyrics += U"\n\nうたってたくさんべんきょー";
+	// 元の曲の歌詞部分を後に追加
+	lyrics += U"\nにほんごのおのまとぺ\nうたってたくさんべんきょー";
 	return lyrics;
 }
 
@@ -526,6 +524,9 @@ void WriteLyrics::submitOnomatopoeiaAnswer(const String& answerText)
 	}
 
 	const auto& problem = m_onimatopoeiaProblems[currentIndex];
+	// 正解判定
+	const bool isCorrect = (answerText == problem.answer);
+
 	getData().solvedTasks << SolvedTask{
 		.phrase = U"",
 		.syllables = makePlaceholderSyllables(U"ラ", 8),
@@ -534,7 +535,8 @@ void WriteLyrics::submitOnomatopoeiaAnswer(const String& answerText)
 		.restPadding = true,
 		.score = 0.0,
 		.rhymeMatchPercent = 0.0,
-		.matchesCount = 0
+		.matchesCount = 0,
+		.isCorrect = true  // 問題のテキスト部分は常に正解として扱う
 	};
 
 	getData().solvedTasks << SolvedTask{
@@ -545,7 +547,8 @@ void WriteLyrics::submitOnomatopoeiaAnswer(const String& answerText)
 		.restPadding = true,
 		.score = 0.0,
 		.rhymeMatchPercent = 0.0,
-		.matchesCount = 0
+		.matchesCount = 0,
+		.isCorrect = isCorrect  // 答え部分に正解判定を反映
 	};
 
 	m_errorMessage.clear();

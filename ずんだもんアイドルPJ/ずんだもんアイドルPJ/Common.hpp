@@ -29,6 +29,7 @@ struct SolvedTask
 	double score = 0.0;             // スコア
 	double rhymeMatchPercent = 0.0; // 韻一致率（パーセンテージ）
 	size_t matchesCount = 0;        // 個別のお題で一致した音韻の数
+	bool isCorrect = true;          // 正解フラグ（オノマトペ用、デフォルトは正解）
 };
 
 // 共有するデータ

@@ -1734,6 +1734,42 @@ namespace VOICEVOX
 		return modified;
 	}
 
+	JSON ApplyParodyLyricsWithCorrectness(
+		const JSON& vvprojOriginal,
+		const Array<SolvedTask>& solvedTasks
+	)
+	{
+		// 正解のsolvedTasksのみを抽出
+		Array<SolvedTask> correctTasks;
+		for (const auto& task : solvedTasks)
+		{
+			if (task.isCorrect)
+			{
+				correctTasks << task;
+			}
+		}
+
+		// 間違いのsolvedTasksのみを抽出
+		Array<SolvedTask> incorrectTasks;
+		for (const auto& task : solvedTasks)
+		{
+			if (!task.isCorrect)
+			{
+				incorrectTasks << task;
+			}
+		}
+
+		// 各々に対して ApplyParodyLyrics を適用
+		JSON correctVV = ApplyParodyLyrics(vvprojOriginal, correctTasks);
+		JSON incorrectVV = ApplyParodyLyrics(vvprojOriginal, incorrectTasks);
+
+		// 結果をJSONで返す
+		JSON result = JSON::Object();
+		result[U"correct"] = correctVV;
+		result[U"incorrect"] = incorrectVV;
+		return result;
+	}
+
 	String BuildResultDisplayLyrics(
 		const FilePath& vvprojPath,
 		const Array<SolvedTask>& solvedTasks
