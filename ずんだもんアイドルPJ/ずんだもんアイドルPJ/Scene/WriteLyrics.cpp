@@ -532,7 +532,7 @@ void WriteLyrics::update()
 
 			if (i != m_correctOptionIndex)
 			{
-				m_errorMessage = U"ざんねん！問題のグループに合う動詞を選んでね";
+				m_errorMessage = U"ざんねん！\n問題のグループに合う動詞を選んでね";
 				return;
 			}
 
