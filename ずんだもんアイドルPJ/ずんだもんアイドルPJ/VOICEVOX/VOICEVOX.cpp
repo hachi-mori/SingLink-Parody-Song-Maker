@@ -815,6 +815,16 @@ namespace VOICEVOX
 				continue;
 			}
 
+			if (segmentNotes.front()[U"notelen"].getOpt<String>().value_or(U"") != U"R")
+			{
+				JSON leadingRest;
+				leadingRest[U"frame_length"] = 2;
+				leadingRest[U"key"] = JSON();
+				leadingRest[U"lyric"] = U"";
+				leadingRest[U"notelen"] = U"R";
+				segmentNotes.push_front(leadingRest);
+			}
+
 			const int32 speakerID = (i < 3 && i < lineCorrects.size() && !lineCorrects[i])
 				? incorrectSpeakerID
 				: normalSpeakerID;
