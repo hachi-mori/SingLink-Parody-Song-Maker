@@ -737,6 +737,145 @@ namespace VOICEVOX
 		return true;
 	}
 
+	bool VOICEVOX::SynthesizeOnomatopoeiaScoreByLine(
+		const FilePath& inputPath,
+		const FilePath& outputPath,
+		const Array<bool>& lineCorrects,
+		int32 normalSpeakerID,
+		int32 incorrectSpeakerID,
+		const URL& baseURL,
+		int keyShift)
+	{
+		JSON score = JSON::Load(inputPath);
+		if (!score || !score[U"notes"].isArray())
+		{
+			Console(U"Score JSON の読み込み失敗");
+			return false;
+		}
+
+		Array<JSON> notes;
+		for (const auto& note : score[U"notes"].arrayView())
+		{
+			notes << note;
+		}
+
+		// オノマトペ譜面は「問題行1」「問題行2」「問題行3」「固定歌詞」の順。
+		// ConvertVVProjToScoreJSON が挿入する休符も、直前の行に含めてタイミングを保つ。
+		const Array<std::pair<size_t, size_t>> ranges = {
+			{ 0, 16 },
+			{ 16, 31 },
+			{ 31, 47 },
+			{ 47, notes.size() }
+		};
+
+		if (notes.size() < 48)
+		{
+			Console(U"オノマトペ譜面のノート数が想定より少ないため通常合成します");
+			return VOICEVOX::SynthesizeFromJSONFileWrapperSplit(
+				inputPath,
+				outputPath,
+				normalSpeakerID,
+				baseURL,
+				2500,
+				keyShift);
+		}
+
+		if (keyShift != 0)
+		{
+			if (!VOICEVOX::TransposeScoreJSON(inputPath, inputPath, -keyShift))
+			{
+				Console(U"Score 移調に失敗しました");
+				return false;
+			}
+			score = JSON::Load(inputPath);
+			notes.clear();
+			for (const auto& note : score[U"notes"].arrayView())
+			{
+				notes << note;
+			}
+		}
+
+		Array<FilePath> tempWavs;
+		for (size_t i = 0; i < ranges.size(); ++i)
+		{
+			const size_t start = ranges[i].first;
+			const size_t end = ranges[i].second;
+			if (start >= end || start >= notes.size())
+			{
+				continue;
+			}
+
+			Array<JSON> segmentNotes;
+			for (size_t ni = start; ni < end && ni < notes.size(); ++ni)
+			{
+				segmentNotes << notes[ni];
+			}
+			if (segmentNotes.isEmpty())
+			{
+				continue;
+			}
+
+			const int32 speakerID = (i < 3 && i < lineCorrects.size() && !lineCorrects[i])
+				? incorrectSpeakerID
+				: normalSpeakerID;
+
+			JSON segJson;
+			segJson[U"notes"] = segmentNotes;
+
+			const FilePath tmpScore = U"tmp/tmp_onomatopoeia_score_" + Format(i) + U".json";
+			const FilePath tmpQuery = U"tmp/tmp_onomatopoeia_query_" + Format(i) + U".json";
+			const FilePath tmpWav = U"tmp/tmp_onomatopoeia_part_" + Format(i) + U".wav";
+			segJson.save(tmpScore);
+
+			const URL queryURL = U"{}/sing_frame_audio_query?speaker=6000"_fmt(baseURL);
+			if (!VOICEVOX::SynthesizeFromJSONFile(tmpScore, tmpQuery, queryURL))
+			{
+				Console(U"SingQuery 作成失敗 (オノマトペ分割 " + Format(i) + U")");
+				return false;
+			}
+
+			if (keyShift != 0 &&
+				!VOICEVOX::TransposeSingQueryJSON(tmpQuery, tmpQuery, keyShift))
+			{
+				Console(U"SingQuery 移調に失敗しました");
+				return false;
+			}
+
+			if (JSON query = JSON::Load(tmpQuery))
+			{
+				query[U"volumeScale"] = 1.0;
+				query[U"outputSamplingRate"] = 44100;
+				query[U"outputStereo"] = true;
+				query.save(tmpQuery);
+			}
+
+			const URL synthURL = U"{}/frame_synthesis?speaker={}"_fmt(baseURL, speakerID);
+			if (!VOICEVOX::SynthesizeFromJSONFile(tmpQuery, tmpWav, synthURL))
+			{
+				Console(U"音声合成失敗 (オノマトペ分割 " + Format(i) + U")");
+				return false;
+			}
+			tempWavs << tmpWav;
+		}
+
+		Wave joined;
+		for (const auto& wav : tempWavs)
+		{
+			Wave part{ wav };
+			joined.append(part);
+		}
+		joined.save(outputPath);
+
+		for (size_t i = 0; i < ranges.size(); ++i)
+		{
+			FileSystem::Remove(U"tmp/tmp_onomatopoeia_score_" + Format(i) + U".json");
+			FileSystem::Remove(U"tmp/tmp_onomatopoeia_query_" + Format(i) + U".json");
+			FileSystem::Remove(U"tmp/tmp_onomatopoeia_part_" + Format(i) + U".wav");
+		}
+
+		return true;
+	}
+
 	namespace {
 		// 共通：index 指定で 1 トラック取得（trackOrder 優先）
 		static bool SelectTrackByIndex(const JSON& song, size_t index, JSON& outTrack)

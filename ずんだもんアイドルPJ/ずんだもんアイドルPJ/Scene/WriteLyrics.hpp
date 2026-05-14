@@ -86,4 +86,5 @@ private:
 	Array<OnomatopoeiaEntry> m_onimatopoeiaEntries;
 	Array<OnomatopoeiaEntry> m_onimatopoeiaProblems;
 	Array<String> m_onimatopoeiaOptions;
+	Array<String> m_onimatopoeiaSelectedAnswers;
 };

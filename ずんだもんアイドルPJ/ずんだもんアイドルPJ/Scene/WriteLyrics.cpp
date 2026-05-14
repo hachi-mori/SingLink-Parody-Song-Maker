@@ -31,6 +31,7 @@ WriteLyrics::WriteLyrics(const InitData& init)
 			? U"{}のオノマトペは？"_fmt(m_onimatopoeiaProblems[currentIndex].word)
 			: m_problems[currentIndex].questionText;
 		getData().solvedTasks.clear();
+		m_onimatopoeiaSelectedAnswers.clear();
 		getData().finalRhymeMatchPercent = 0.0; // スコア機能は無効化
 		if (m_isOnomatopoeiaQuizSong)
 		{
@@ -508,7 +509,10 @@ String WriteLyrics::buildOnomatopoeiaResultLyrics() const
 		{
 			lyrics += U"\n";
 		}
-		lyrics += U"{}　{}"_fmt(m_onimatopoeiaProblems[i].word, m_onimatopoeiaProblems[i].answer);
+		const String answer = (i < m_onimatopoeiaSelectedAnswers.size())
+			? m_onimatopoeiaSelectedAnswers[i]
+			: m_onimatopoeiaProblems[i].answer;
+		lyrics += U"{}　{}"_fmt(m_onimatopoeiaProblems[i].word, answer);
 	}
 
 	// 元の曲の歌詞部分を後に追加
@@ -526,6 +530,7 @@ void WriteLyrics::submitOnomatopoeiaAnswer(const String& answerText)
 	const auto& problem = m_onimatopoeiaProblems[currentIndex];
 	// 正解判定
 	const bool isCorrect = (answerText == problem.answer);
+	m_onimatopoeiaSelectedAnswers << answerText;
 
 	getData().solvedTasks << SolvedTask{
 		.phrase = U"",
@@ -783,11 +788,9 @@ void WriteLyrics::update()
 				continue;
 			}
 
-			if (i != m_correctOptionIndex)
+			if (i != m_correctOptionIndex && !m_isOnomatopoeiaQuizSong)
 			{
-				m_errorMessage = m_isOnomatopoeiaQuizSong
-					? U"ざんねん！\nぴったりのオノマトペを選んでね"
-					: U"ざんねん！\n問題のグループに合う動詞を選んでね";
+				m_errorMessage = U"ざんねん！\n問題のグループに合う動詞を選んでね";
 				return;
 			}
 
