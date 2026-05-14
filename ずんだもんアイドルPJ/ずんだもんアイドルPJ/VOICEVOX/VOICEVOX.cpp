@@ -1903,7 +1903,7 @@ namespace VOICEVOX
 		JSON incorrectVV = ApplyParodyLyrics(vvprojOriginal, incorrectTasks);
 
 		// 結果をJSONで返す
-		JSON result = JSON::Object();
+		JSON result;
 		result[U"correct"] = correctVV;
 		result[U"incorrect"] = incorrectVV;
 		return result;

@@ -67,11 +67,17 @@ VocalSynthesis::VocalSynthesis(const InitData& init)
 
 	// 一時vvproj
 	FilePath vvTmp = U"tmp/tmp_modified_" + base + U"_track" + Format(i + 1) + U".vvproj";
-	parodyVV.save(vvTmp);
+	if (!parodyVV.save(vvTmp))
+	{
+		Console << U"一時vvprojの保存に失敗しました: " << vvTmp;
+	}
 
 	// ③ スコアJSONへの変換は、元vvprojではなくvvTmpを使う
 	FilePath score = U"tmp/tmp_" + base + U"_track" + Format(i + 1) + U".json";
-	VOICEVOX::ConvertVVProjToScoreJSON(vvTmp, score, i);
+	if (!VOICEVOX::ConvertVVProjToScoreJSON(vvTmp, score, i))
+	{
+		Console << U"スコアJSONへの変換に失敗しました: " << score;
+	}
 
 	FilePath songwav = U"Voice/" + base + U"-ずんだもん（ノーマル）_track" + Format(i + 1) + U".wav";
 
