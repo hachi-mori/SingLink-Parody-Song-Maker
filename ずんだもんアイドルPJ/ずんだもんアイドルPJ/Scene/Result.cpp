@@ -83,6 +83,7 @@ void Result::draw() const
 	// --- 歌詞の色付き描画（字間調整つき） ---
 	const ColorF normalColor = kogetyaColor;
 	const ColorF userColor = kogetyaColor;
+	const ColorF incorrectColor = Palette::Red;
 	const double fontSize = 50;
 	const double letterSpacing = 0.0;
 
@@ -90,9 +91,29 @@ void Result::draw() const
 	Vec2 penPos = basePos;
 
 	const Array<String> lines = getData().fullLyrics.removed(U'{').removed(U'}').split(U'\n');
-
-	for (const auto& line : lines)
+	Array<bool> onomatopoeiaLineCorrects;
+	if (getData().songTitle == U"オノマトペ")
 	{
+		for (const auto& task : getData().solvedTasks)
+		{
+			if (task.restPadding
+				&& task.syllables.size() == 6
+				&& !task.syllables.isEmpty()
+				&& task.syllables.front() == U"ル")
+			{
+				onomatopoeiaLineCorrects << task.isCorrect;
+			}
+		}
+	}
+
+	for (size_t lineIndex = 0; lineIndex < lines.size(); ++lineIndex)
+	{
+		const String& line = lines[lineIndex];
+		const bool isIncorrectLine =
+			(getData().songTitle == U"オノマトペ")
+			&& (lineIndex < onomatopoeiaLineCorrects.size())
+			&& !onomatopoeiaLineCorrects[lineIndex];
+
 		// まずユーザー入力箇所の範囲を全て列挙
 		Array<std::pair<size_t, size_t>> coloredRanges; // (開始, 終了)
 		for (const auto& task : getData().solvedTasks)
@@ -119,7 +140,7 @@ void Result::draw() const
 			}
 
 			const String s(1, line[i]);
-			const ColorF color = isColored ? userColor : normalColor;
+			const ColorF color = isIncorrectLine ? incorrectColor : (isColored ? userColor : normalColor);
 			m_font(s).draw(fontSize, penPos, color);
 			penPos.x += m_font(s).region().w + letterSpacing;
 		}
