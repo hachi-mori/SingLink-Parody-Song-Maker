@@ -304,6 +304,7 @@ void WriteLyrics::loadOnomatopoeiaDictionary()
 		const String word = fields[0].trimmed();
 		const String reading = fields[1].trimmed();
 		const String answer = fields[2].trimmed();
+		const String explanation = (fields.size() >= 4) ? fields[3].trimmed() : U"";
 
 		const size_t readingSyllableCount = splitOnomatopoeiaMoras(replaceChoonWithVowel(reading)).size();
 		const size_t answerSyllableCount = splitOnomatopoeiaMoras(replaceChoonWithVowel(answer)).size();
@@ -312,7 +313,7 @@ void WriteLyrics::loadOnomatopoeiaDictionary()
 			&& readingSyllableCount <= 8
 			&& answerSyllableCount <= 6)
 		{
-			m_onimatopoeiaEntries << OnomatopoeiaEntry{ word, reading, answer };
+			m_onimatopoeiaEntries << OnomatopoeiaEntry{ word, reading, answer, explanation };
 		}
 	}
 }
@@ -520,7 +521,7 @@ String WriteLyrics::buildOnomatopoeiaResultLyrics() const
 	return lyrics;
 }
 
-void WriteLyrics::submitOnomatopoeiaAnswer(const String& answerText)
+void WriteLyrics::submitOnomatopoeiaAnswer(const String& answerText, bool isTimeUp)
 {
 	if (currentIndex >= m_onimatopoeiaProblems.size())
 	{
@@ -528,9 +529,33 @@ void WriteLyrics::submitOnomatopoeiaAnswer(const String& answerText)
 	}
 
 	const auto& problem = m_onimatopoeiaProblems[currentIndex];
-	// 正解判定
-	const bool isCorrect = (answerText == problem.answer);
-	m_onimatopoeiaSelectedAnswers << answerText;
+	const bool isCorrect = (!isTimeUp && answerText == problem.answer);
+	m_onomatopoeiaFeedbackActive = true;
+	m_onomatopoeiaFeedbackCorrect = isCorrect;
+	m_onomatopoeiaFeedbackTimeUp = isTimeUp;
+	m_onomatopoeiaFeedbackQuestion = problem.word;
+	m_onomatopoeiaFeedbackSelected = isTimeUp ? U"（タイムアップ）" : answerText;
+	m_onomatopoeiaFeedbackCorrectAnswer = problem.answer;
+	m_onomatopoeiaFeedbackExplanation = problem.explanation.isEmpty()
+		? U"「{}」には「{}」がぴったりだよ。"_fmt(problem.word, problem.answer)
+		: problem.explanation;
+	m_errorMessage.clear();
+}
+
+void WriteLyrics::advanceOnomatopoeiaProblem()
+{
+	if (!m_onomatopoeiaFeedbackActive || currentIndex >= m_onimatopoeiaProblems.size())
+	{
+		return;
+	}
+
+	const auto& problem = m_onimatopoeiaProblems[currentIndex];
+	const bool isCorrect = m_onomatopoeiaFeedbackCorrect;
+	const String answerForRecord = m_onomatopoeiaFeedbackTimeUp
+		? m_onomatopoeiaFeedbackCorrectAnswer
+		: m_onomatopoeiaFeedbackSelected;
+
+	m_onimatopoeiaSelectedAnswers << answerForRecord;
 
 	getData().solvedTasks << SolvedTask{
 		.phrase = U"",
@@ -541,22 +566,22 @@ void WriteLyrics::submitOnomatopoeiaAnswer(const String& answerText)
 		.score = 0.0,
 		.rhymeMatchPercent = 0.0,
 		.matchesCount = 0,
-		.isCorrect = true  // 問題のテキスト部分は常に正解として扱う
+		.isCorrect = true
 	};
 
 	getData().solvedTasks << SolvedTask{
 		.phrase = U"",
 		.syllables = makePlaceholderSyllables(U"ル", 6),
-		.userInput = answerText,
-		.userSyllables = splitOnomatopoeiaMoras(replaceChoonWithVowel(answerText)),
+		.userInput = answerForRecord,
+		.userSyllables = splitOnomatopoeiaMoras(replaceChoonWithVowel(answerForRecord)),
 		.restPadding = true,
 		.score = 0.0,
 		.rhymeMatchPercent = 0.0,
 		.matchesCount = 0,
-		.isCorrect = isCorrect  // 答え部分に正解判定を反映
+		.isCorrect = isCorrect
 	};
 
-	m_errorMessage.clear();
+	m_onomatopoeiaFeedbackActive = false;
 	++currentIndex;
 	m_timer.restart();
 
@@ -715,6 +740,15 @@ void WriteLyrics::update()
 		return;
 	}
 
+	if (m_isOnomatopoeiaQuizSong && m_onomatopoeiaFeedbackActive)
+	{
+		if (KeyEnter.down() || KeySpace.down() || MouseL.down())
+		{
+			advanceOnomatopoeiaProblem();
+		}
+		return;
+	}
+
 	if (currentIndex >= m_problemCount)
 	{
 		finalizeAndExit();
@@ -729,7 +763,7 @@ void WriteLyrics::update()
 	{
 		if (m_isOnomatopoeiaQuizSong)
 		{
-			submitOnomatopoeiaAnswer(m_onimatopoeiaProblems[currentIndex].answer);
+			submitOnomatopoeiaAnswer(U"", true);
 			return;
 		}
 
@@ -1074,5 +1108,31 @@ void WriteLyrics::draw() const
 	{
 		result_font(m_errorMessage)
 			.draw(22, Vec2{ 40, 480 }, Palette::Red);
+	}
+
+	if (m_isOnomatopoeiaQuizSong && m_onomatopoeiaFeedbackActive)
+	{
+		const RectF panel{ Arg::center = Scene::Center().movedBy(0, 40), 1320, 620 };
+		panel.rounded(28).draw(ColorF{ 1.0, 0.96, 0.88, 0.92 });
+		panel.rounded(28).drawFrame(6, 0, kogetyaColor);
+
+		const String judgeMark = m_onomatopoeiaFeedbackCorrect ? U"〇" : U"✖";
+		const ColorF judgeColor = m_onomatopoeiaFeedbackCorrect ? ColorF{ 0.14, 0.56, 0.21 } : ColorF{ 0.85, 0.16, 0.16 };
+		m_font(judgeMark).drawAt(250, Scene::Center().movedBy(0, -120), judgeColor);
+
+		const String titleText = m_onomatopoeiaFeedbackTimeUp
+			? U"タイムアップ！"
+			: (m_onomatopoeiaFeedbackCorrect ? U"せいかい！" : U"ざんねん！");
+		m_font(titleText).drawAt(56, Scene::Center().movedBy(0, 45), kogetyaColor);
+
+		const String selectedText = U"あなたのこたえ: {}"_fmt(m_onomatopoeiaFeedbackSelected);
+		const String correctText = U"せいかい: {}"_fmt(m_onomatopoeiaFeedbackCorrectAnswer);
+		result_font(selectedText).drawAt(34, Scene::Center().movedBy(0, 130), kogetyaColor);
+		result_font(correctText).drawAt(36, Scene::Center().movedBy(0, 182), kogetyaColor);
+		result_font(U"かいせつ: {}"_fmt(m_onomatopoeiaFeedbackExplanation))
+			.drawAt(26, Scene::Center().movedBy(0, 242), ColorF{ 0.20, 0.20, 0.20 });
+
+		result_font(U"Enter / Space / クリック で つぎへ")
+			.drawAt(22, Scene::Center().movedBy(0, 300), ColorF{ 0.32, 0.32, 0.32 });
 	}
 }

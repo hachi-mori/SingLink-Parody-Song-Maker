@@ -25,6 +25,7 @@ private:
 		String word;
 		String reading;
 		String answer;
+		String explanation;
 	};
 
 	mutable TextEditState m_textState;
@@ -52,7 +53,8 @@ private:
 	void loadOnomatopoeiaDictionary();
 	void prepareOnomatopoeiaProblems();
 	void prepareOnomatopoeiaChoices();
-	void submitOnomatopoeiaAnswer(const String& answerText);
+	void submitOnomatopoeiaAnswer(const String& answerText, bool isTimeUp = false);
+	void advanceOnomatopoeiaProblem();
 	Array<String> makePlaceholderSyllables(const String& syllable, size_t count) const;
 	String buildOnomatopoeiaResultLyrics() const;
 
@@ -87,4 +89,11 @@ private:
 	Array<OnomatopoeiaEntry> m_onimatopoeiaProblems;
 	Array<String> m_onimatopoeiaOptions;
 	Array<String> m_onimatopoeiaSelectedAnswers;
+	bool m_onomatopoeiaFeedbackActive = false;
+	bool m_onomatopoeiaFeedbackCorrect = false;
+	bool m_onomatopoeiaFeedbackTimeUp = false;
+	String m_onomatopoeiaFeedbackQuestion;
+	String m_onomatopoeiaFeedbackSelected;
+	String m_onomatopoeiaFeedbackCorrectAnswer;
+	String m_onomatopoeiaFeedbackExplanation;
 };
