@@ -534,7 +534,7 @@ void WriteLyrics::submitOnomatopoeiaAnswer(const String& answerText, bool isTime
 	m_onomatopoeiaFeedbackCorrect = isCorrect;
 	m_onomatopoeiaFeedbackTimeUp = isTimeUp;
 	m_onomatopoeiaFeedbackQuestion = problem.word;
-	m_onomatopoeiaFeedbackSelected = isTimeUp ? U"（タイムアップ）" : answerText;
+	m_onomatopoeiaFeedbackSelected = isTimeUp ? U"みかいとう" : answerText;
 	m_onomatopoeiaFeedbackCorrectAnswer = problem.answer;
 	m_onomatopoeiaFeedbackExplanation = problem.explanation.isEmpty()
 		? U"「{}」には「{}」がぴったりだよ。"_fmt(problem.word, problem.answer)
@@ -1112,27 +1112,89 @@ void WriteLyrics::draw() const
 
 	if (m_isOnomatopoeiaQuizSong && m_onomatopoeiaFeedbackActive)
 	{
-		const RectF panel{ Arg::center = Scene::Center().movedBy(0, 40), 1320, 620 };
-		panel.rounded(28).draw(ColorF{ 1.0, 0.96, 0.88, 0.92 });
-		panel.rounded(28).drawFrame(6, 0, kogetyaColor);
+		RectF{ 0, 0, Scene::Width(), Scene::Height() }.draw(ColorF{ 0.0, 0.0, 0.0, 0.25 });
 
-		const String judgeMark = m_onomatopoeiaFeedbackCorrect ? U"〇" : U"✖";
-		const ColorF judgeColor = m_onomatopoeiaFeedbackCorrect ? ColorF{ 0.14, 0.56, 0.21 } : ColorF{ 0.85, 0.16, 0.16 };
-		m_font(judgeMark).drawAt(250, Scene::Center().movedBy(0, -120), judgeColor);
+		const RectF panel{ Arg::center = Scene::Center().movedBy(0, 20), 1360, 680 };
+		panel.rounded(32).draw(ColorF{ 1.0, 0.98, 0.92, 0.99 });
+		panel.rounded(32).drawFrame(7, 0, kogetyaColor);
+
+		static const Texture kCorrectEmoji{ U"⭕"_emoji };
+		static const Texture kIncorrectEmoji{ U"❌"_emoji };
+		const Texture& judgeEmoji = m_onomatopoeiaFeedbackCorrect ? kCorrectEmoji : kIncorrectEmoji;
+		Circle{ Scene::Center().movedBy(0, -160), 120 }.draw(ColorF{ 1.0, 1.0, 1.0, 0.92 });
+		judgeEmoji.resized(210).drawAt(Scene::Center().movedBy(0, -160));
 
 		const String titleText = m_onomatopoeiaFeedbackTimeUp
 			? U"タイムアップ！"
-			: (m_onomatopoeiaFeedbackCorrect ? U"せいかい！" : U"ざんねん！");
-		m_font(titleText).drawAt(56, Scene::Center().movedBy(0, 45), kogetyaColor);
+			: (m_onomatopoeiaFeedbackCorrect ? U"せいかい！" : U"ふせいかい");
+		m_font(titleText).drawAt(60, Scene::Center().movedBy(0, -10), kogetyaColor);
 
+		const String questionText = U"おだい: {}"_fmt(m_onomatopoeiaFeedbackQuestion);
 		const String selectedText = U"あなたのこたえ: {}"_fmt(m_onomatopoeiaFeedbackSelected);
 		const String correctText = U"せいかい: {}"_fmt(m_onomatopoeiaFeedbackCorrectAnswer);
-		result_font(selectedText).drawAt(34, Scene::Center().movedBy(0, 130), kogetyaColor);
-		result_font(correctText).drawAt(36, Scene::Center().movedBy(0, 182), kogetyaColor);
-		result_font(U"かいせつ: {}"_fmt(m_onomatopoeiaFeedbackExplanation))
-			.drawAt(26, Scene::Center().movedBy(0, 242), ColorF{ 0.20, 0.20, 0.20 });
+		result_font(questionText).drawAt(32, Scene::Center().movedBy(0, 72), ColorF{ 0.22, 0.22, 0.22 });
+		result_font(selectedText).drawAt(32, Scene::Center().movedBy(0, 114), ColorF{ 0.22, 0.22, 0.22 });
+		result_font(correctText).drawAt(35, Scene::Center().movedBy(0, 158), kogetyaColor);
 
-		result_font(U"Enter / Space / クリック で つぎへ")
-			.drawAt(22, Scene::Center().movedBy(0, 300), ColorF{ 0.32, 0.32, 0.32 });
+		auto wrapText = [](const String& text, const size_t maxChars)
+			{
+				Array<String> lines;
+				String current;
+				size_t count = 0;
+
+				for (const auto ch : text)
+				{
+					if (ch == U'\n')
+					{
+						if (!current.isEmpty())
+						{
+							lines << current;
+						}
+						current.clear();
+						count = 0;
+						continue;
+					}
+
+					current += ch;
+					++count;
+
+					if (count >= maxChars)
+					{
+						lines << current;
+						current.clear();
+						count = 0;
+					}
+				}
+
+				if (!current.isEmpty())
+				{
+					lines << current;
+				}
+
+				if (lines.isEmpty())
+				{
+					lines << U"-";
+				}
+
+				return lines;
+			};
+
+		// 解説パネルを1行分の高さに制限して重なりを防ぐ
+		const RectF explainPanel{ Arg::center = Scene::Center().movedBy(0, 248), 1160, 72 };
+		explainPanel.rounded(16).draw(ColorF{ 1.0, 1.0, 1.0, 0.9 });
+		explainPanel.rounded(16).drawFrame(3, 0, ColorF{ 0.72, 0.60, 0.40, 0.95 });
+
+		// 見出しは小さめに、本文は最大1行（超過は省略）で描画
+		result_font(U"かいせつ").drawAt(20, explainPanel.center().movedBy(-420, 0), ColorF{ 0.35, 0.27, 0.15 });
+		String explanationLine = m_onomatopoeiaFeedbackExplanation;
+		const size_t maxChars = 48;
+		if (explanationLine.size() > maxChars)
+		{
+			explanationLine = explanationLine.substr(0, maxChars - 1) + U"…";
+		}
+		result_font(explanationLine).drawAt(28, explainPanel.center().movedBy(0, 0), ColorF{ 0.18, 0.18, 0.18 });
+
+		result_font(U"Enter / Space / クリック で つぎのもんだいへ")
+			.drawAt(20, Scene::Center().movedBy(0, 300), ColorF{ 0.32, 0.32, 0.32 });
 	}
 }
