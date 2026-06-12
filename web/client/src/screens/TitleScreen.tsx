@@ -44,9 +44,8 @@ export function TitleScreen(props: TitleScreenProps) {
 
         <button className="credit-link" onClick={props.onOpenCredit}>クレジット</button>
 
-        <img className="title-logo" src="/assets/texture/assets/title_logo.png" alt="シングリンク" />
-        <div className="title-frame">
-          <img src="/assets/texture/assets/title_frame_w_trans.png" alt="" aria-hidden="true" />
+        <div className="title-main">
+          <img className="title-logo" src="/assets/texture/assets/title_logo.png" alt="シングリンク" />
           <div className="song-picker">
             <label htmlFor="song-select">あそぶ曲</label>
             <select
@@ -63,14 +62,14 @@ export function TitleScreen(props: TitleScreenProps) {
             </select>
             {props.error ? <p className="error-text">{props.error}</p> : null}
           </div>
-        </div>
 
-        <nav className="title-actions" aria-label="タイトルメニュー">
-          <AssetButton imageSrc="/assets/texture/assets/button/story.png" label="ストーリー" onClick={props.onOpenStory} />
-          <AssetButton imageSrc="/assets/texture/assets/button/start.png" label="スタート" onClick={props.onStart} disabled={props.loading} />
-          <AssetButton imageSrc="/assets/texture/assets/button/howtoplay.png" label="あそびかた" onClick={props.onOpenHowTo} />
-          <button className="history-button" onClick={props.onOpenHistory}>保存した曲</button>
-        </nav>
+          <nav className="title-actions" aria-label="タイトルメニュー">
+            <AssetButton imageSrc="/assets/texture/assets/button/story.png" label="ストーリー" onClick={props.onOpenStory} />
+            <AssetButton imageSrc="/assets/texture/assets/button/start.png" label="スタート" onClick={props.onStart} disabled={props.loading} />
+            <AssetButton imageSrc="/assets/texture/assets/button/howtoplay.png" label="あそびかた" onClick={props.onOpenHowTo} />
+            <button className="history-button" onClick={props.onOpenHistory}>保存した曲</button>
+          </nav>
+        </div>
       </section>
     </ScreenShell>
   );

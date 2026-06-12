@@ -93,7 +93,7 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
         </div>
         <AssetButton imageSrc="/assets/texture/assets/button/title.png" label="タイトルへ" onClick={onTitle} className="result-title-button" />
       </section>
-      <audio ref={voiceRef} src={result.blobUrl} onEnded={() => setPlaying(false)} />
+      <audio ref={voiceRef} src={result.blobUrl} loop />
       {song.instUrl ? <audio ref={instRef} src={song.instUrl} loop /> : null}
     </ScreenShell>
   );
