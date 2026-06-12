@@ -13,6 +13,8 @@
   --brown: #864f09;
   --gold: #f3ae06;
   --cream: rgba(255, 249, 226, 0.94);
+  --soft-panel: rgba(255, 250, 231, 0.88);
+  --panel-border: rgba(134, 79, 9, 0.28);
   --shadow: 0 18px 60px rgba(72, 40, 5, 0.2);
 }
 
@@ -48,7 +50,8 @@ button:disabled {
 .screen-shell {
   position: relative;
   min-height: 100svh;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   background: #f9df89;
 }
 
@@ -103,7 +106,8 @@ button:disabled {
   width: min(300px, 56vw);
   padding: 12px 14px;
   border-radius: 8px;
-  background: rgba(255, 250, 235, 0.82);
+  background: rgba(255, 250, 235, 0.9);
+  border: 2px solid var(--panel-border);
   box-shadow: var(--shadow);
 }
 
@@ -159,8 +163,8 @@ button:disabled {
 }
 
 .title-logo {
-  width: min(48vw, 700px);
-  max-height: 22svh;
+  width: min(50vw, 720px);
+  max-height: 24svh;
   object-fit: contain;
   filter: drop-shadow(0 12px 24px rgba(78, 40, 4, 0.22));
 }
@@ -198,11 +202,15 @@ button:disabled {
   justify-content: center;
   flex-wrap: wrap;
   gap: clamp(8px, 1.6vw, 22px);
-  padding-bottom: 0;
+  padding: clamp(8px, 1.4vw, 16px) clamp(12px, 2vw, 24px);
+  border: 2px solid var(--panel-border);
+  border-radius: 12px;
+  background: var(--soft-panel);
+  box-shadow: var(--shadow);
 }
 
 .asset-button {
-  width: clamp(140px, 16vw, 230px);
+  width: clamp(154px, 17vw, 250px);
   background: transparent;
   padding: 0;
   transition: transform 0.16s ease, filter 0.16s ease;
@@ -232,6 +240,20 @@ button:disabled {
   text-align: center;
   padding: 24px;
   color: var(--brown);
+}
+
+.countdown-screen,
+.loading-panel {
+  width: min(920px, calc(100vw - 36px));
+  min-height: auto;
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  padding: clamp(24px, 5vw, 56px);
+  border: 3px solid var(--panel-border);
+  border-radius: 18px;
+  background: var(--soft-panel);
+  box-shadow: var(--shadow);
 }
 
 .countdown-screen p {
@@ -272,8 +294,13 @@ button:disabled {
 .game-card h1 {
   max-width: min(1100px, 94vw);
   margin: 0;
+  padding: clamp(14px, 2.6vw, 26px) clamp(18px, 4vw, 44px);
+  border: 3px solid var(--panel-border);
+  border-radius: 16px;
+  background: rgba(255, 250, 231, 0.82);
+  box-shadow: var(--shadow);
   color: var(--brown);
-  font-size: clamp(34px, 7vw, 100px);
+  font-size: clamp(40px, 7.4vw, 108px);
   line-height: 1.16;
   text-shadow: 0 3px 0 rgba(255, 247, 217, 0.75);
 }
@@ -282,6 +309,10 @@ button:disabled {
   display: flex;
   gap: 12px;
   width: min(680px, 94vw);
+  padding: clamp(10px, 2vw, 16px);
+  border-radius: 14px;
+  background: rgba(255, 250, 231, 0.72);
+  box-shadow: var(--shadow);
 }
 
 .answer-form input {
@@ -464,6 +495,10 @@ button:disabled {
   left: clamp(14px, 2vw, 28px);
   bottom: clamp(14px, 2vw, 28px);
   width: clamp(130px, 14vw, 220px);
+  padding: 8px;
+  border-radius: 12px;
+  background: var(--soft-panel);
+  box-shadow: var(--shadow);
 }
 
 .static-image-screen {
@@ -475,11 +510,26 @@ button:disabled {
   padding: clamp(16px, 4vw, 40px);
 }
 
-.static-image-screen > img {
+.static-image-frame {
   width: min(94vw, 1300px);
-  max-height: 82svh;
-  object-fit: contain;
+  max-height: 76svh;
+  overflow: auto;
   border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.static-image-frame > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 76svh;
+  object-fit: contain;
+}
+
+.static-image-screen .asset-button {
+  padding: 8px;
+  border-radius: 12px;
+  background: var(--soft-panel);
   box-shadow: var(--shadow);
 }
 
@@ -621,7 +671,7 @@ button:disabled {
   .result-layout {
     grid-template-columns: 1fr;
     align-content: start;
-    padding-bottom: 100px;
+    padding-bottom: 28px;
   }
 
   .result-character {
@@ -632,6 +682,12 @@ button:disabled {
     max-height: none;
   }
 
+  .result-title-button {
+    position: static;
+    width: min(190px, 48vw);
+    justify-self: start;
+  }
+
   .history-grid {
     grid-template-columns: 1fr;
   }
@@ -639,12 +695,13 @@ button:disabled {
 
 @media (max-width: 520px) {
   .asset-button {
-    width: min(190px, 42vw);
+    width: min(180px, 42vw);
   }
 
   .title-actions {
     display: grid;
     grid-template-columns: repeat(2, minmax(130px, 1fr));
+    width: min(366px, calc(100vw - 24px));
   }
 
   .history-button {
@@ -656,7 +713,12 @@ button:disabled {
   }
 
   .game-card {
-    padding-top: 92px;
+    padding-top: 86px;
+    gap: 18px;
+  }
+
+  .game-card h1 {
+    font-size: clamp(34px, 10vw, 48px);
   }
 
   .feedback-panel {
@@ -667,5 +729,14 @@ button:disabled {
   .history-screen header {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .static-image-frame {
+    max-height: 68svh;
+  }
+
+  .static-image-frame > img {
+    width: max(100%, 680px);
+    max-height: none;
   }
 }

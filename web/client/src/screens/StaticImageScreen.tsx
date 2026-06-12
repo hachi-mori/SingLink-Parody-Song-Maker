@@ -11,7 +11,9 @@ export function StaticImageScreen({ title, imageSrc, onBack }: StaticImageScreen
   return (
     <ScreenShell background="/assets/texture/assets/result_background.png" fit="cover">
       <section className="static-image-screen">
-        <img src={imageSrc} alt={title} />
+        <div className="static-image-frame">
+          <img src={imageSrc} alt={title} />
+        </div>
         <AssetButton imageSrc="/assets/texture/assets/button/title.png" label="タイトルへ" onClick={onBack} />
       </section>
     </ScreenShell>
