@@ -8,7 +8,7 @@ type StaticImageScreenProps = {
 
 export function StaticImageScreen({ title, imageSrc, onBack }: StaticImageScreenProps) {
   return (
-    <ScreenShell background="/assets/texture/assets/result_background.png" fit="cover">
+    <ScreenShell>
       <section className="static-image-screen">
         <header className="static-image-header">
           <h1>{title}</h1>

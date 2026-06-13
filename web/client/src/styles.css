@@ -164,7 +164,7 @@ button:disabled {
 }
 
 .title-main {
-  width: min(820px, 82vw);
+  width: min(980px, 88vw);
   display: grid;
   justify-items: center;
   gap: clamp(14px, 2.2svh, 28px);
@@ -172,9 +172,9 @@ button:disabled {
 }
 
 .title-logo {
-  width: min(48vw, 760px);
-  min-width: 330px;
-  max-height: 30svh;
+  width: min(58vw, 940px);
+  min-width: 380px;
+  max-height: 36svh;
   object-fit: contain;
   filter: drop-shadow(0 12px 24px rgba(78, 40, 4, 0.22));
 }
@@ -516,6 +516,9 @@ button:disabled {
   justify-items: center;
   gap: clamp(12px, 2svh, 20px);
   padding: clamp(14px, 2.6vw, 34px);
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.55), transparent 28%),
+    linear-gradient(180deg, #edf8e4 0%, #dff1d2 100%);
 }
 
 .static-image-header {
@@ -681,9 +684,9 @@ button:disabled {
   }
 
   .title-logo {
-    width: min(82vw, 520px);
+    width: min(90vw, 620px);
     min-width: 0;
-    max-height: 24svh;
+    max-height: 28svh;
   }
 
   .song-picker {
