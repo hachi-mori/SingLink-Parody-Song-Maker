@@ -798,9 +798,12 @@ button:disabled {
   }
 
   .result-layout {
-    grid-template-columns: minmax(360px, 0.78fr) minmax(620px, 1.05fr);
+    width: min(100%, 1760px);
+    margin: 0 auto;
+    grid-template-columns: minmax(440px, 0.92fr) minmax(620px, 1fr);
+    gap: clamp(14px, 2vw, 34px);
     align-items: center;
-    padding: clamp(28px, 4vw, 64px);
+    padding: clamp(28px, 4vw, 64px) clamp(28px, 3vw, 56px);
   }
 
   .result-character {
@@ -815,8 +818,9 @@ button:disabled {
 
   .result-card {
     grid-column: 2;
-    justify-self: start;
-    width: min(920px, 56vw);
+    justify-self: center;
+    width: min(900px, 50vw);
+    transform: translateX(clamp(8px, 1vw, 24px));
   }
 }
 
