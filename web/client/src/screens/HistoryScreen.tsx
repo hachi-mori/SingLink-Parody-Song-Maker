@@ -39,7 +39,7 @@ export function HistoryScreen({ onBack }: HistoryScreenProps) {
   };
 
   return (
-    <ScreenShell background="/assets/texture/assets/result_background.png" fit="cover" dim>
+    <ScreenShell>
       <section className="history-screen">
         <header>
           <div>

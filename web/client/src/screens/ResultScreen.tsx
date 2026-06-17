@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Download, Pause, Play, RotateCcw } from 'lucide-react';
 import type { SolvedTask, SongDetail } from '@shared/types';
 import { AssetButton } from '../components/AssetButton';
@@ -19,42 +19,104 @@ type ResultScreenProps = {
 };
 
 export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHistory }: ResultScreenProps) {
-  const voiceRef = useRef<HTMLAudioElement>(null);
-  const instRef = useRef<HTMLAudioElement>(null);
+  const audioContextRef = useRef<AudioContext | undefined>(undefined);
+  const voiceBufferRef = useRef<AudioBuffer | undefined>(undefined);
+  const instBufferRef = useRef<AudioBuffer | undefined>(undefined);
+  const voiceSourceRef = useRef<AudioBufferSourceNode | undefined>(undefined);
+  const instSourceRef = useRef<AudioBufferSourceNode | undefined>(undefined);
   const [playing, setPlaying] = useState(false);
   const [playError, setPlayError] = useState('');
 
   const userInputs = useMemo(() => tasks.map((task) => task.userInput).filter(Boolean), [tasks]);
   const lines = fullLyrics.replace(/[{}]/g, '').split('\n');
 
-  const stop = () => {
-    voiceRef.current?.pause();
-    instRef.current?.pause();
+  const stopSources = useCallback(() => {
+    try {
+      voiceSourceRef.current?.stop();
+      instSourceRef.current?.stop();
+    } catch {
+      // Already-stopped Web Audio sources can throw in some browsers.
+    }
+    voiceSourceRef.current = undefined;
+    instSourceRef.current = undefined;
+  }, []);
+
+  const stop = useCallback(() => {
+    stopSources();
     setPlaying(false);
+  }, [stopSources]);
+
+  const getAudioContext = () => {
+    audioContextRef.current ??= new AudioContext();
+    return audioContextRef.current;
+  };
+
+  const decodeBlob = async (context: AudioContext, blob: Blob) => {
+    return context.decodeAudioData(await blob.arrayBuffer());
+  };
+
+  const decodeUrl = async (context: AudioContext, url: string) => {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`伴奏を読み込めませんでした: ${response.statusText}`);
+    }
+    return context.decodeAudioData(await response.arrayBuffer());
+  };
+
+  const ensureBuffers = async (context: AudioContext) => {
+    voiceBufferRef.current ??= await decodeBlob(context, result.blob);
+    if (song.instUrl && !instBufferRef.current) {
+      instBufferRef.current = await decodeUrl(context, song.instUrl);
+    }
+  };
+
+  const startSyncedPlayback = (context: AudioContext) => {
+    stopSources();
+
+    const voiceBuffer = voiceBufferRef.current;
+    if (!voiceBuffer) {
+      throw new Error('歌声データを読み込めませんでした。');
+    }
+
+    const startAt = context.currentTime + 0.08;
+    const voiceSource = new AudioBufferSourceNode(context, { buffer: voiceBuffer, loop: true });
+    voiceSource.connect(context.destination);
+    voiceSource.start(startAt);
+    voiceSourceRef.current = voiceSource;
+
+    const instBuffer = instBufferRef.current;
+    if (instBuffer) {
+      const instSource = new AudioBufferSourceNode(context, { buffer: instBuffer, loop: true });
+      const instGain = new GainNode(context, { gain: 0.4 });
+      instSource.connect(instGain).connect(context.destination);
+      instSource.start(startAt);
+      instSourceRef.current = instSource;
+    }
   };
 
   const restart = () => {
-    if (voiceRef.current) {
-      voiceRef.current.currentTime = 0;
-    }
-    if (instRef.current) {
-      instRef.current.currentTime = 0;
+    if (playing) {
+      try {
+        startSyncedPlayback(getAudioContext());
+      } catch (error) {
+        setPlayError(error instanceof Error ? error.message : String(error));
+      }
     }
   };
 
   const play = async () => {
     setPlayError('');
     try {
-      restart();
-      if (instRef.current) {
-        instRef.current.volume = 0.4;
-        await instRef.current.play();
+      const context = getAudioContext();
+      if (context.state === 'suspended') {
+        await context.resume();
       }
-      await voiceRef.current?.play();
+      await ensureBuffers(context);
+      startSyncedPlayback(context);
       setPlaying(true);
     } catch (error) {
       setPlaying(false);
-      setPlayError('音声を再生できませんでした。ブラウザの再生ボタンをもう一度押してください。');
+      setPlayError(error instanceof Error ? error.message : '音声を再生できませんでした。ブラウザの再生ボタンをもう一度押してください。');
       console.error(error);
     }
   };
@@ -62,8 +124,9 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
   useEffect(() => {
     return () => {
       stop();
+      void audioContextRef.current?.close();
     };
-  }, []);
+  }, [stop]);
 
   return (
     <ScreenShell background="/assets/texture/assets/result_sunny.gif" fit="cover">
@@ -93,8 +156,6 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
         </div>
         <AssetButton imageSrc="/assets/texture/assets/button/title.png" label="タイトルへ" onClick={onTitle} className="result-title-button" />
       </section>
-      <audio ref={voiceRef} src={result.blobUrl} loop />
-      {song.instUrl ? <audio ref={instRef} src={song.instUrl} loop /> : null}
     </ScreenShell>
   );
 }
