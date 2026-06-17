@@ -8,6 +8,13 @@ import type {
 import { fetchStaticSongDetail, fetchStaticSongs, previewStaticLyrics } from './staticSongs';
 
 const staticSynthesisMessage = 'この公開版では歌声生成サーバーに接続できません。クイズは遊べますが、歌声生成にはローカル版とVOICEVOXの起動が必要です。';
+const synthesisTimeoutMessage = '歌声生成の応答がありませんでした。VOICEVOX未接続、またはブラウザからローカルVOICEVOXへ接続できない可能性があります。';
+
+function createTimeoutSignal(ms: number): AbortSignal {
+  const controller = new AbortController();
+  window.setTimeout(() => controller.abort(), ms);
+  return controller.signal;
+}
 
 function apiUrl(path: string): string {
   return `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
@@ -15,6 +22,10 @@ function apiUrl(path: string): string {
 
 function isNetworkOrStaticHostError(error: unknown): boolean {
   return error instanceof TypeError || error instanceof SyntaxError;
+}
+
+function isAbortError(error: unknown): boolean {
+  return error instanceof DOMException && error.name === 'AbortError';
 }
 
 async function readError(response: Response): Promise<string> {
@@ -97,7 +108,8 @@ export async function synthesizeSong(request: SynthesisRequest): Promise<Blob> {
     const response = await fetch(apiUrl('/api/synthesis'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(request)
+      body: JSON.stringify(request),
+      signal: createTimeoutSignal(120_000)
     });
     if (!response.ok) {
       const contentType = response.headers.get('content-type') ?? '';
@@ -108,6 +120,9 @@ export async function synthesizeSong(request: SynthesisRequest): Promise<Blob> {
     }
     return response.blob();
   } catch (error) {
+    if (isAbortError(error)) {
+      throw new Error(synthesisTimeoutMessage);
+    }
     if (isNetworkOrStaticHostError(error)) {
       throw new Error(staticSynthesisMessage);
     }

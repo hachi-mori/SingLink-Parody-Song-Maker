@@ -21,6 +21,7 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
   const [message, setMessage] = useState('ずんだもん が おうた を れんしゅう しているよ');
   const [error, setError] = useState('');
   const startedRef = useRef(false);
+  const doneRef = useRef(false);
 
   useEffect(() => {
     if (startedRef.current) {
@@ -28,6 +29,11 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
     }
     startedRef.current = true;
     let cancelled = false;
+    const skipTimer = window.setTimeout(() => {
+      if (!cancelled && !doneRef.current) {
+        setError('歌声生成に時間がかかっています。VOICEVOXに接続できない場合は、音声なしでリザルトを確認できます。');
+      }
+    }, 12_000);
 
     const run = async () => {
       try {
@@ -39,7 +45,7 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
           voicevoxBaseUrl
         });
 
-        if (cancelled) {
+        if (cancelled || doneRef.current) {
           return;
         }
 
@@ -56,9 +62,10 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
           wavBlob: blob
         });
 
-        if (cancelled) {
+        if (cancelled || doneRef.current) {
           return;
         }
+        doneRef.current = true;
         onDone({
           status: 'generated',
           blob,
@@ -66,7 +73,7 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
           fileName
         });
       } catch (synthesisError) {
-        if (!cancelled) {
+        if (!cancelled && !doneRef.current) {
           setError(synthesisError instanceof Error ? synthesisError.message : String(synthesisError));
         }
       }
@@ -75,10 +82,15 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
     void run();
     return () => {
       cancelled = true;
+      window.clearTimeout(skipTimer);
     };
   }, [song, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, onDone]);
 
   const skipVoice = () => {
+    if (doneRef.current) {
+      return;
+    }
+    doneRef.current = true;
     onDone({
       status: 'skipped',
       message: error || 'VOICEVOXに接続できなかったため、音声生成をスキップしました。'
