@@ -5,6 +5,7 @@ import { buildGeneratedFileName } from '../lib/fileName';
 import { saveGeneratedTrack } from '../lib/historyDb';
 import { ScreenShell } from '../components/ScreenShell';
 import { assetUrl } from '../lib/assets';
+import type { GeneratedResult } from '../lib/generatedResult';
 
 type LoadingScreenProps = {
   song: SongDetail;
@@ -12,7 +13,7 @@ type LoadingScreenProps = {
   fullLyrics: string;
   inputTexts: string[];
   voicevoxBaseUrl: string;
-  onDone: (result: { blob: Blob; blobUrl: string; fileName: string }) => void;
+  onDone: (result: GeneratedResult) => void;
   onBack: () => void;
 };
 
@@ -59,6 +60,7 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
           return;
         }
         onDone({
+          status: 'generated',
           blob,
           blobUrl: URL.createObjectURL(blob),
           fileName
@@ -76,6 +78,13 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
     };
   }, [song, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, onDone]);
 
+  const skipVoice = () => {
+    onDone({
+      status: 'skipped',
+      message: error || 'VOICEVOXに接続できなかったため、音声生成をスキップしました。'
+    });
+  };
+
   return (
     <ScreenShell background={assetUrl('assets/texture/assets/loding_background.gif')} fit="cover">
       <section className="loading-panel">
@@ -84,6 +93,7 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
         {error ? (
           <>
             <p className="error-text">{error}</p>
+            <button onClick={skipVoice}>音声なしでリザルトを見る</button>
             <button onClick={onBack}>入力画面へ戻る</button>
           </>
         ) : null}

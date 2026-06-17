@@ -5,16 +5,14 @@ import { AssetButton } from '../components/AssetButton';
 import { ScreenShell } from '../components/ScreenShell';
 import { downloadBlob } from '../lib/fileName';
 import { assetUrl } from '../lib/assets';
+import type { GeneratedResult } from '../lib/generatedResult';
+import { hasGeneratedAudio } from '../lib/generatedResult';
 
 type ResultScreenProps = {
   song: SongDetail;
   tasks: SolvedTask[];
   fullLyrics: string;
-  result: {
-    blob: Blob;
-    blobUrl: string;
-    fileName: string;
-  };
+  result: GeneratedResult;
   onTitle: () => void;
   onHistory: () => void;
 };
@@ -27,6 +25,7 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
   const instSourceRef = useRef<AudioBufferSourceNode | undefined>(undefined);
   const [playing, setPlaying] = useState(false);
   const [playError, setPlayError] = useState('');
+  const generatedAudio = hasGeneratedAudio(result);
 
   const userInputs = useMemo(() => tasks.map((task) => task.userInput).filter(Boolean), [tasks]);
   const lines = fullLyrics.replace(/[{}]/g, '').split('\n');
@@ -65,6 +64,9 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
   };
 
   const ensureBuffers = async (context: AudioContext) => {
+    if (!generatedAudio) {
+      throw new Error('音声生成をスキップしたため、再生できる音声はありません。');
+    }
     voiceBufferRef.current ??= await decodeBlob(context, result.blob);
     if (song.instUrl && !instBufferRef.current) {
       instBufferRef.current = await decodeUrl(context, song.instUrl);
@@ -147,12 +149,20 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
             ))}
           </div>
 
+          {generatedAudio ? (
           <div className="player-actions">
             <button onClick={playing ? stop : play}>{playing ? <Pause /> : <Play />}{playing ? '停止' : '再生'}</button>
             <button onClick={restart}><RotateCcw />最初から</button>
             <button onClick={() => downloadBlob(result.blob, result.fileName)}><Download />DL</button>
             <button onClick={onHistory}>履歴</button>
           </div>
+          ) : (
+            <div className="result-notice">
+              <strong>音声生成をスキップしました</strong>
+              <p>{result.message}</p>
+              <p>歌詞と結果はこの画面で確認できます。</p>
+            </div>
+          )}
           {playError ? <p className="error-text">{playError}</p> : null}
         </div>
         <AssetButton imageSrc={assetUrl('assets/texture/assets/button/title.png')} label="タイトルへ" onClick={onTitle} className="result-title-button" />

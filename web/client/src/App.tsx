@@ -8,14 +8,9 @@ import { ResultScreen } from './screens/ResultScreen';
 import { StaticImageScreen } from './screens/StaticImageScreen';
 import { HistoryScreen } from './screens/HistoryScreen';
 import { assetUrl } from './lib/assets';
+import type { GeneratedResult } from './lib/generatedResult';
 
 type Screen = 'title' | 'write' | 'loading' | 'result' | 'story' | 'howto' | 'credit' | 'history';
-
-type GeneratedResult = {
-  blob: Blob;
-  blobUrl: string;
-  fileName: string;
-};
 
 export function App() {
   const [screen, setScreen] = useState<Screen>('title');
