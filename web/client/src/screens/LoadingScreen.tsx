@@ -5,6 +5,7 @@ import { buildGeneratedFileName } from '../lib/fileName';
 import { saveGeneratedTrack } from '../lib/historyDb';
 import { ScreenShell } from '../components/ScreenShell';
 import { assetUrl } from '../lib/assets';
+import type { GeneratedResult } from '../lib/generatedResult';
 
 type LoadingScreenProps = {
   song: SongDetail;
@@ -12,14 +13,16 @@ type LoadingScreenProps = {
   fullLyrics: string;
   inputTexts: string[];
   voicevoxBaseUrl: string;
-  onDone: (result: { blob: Blob; blobUrl: string; fileName: string }) => void;
+  voicevoxConnected: boolean;
+  onDone: (result: GeneratedResult) => void;
   onBack: () => void;
 };
 
-export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, onDone, onBack }: LoadingScreenProps) {
+export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, voicevoxConnected, onDone, onBack }: LoadingScreenProps) {
   const [message, setMessage] = useState('ずんだもん が おうた を れんしゅう しているよ');
   const [error, setError] = useState('');
   const startedRef = useRef(false);
+  const doneRef = useRef(false);
 
   useEffect(() => {
     if (startedRef.current) {
@@ -27,9 +30,27 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
     }
     startedRef.current = true;
     let cancelled = false;
+    const skipWithMessage = (reason: string) => {
+      if (cancelled || doneRef.current) {
+        return;
+      }
+      doneRef.current = true;
+      onDone({
+        status: 'skipped',
+        message: reason
+      });
+    };
+    const skipTimer = window.setTimeout(() => {
+      skipWithMessage('歌声生成に時間がかかっているため、音声なしでリザルトを表示しました。VOICEVOXに接続できない場合でもクイズ結果は確認できます。');
+    }, 12_000);
 
     const run = async () => {
       try {
+        if (!voicevoxConnected) {
+          skipWithMessage('VOICEVOXに接続されていないため、音声生成をスキップしました。クイズ結果は音声なしで確認できます。');
+          return;
+        }
+
         setMessage('VOICEVOXに歌声をお願いしています...');
         const blob = await synthesizeSong({
           songId: song.id,
@@ -38,7 +59,7 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
           voicevoxBaseUrl
         });
 
-        if (cancelled) {
+        if (cancelled || doneRef.current) {
           return;
         }
 
@@ -55,26 +76,38 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
           wavBlob: blob
         });
 
-        if (cancelled) {
+        if (cancelled || doneRef.current) {
           return;
         }
+        doneRef.current = true;
         onDone({
+          status: 'generated',
           blob,
           blobUrl: URL.createObjectURL(blob),
           fileName
         });
       } catch (synthesisError) {
-        if (!cancelled) {
-          setError(synthesisError instanceof Error ? synthesisError.message : String(synthesisError));
-        }
+        skipWithMessage(synthesisError instanceof Error ? synthesisError.message : String(synthesisError));
       }
     };
 
     void run();
     return () => {
       cancelled = true;
+      window.clearTimeout(skipTimer);
     };
-  }, [song, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, onDone]);
+  }, [song, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, voicevoxConnected, onDone]);
+
+  const skipVoice = () => {
+    if (doneRef.current) {
+      return;
+    }
+    doneRef.current = true;
+    onDone({
+      status: 'skipped',
+      message: error || 'VOICEVOXに接続できなかったため、音声生成をスキップしました。'
+    });
+  };
 
   return (
     <ScreenShell background={assetUrl('assets/texture/assets/loding_background.gif')} fit="cover">
@@ -84,6 +117,7 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
         {error ? (
           <>
             <p className="error-text">{error}</p>
+            <button onClick={skipVoice}>音声なしでリザルトを見る</button>
             <button onClick={onBack}>入力画面へ戻る</button>
           </>
         ) : null}
