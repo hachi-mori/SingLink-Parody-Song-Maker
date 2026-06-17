@@ -1184,8 +1184,7 @@ void WriteLyrics::draw() const
 		explainPanel.rounded(16).draw(ColorF{ 1.0, 1.0, 1.0, 0.9 });
 		explainPanel.rounded(16).drawFrame(3, 0, ColorF{ 0.72, 0.60, 0.40, 0.95 });
 
-		// 見出しは小さめに、本文は最大1行（超過は省略）で描画
-		result_font(U"かいせつ").drawAt(20, explainPanel.center().movedBy(-420, 0), ColorF{ 0.35, 0.27, 0.15 });
+		// 本文は最大1行（超過は省略）で描画
 		String explanationLine = m_onomatopoeiaFeedbackExplanation;
 		const size_t maxChars = 48;
 		if (explanationLine.size() > maxChars)
