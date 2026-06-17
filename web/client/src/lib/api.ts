@@ -20,6 +20,10 @@ function apiUrl(path: string): string {
   return `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
 }
 
+function isGitHubPagesHost(): boolean {
+  return window.location.hostname.endsWith('.github.io');
+}
+
 function isNetworkOrStaticHostError(error: unknown): boolean {
   return error instanceof TypeError || error instanceof SyntaxError;
 }
@@ -104,6 +108,10 @@ export async function previewLyrics(songId: string, solvedTasks: SynthesisReques
 }
 
 export async function synthesizeSong(request: SynthesisRequest): Promise<Blob> {
+  if (isGitHubPagesHost()) {
+    throw new Error(staticSynthesisMessage);
+  }
+
   try {
     const response = await fetch(apiUrl('/api/synthesis'), {
       method: 'POST',

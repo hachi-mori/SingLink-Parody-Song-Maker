@@ -91,6 +91,7 @@ export function App() {
         fullLyrics={fullLyrics}
         inputTexts={inputTexts}
         voicevoxBaseUrl={voicevoxBaseUrl}
+        voicevoxConnected={voicevoxStatus?.ok !== false}
         onBack={() => setScreen('write')}
         onDone={(result) => {
           setGeneratedResult(result);
