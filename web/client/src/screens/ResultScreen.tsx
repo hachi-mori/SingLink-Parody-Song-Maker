@@ -4,6 +4,7 @@ import type { SolvedTask, SongDetail } from '@shared/types';
 import { AssetButton } from '../components/AssetButton';
 import { ScreenShell } from '../components/ScreenShell';
 import { downloadBlob } from '../lib/fileName';
+import { assetUrl } from '../lib/assets';
 
 type ResultScreenProps = {
   song: SongDetail;
@@ -129,9 +130,9 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
   }, [stop]);
 
   return (
-    <ScreenShell background="/assets/texture/assets/result_sunny.gif" fit="cover">
+    <ScreenShell background={assetUrl('assets/texture/assets/result_sunny.gif')} fit="cover">
       <section className="result-layout">
-        <img className="result-character" src="/assets/texture/assets/zunda_singing.gif" alt="" aria-hidden="true" />
+        <img className="result-character" src={assetUrl('assets/texture/assets/zunda_singing.gif')} alt="" aria-hidden="true" />
         <div className="result-card">
           <p>{song.title}の曲で作った</p>
           <h1>{song.trackName || song.title}</h1>
@@ -154,7 +155,7 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
           </div>
           {playError ? <p className="error-text">{playError}</p> : null}
         </div>
-        <AssetButton imageSrc="/assets/texture/assets/button/title.png" label="タイトルへ" onClick={onTitle} className="result-title-button" />
+        <AssetButton imageSrc={assetUrl('assets/texture/assets/button/title.png')} label="タイトルへ" onClick={onTitle} className="result-title-button" />
       </section>
     </ScreenShell>
   );

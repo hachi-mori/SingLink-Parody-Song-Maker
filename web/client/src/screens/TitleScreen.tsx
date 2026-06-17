@@ -2,6 +2,7 @@ import { RefreshCw } from 'lucide-react';
 import type { SongInfo, VoicevoxVersionResponse } from '@shared/types';
 import { AssetButton } from '../components/AssetButton';
 import { ScreenShell } from '../components/ScreenShell';
+import { assetUrl } from '../lib/assets';
 
 type TitleScreenProps = {
   songs: SongInfo[];
@@ -24,7 +25,7 @@ export function TitleScreen(props: TitleScreenProps) {
   const statusClass = props.voicevoxStatus?.ok ? 'status-ok' : 'status-warn';
 
   return (
-    <ScreenShell background="/assets/texture/assets/title_background.png" fit="cover">
+    <ScreenShell background={assetUrl('assets/texture/assets/title_background.png')} fit="cover">
       <section className="title-layout">
         <div className="voicevox-panel">
           <div className={statusClass}>{props.voicevoxStatus?.message ?? 'VOICEVOX確認中...'}</div>
@@ -45,7 +46,7 @@ export function TitleScreen(props: TitleScreenProps) {
         <button className="credit-link" onClick={props.onOpenCredit}>クレジット</button>
 
         <div className="title-main">
-          <img className="title-logo" src="/assets/texture/assets/title_logo.png" alt="シングリンク" />
+          <img className="title-logo" src={assetUrl('assets/texture/assets/title_logo.png')} alt="シングリンク" />
           <div className="song-picker">
             <label htmlFor="song-select">あそぶ曲</label>
             <select
@@ -64,9 +65,9 @@ export function TitleScreen(props: TitleScreenProps) {
           </div>
 
           <nav className="title-actions" aria-label="タイトルメニュー">
-            <AssetButton imageSrc="/assets/texture/assets/button/story.png" label="ストーリー" onClick={props.onOpenStory} />
-            <AssetButton imageSrc="/assets/texture/assets/button/start.png" label="スタート" onClick={props.onStart} disabled={props.loading} />
-            <AssetButton imageSrc="/assets/texture/assets/button/howtoplay.png" label="あそびかた" onClick={props.onOpenHowTo} />
+            <AssetButton imageSrc={assetUrl('assets/texture/assets/button/story.png')} label="ストーリー" onClick={props.onOpenStory} />
+            <AssetButton imageSrc={assetUrl('assets/texture/assets/button/start.png')} label="スタート" onClick={props.onStart} disabled={props.loading} />
+            <AssetButton imageSrc={assetUrl('assets/texture/assets/button/howtoplay.png')} label="あそびかた" onClick={props.onOpenHowTo} />
             <button className="history-button" onClick={props.onOpenHistory}>保存した曲</button>
           </nav>
         </div>

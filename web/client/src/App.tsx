@@ -7,6 +7,7 @@ import { LoadingScreen } from './screens/LoadingScreen';
 import { ResultScreen } from './screens/ResultScreen';
 import { StaticImageScreen } from './screens/StaticImageScreen';
 import { HistoryScreen } from './screens/HistoryScreen';
+import { assetUrl } from './lib/assets';
 
 type Screen = 'title' | 'write' | 'loading' | 'result' | 'story' | 'howto' | 'credit' | 'history';
 
@@ -118,15 +119,15 @@ export function App() {
   }
 
   if (screen === 'story') {
-    return <StaticImageScreen title="ストーリー" imageSrc="/assets/texture/assets/story.png" onBack={() => setScreen('title')} />;
+    return <StaticImageScreen title="ストーリー" imageSrc={assetUrl('assets/texture/assets/story.png')} onBack={() => setScreen('title')} />;
   }
 
   if (screen === 'howto') {
-    return <StaticImageScreen title="あそびかた" imageSrc="/assets/texture/assets/howtoplay.png" onBack={() => setScreen('title')} />;
+    return <StaticImageScreen title="あそびかた" imageSrc={assetUrl('assets/texture/assets/howtoplay.png')} onBack={() => setScreen('title')} />;
   }
 
   if (screen === 'credit') {
-    return <StaticImageScreen title="クレジット" imageSrc="/assets/texture/assets/credit.png" onBack={() => setScreen('title')} />;
+    return <StaticImageScreen title="クレジット" imageSrc={assetUrl('assets/texture/assets/credit.png')} onBack={() => setScreen('title')} />;
   }
 
   if (screen === 'history') {

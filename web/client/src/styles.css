@@ -1,6 +1,6 @@
 @font-face {
   font-family: "FutehodoMaru";
-  src: url("/assets/texture/Futehodo-MaruGothic.ttf") format("truetype");
+  src: url("../../assets/texture/Futehodo-MaruGothic.ttf") format("truetype");
   font-display: swap;
 }
 

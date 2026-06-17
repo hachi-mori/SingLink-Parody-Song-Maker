@@ -4,6 +4,7 @@ import { synthesizeSong } from '../lib/api';
 import { buildGeneratedFileName } from '../lib/fileName';
 import { saveGeneratedTrack } from '../lib/historyDb';
 import { ScreenShell } from '../components/ScreenShell';
+import { assetUrl } from '../lib/assets';
 
 type LoadingScreenProps = {
   song: SongDetail;
@@ -76,7 +77,7 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
   }, [song, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, onDone]);
 
   return (
-    <ScreenShell background="/assets/texture/assets/loding_background.gif" fit="cover">
+    <ScreenShell background={assetUrl('assets/texture/assets/loding_background.gif')} fit="cover">
       <section className="loading-panel">
         <h1>{message}</h1>
         {!error ? <div className="loading-dots"><span /><span /><span /></div> : null}

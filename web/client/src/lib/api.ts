@@ -5,6 +5,17 @@ import type {
   SynthesisRequest,
   VoicevoxVersionResponse
 } from '@shared/types';
+import { fetchStaticSongDetail, fetchStaticSongs, previewStaticLyrics } from './staticSongs';
+
+const staticSynthesisMessage = 'この公開版では歌声生成サーバーに接続できません。クイズは遊べますが、歌声生成にはローカル版とVOICEVOXの起動が必要です。';
+
+function apiUrl(path: string): string {
+  return `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
+}
+
+function isNetworkOrStaticHostError(error: unknown): boolean {
+  return error instanceof TypeError || error instanceof SyntaxError;
+}
 
 async function readError(response: Response): Promise<string> {
   try {
@@ -16,47 +27,90 @@ async function readError(response: Response): Promise<string> {
 }
 
 export async function fetchSongs(): Promise<SongInfo[]> {
-  const response = await fetch('/api/songs');
-  if (!response.ok) {
-    throw new Error(`曲一覧を読み込めませんでした: ${await readError(response)}`);
+  try {
+    const response = await fetch(apiUrl('/api/songs'));
+    if (!response.ok) {
+      return fetchStaticSongs();
+    }
+    return (await response.json()) as SongInfo[];
+  } catch (error) {
+    if (isNetworkOrStaticHostError(error)) {
+      return fetchStaticSongs();
+    }
+    throw error;
   }
-  return (await response.json()) as SongInfo[];
 }
 
 export async function fetchSongDetail(songId: string): Promise<SongDetail> {
-  const response = await fetch(`/api/songs/${encodeURIComponent(songId)}`);
-  if (!response.ok) {
-    throw new Error(`曲データを読み込めませんでした: ${await readError(response)}`);
+  try {
+    const response = await fetch(apiUrl(`/api/songs/${encodeURIComponent(songId)}`));
+    if (!response.ok) {
+      return fetchStaticSongDetail(songId);
+    }
+    return (await response.json()) as SongDetail;
+  } catch (error) {
+    if (isNetworkOrStaticHostError(error)) {
+      return fetchStaticSongDetail(songId);
+    }
+    throw error;
   }
-  return (await response.json()) as SongDetail;
 }
 
 export async function checkVoicevox(baseUrl: string): Promise<VoicevoxVersionResponse> {
-  const response = await fetch(`/api/voicevox/version?baseUrl=${encodeURIComponent(baseUrl)}`);
-  return (await response.json()) as VoicevoxVersionResponse;
+  try {
+    const response = await fetch(apiUrl(`/api/voicevox/version?baseUrl=${encodeURIComponent(baseUrl)}`));
+    if (!response.ok) {
+      throw new Error(await readError(response));
+    }
+    return (await response.json()) as VoicevoxVersionResponse;
+  } catch {
+    return {
+      ok: false,
+      baseUrl,
+      message: 'VOICEVOX未接続: クイズは遊べます。歌声生成にはローカル版の起動が必要です。'
+    };
+  }
 }
 
 export async function previewLyrics(songId: string, solvedTasks: SynthesisRequest['solvedTasks']): Promise<string> {
-  const response = await fetch('/api/parody/preview', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ songId, solvedTasks })
-  });
-  if (!response.ok) {
-    throw new Error(`歌詞プレビューを生成できませんでした: ${await readError(response)}`);
+  try {
+    const response = await fetch(apiUrl('/api/parody/preview'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ songId, solvedTasks })
+    });
+    if (!response.ok) {
+      return previewStaticLyrics(songId, solvedTasks);
+    }
+    const body = (await response.json()) as { lyrics: string };
+    return body.lyrics;
+  } catch (error) {
+    if (isNetworkOrStaticHostError(error)) {
+      return previewStaticLyrics(songId, solvedTasks);
+    }
+    throw error;
   }
-  const body = (await response.json()) as { lyrics: string };
-  return body.lyrics;
 }
 
 export async function synthesizeSong(request: SynthesisRequest): Promise<Blob> {
-  const response = await fetch('/api/synthesis', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(request)
-  });
-  if (!response.ok) {
-    throw new Error(await readError(response));
+  try {
+    const response = await fetch(apiUrl('/api/synthesis'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request)
+    });
+    if (!response.ok) {
+      const contentType = response.headers.get('content-type') ?? '';
+      if (response.status === 404 || contentType.includes('text/html')) {
+        throw new Error(staticSynthesisMessage);
+      }
+      throw new Error(await readError(response));
+    }
+    return response.blob();
+  } catch (error) {
+    if (isNetworkOrStaticHostError(error)) {
+      throw new Error(staticSynthesisMessage);
+    }
+    throw error;
   }
-  return response.blob();
 }

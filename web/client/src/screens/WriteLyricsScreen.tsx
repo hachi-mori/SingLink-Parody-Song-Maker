@@ -13,6 +13,7 @@ import type { OnomatopoeiaEntry, SolvedTask, SongDetail, VerbEntry } from '@shar
 import { AssetButton } from '../components/AssetButton';
 import { ScreenShell } from '../components/ScreenShell';
 import { previewLyrics } from '../lib/api';
+import { assetUrl } from '../lib/assets';
 import { shuffle, takeShuffled } from '../lib/random';
 
 type WriteLyricsScreenProps = {
@@ -244,7 +245,7 @@ export function WriteLyricsScreen({ song, onComplete, onCancel }: WriteLyricsScr
   if (!started) {
     const remaining = Math.max(0, countdownSeconds - Math.floor((Date.now() - countdownStartedAt) / 1000));
     return (
-      <ScreenShell background="/assets/texture/assets/result_background.png" fit="cover">
+      <ScreenShell background={assetUrl('assets/texture/assets/result_background.png')} fit="cover">
         <section className="countdown-screen">
           <p>{song.title}</p>
           <strong>{remaining > 0 ? remaining : 'START!'}</strong>
@@ -255,11 +256,11 @@ export function WriteLyricsScreen({ song, onComplete, onCancel }: WriteLyricsScr
 
   if (problemCount === 0) {
     return (
-      <ScreenShell background="/assets/texture/assets/game_background2.gif" fit="cover" dim>
+      <ScreenShell background={assetUrl('assets/texture/assets/game_background2.gif')} fit="cover" dim>
         <section className="game-panel">
           <h1>お題がありません</h1>
           <p>曲データか辞書CSVを確認してください。</p>
-          <AssetButton imageSrc="/assets/texture/assets/button/title.png" label="タイトルへ" onClick={onCancel} />
+          <AssetButton imageSrc={assetUrl('assets/texture/assets/button/title.png')} label="タイトルへ" onClick={onCancel} />
         </section>
       </ScreenShell>
     );
@@ -270,7 +271,7 @@ export function WriteLyricsScreen({ song, onComplete, onCancel }: WriteLyricsScr
     : currentProblem?.questionText ?? '';
 
   return (
-    <ScreenShell background="/assets/texture/assets/game_background2.gif" fit="cover">
+    <ScreenShell background={assetUrl('assets/texture/assets/game_background2.gif')} fit="cover">
       <section className="game-hud">
         <span>{Math.min(currentIndex + 1, problemCount)} / {problemCount}</span>
         <strong className={remainingSeconds <= 3 ? 'danger-time' : ''}>{remainingSeconds}</strong>

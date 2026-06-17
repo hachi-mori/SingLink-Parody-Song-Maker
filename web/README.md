@@ -75,6 +75,20 @@ npm run test
 npm run build
 ```
 
+`npm run build` では、`dist/client/` にフロントエンド一式と `web/assets/` の素材をコピーします。
+
+## GitHub Pages 公開について
+
+GitHub Pages は静的ファイル配信のみのため、Node.js / Fastify の API サーバーは動きません。そのため公開版では次の扱いになります。
+
+- タイトル、説明、曲選択、クイズ、歌詞プレビューは動きます。
+- `.vvproj`、伴奏、辞書CSV、画像/GIFは `dist/client/assets/` から読み込みます。
+- VOICEVOX 歌声生成は GitHub Pages 単体では動きません。
+- VOICEVOX や合成サーバーが無い場合は、画面に注意文を出して停止します。
+- 歌声生成まで確認したい場合は、従来どおりローカルで `npm run dev` と VOICEVOX を起動してください。
+
+GitHub Pages に置く対象は `web/dist/client/` です。
+
 ## 実画面確認済み
 
 - タイトル表示
@@ -91,5 +105,5 @@ npm run build
 
 - スマホ幅の UI 表示には対応していますが、ローカル VOICEVOX での合成は PC ローカル起動を推奨します。
 - 公開 Web サービスとしてのユーザー管理、クラウド保存、サーバーDBは未実装です。
-- 本番ビルド時、フォントの `/assets/texture/Futehodo-MaruGothic.ttf` は実行時解決として扱われます。サーバー経由では正しく配信されます。
-- VOICEVOX が起動していない場合、合成画面でエラーを表示します。
+- GitHub Pages 版では歌声生成はできません。クイズ後に注意文を表示します。
+- ローカル版で VOICEVOX が起動していない場合、合成画面でエラーを表示します。
