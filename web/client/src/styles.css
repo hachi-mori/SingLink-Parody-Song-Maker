@@ -391,11 +391,13 @@ button:disabled {
 }
 
 .feedback-panel {
-  width: min(900px, 94vw);
+  width: min(1040px, 94vw);
+  max-height: calc(100svh - 36px);
+  overflow: auto;
   display: grid;
   justify-items: center;
-  gap: 10px;
-  padding: clamp(20px, 5vw, 48px);
+  gap: clamp(8px, 1.2vw, 14px);
+  padding: clamp(18px, 3vw, 34px);
   border: 6px solid var(--brown);
   border-radius: 24px;
   background: var(--cream);
@@ -403,15 +405,41 @@ button:disabled {
   text-align: center;
 }
 
+.feedback-panel h2 {
+  margin: 0;
+  color: var(--brown);
+  font-size: clamp(34px, 4vw, 56px);
+  line-height: 1.08;
+}
+
+.feedback-panel p {
+  margin: 0;
+  font-size: clamp(24px, 2.4vw, 34px);
+  line-height: 1.28;
+}
+
+.feedback-panel small {
+  max-width: 880px;
+  color: var(--brown);
+  font-size: clamp(21px, 2vw, 28px);
+  line-height: 1.45;
+}
+
+.feedback-panel button {
+  min-width: 180px;
+  min-height: 56px;
+  font-size: clamp(24px, 2.2vw, 30px);
+}
+
 .judge-mark {
-  width: 120px;
-  height: 120px;
+  width: clamp(106px, 9vw, 132px);
+  height: clamp(106px, 9vw, 132px);
   display: grid;
   place-items: center;
   border-radius: 50%;
   background: #fff;
   color: #d92525;
-  font-size: 96px;
+  font-size: clamp(82px, 8vw, 112px);
   line-height: 1;
 }
 
@@ -759,8 +787,18 @@ button:disabled {
 }
 
 @media (min-width: 841px) and (orientation: landscape) {
+  .title-main {
+    width: min(1160px, 92vw);
+    transform: translateY(clamp(16px, 3svh, 34px));
+  }
+
+  .title-logo {
+    width: min(70vw, 1120px);
+    max-height: 44svh;
+  }
+
   .result-layout {
-    grid-template-columns: minmax(420px, 0.92fr) minmax(420px, 0.78fr);
+    grid-template-columns: minmax(360px, 0.78fr) minmax(620px, 1.05fr);
     align-items: center;
     padding: clamp(28px, 4vw, 64px);
   }
@@ -777,8 +815,8 @@ button:disabled {
 
   .result-card {
     grid-column: 2;
-    justify-self: end;
-    width: min(720px, 43vw);
+    justify-self: start;
+    width: min(920px, 56vw);
   }
 }
 
