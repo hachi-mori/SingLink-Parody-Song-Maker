@@ -458,11 +458,19 @@ namespace VOICEVOX
 		{
 			const int64 pos = note[U"position"].get<int64>();
 			const int64 dur = note[U"duration"].get<int64>();
-			const int   midi = note[U"noteNumber"].get<int>();
-			const String lyr = note[U"lyric"].getString();
 
 			if (const int64 gap = pos - prevEnd; gap > 0)
 				putRest(CalcFrameLen(gap, bpm, tpqn, carry));
+
+			if (note[U"notelen"].getOpt<String>().value_or(U"") == U"R")
+			{
+				putRest(CalcFrameLen(dur, bpm, tpqn, carry));
+				prevEnd = pos + dur;
+				continue;
+			}
+
+			const int   midi = note[U"noteNumber"].get<int>();
+			const String lyr = note[U"lyric"].getString();
 
 			JSON n;
 			n[U"frame_length"] = CalcFrameLen(dur, bpm, tpqn, carry);
@@ -726,6 +734,155 @@ namespace VOICEVOX
 		}
 
 		//Console(U"分割合成＆連結が完了: " + outputPath);
+		return true;
+	}
+
+	bool VOICEVOX::SynthesizeOnomatopoeiaScoreByLine(
+		const FilePath& inputPath,
+		const FilePath& outputPath,
+		const Array<bool>& lineCorrects,
+		int32 normalSpeakerID,
+		int32 incorrectSpeakerID,
+		const URL& baseURL,
+		int keyShift)
+	{
+		JSON score = JSON::Load(inputPath);
+		if (!score || !score[U"notes"].isArray())
+		{
+			Console(U"Score JSON の読み込み失敗");
+			return false;
+		}
+
+		Array<JSON> notes;
+		for (const auto& note : score[U"notes"].arrayView())
+		{
+			notes << note;
+		}
+
+		// オノマトペ譜面は「問題行1」「問題行2」「問題行3」「固定歌詞」の順。
+		// ConvertVVProjToScoreJSON が挿入する休符も、直前の行に含めてタイミングを保つ。
+		const Array<std::pair<size_t, size_t>> ranges = {
+			{ 0, 16 },
+			{ 16, 31 },
+			{ 31, 47 },
+			{ 47, notes.size() }
+		};
+
+		if (notes.size() < 48)
+		{
+			Console(U"オノマトペ譜面のノート数が想定より少ないため通常合成します");
+			return VOICEVOX::SynthesizeFromJSONFileWrapperSplit(
+				inputPath,
+				outputPath,
+				normalSpeakerID,
+				baseURL,
+				2500,
+				keyShift);
+		}
+
+		if (keyShift != 0)
+		{
+			if (!VOICEVOX::TransposeScoreJSON(inputPath, inputPath, -keyShift))
+			{
+				Console(U"Score 移調に失敗しました");
+				return false;
+			}
+			score = JSON::Load(inputPath);
+			notes.clear();
+			for (const auto& note : score[U"notes"].arrayView())
+			{
+				notes << note;
+			}
+		}
+
+		Array<FilePath> tempWavs;
+		for (size_t i = 0; i < ranges.size(); ++i)
+		{
+			const size_t start = ranges[i].first;
+			const size_t end = ranges[i].second;
+			if (start >= end || start >= notes.size())
+			{
+				continue;
+			}
+
+			Array<JSON> segmentNotes;
+			for (size_t ni = start; ni < end && ni < notes.size(); ++ni)
+			{
+				segmentNotes << notes[ni];
+			}
+			if (segmentNotes.isEmpty())
+			{
+				continue;
+			}
+
+			if (segmentNotes.front()[U"notelen"].getOpt<String>().value_or(U"") != U"R")
+			{
+				JSON leadingRest;
+				leadingRest[U"frame_length"] = 2;
+				leadingRest[U"key"] = JSON();
+				leadingRest[U"lyric"] = U"";
+				leadingRest[U"notelen"] = U"R";
+				segmentNotes.push_front(leadingRest);
+			}
+
+			const int32 speakerID = (i < 3 && i < lineCorrects.size() && !lineCorrects[i])
+				? incorrectSpeakerID
+				: normalSpeakerID;
+
+			JSON segJson;
+			segJson[U"notes"] = segmentNotes;
+
+			const FilePath tmpScore = U"tmp/tmp_onomatopoeia_score_" + Format(i) + U".json";
+			const FilePath tmpQuery = U"tmp/tmp_onomatopoeia_query_" + Format(i) + U".json";
+			const FilePath tmpWav = U"tmp/tmp_onomatopoeia_part_" + Format(i) + U".wav";
+			segJson.save(tmpScore);
+
+			const URL queryURL = U"{}/sing_frame_audio_query?speaker=6000"_fmt(baseURL);
+			if (!VOICEVOX::SynthesizeFromJSONFile(tmpScore, tmpQuery, queryURL))
+			{
+				Console(U"SingQuery 作成失敗 (オノマトペ分割 " + Format(i) + U")");
+				return false;
+			}
+
+			if (keyShift != 0 &&
+				!VOICEVOX::TransposeSingQueryJSON(tmpQuery, tmpQuery, keyShift))
+			{
+				Console(U"SingQuery 移調に失敗しました");
+				return false;
+			}
+
+			if (JSON query = JSON::Load(tmpQuery))
+			{
+				query[U"volumeScale"] = 1.0;
+				query[U"outputSamplingRate"] = 44100;
+				query[U"outputStereo"] = true;
+				query.save(tmpQuery);
+			}
+
+			const URL synthURL = U"{}/frame_synthesis?speaker={}"_fmt(baseURL, speakerID);
+			if (!VOICEVOX::SynthesizeFromJSONFile(tmpQuery, tmpWav, synthURL))
+			{
+				Console(U"音声合成失敗 (オノマトペ分割 " + Format(i) + U")");
+				return false;
+			}
+			tempWavs << tmpWav;
+		}
+
+		Wave joined;
+		for (const auto& wav : tempWavs)
+		{
+			Wave part{ wav };
+			joined.append(part);
+		}
+		joined.save(outputPath);
+
+		for (size_t i = 0; i < ranges.size(); ++i)
+		{
+			FileSystem::Remove(U"tmp/tmp_onomatopoeia_score_" + Format(i) + U".json");
+			FileSystem::Remove(U"tmp/tmp_onomatopoeia_query_" + Format(i) + U".json");
+			FileSystem::Remove(U"tmp/tmp_onomatopoeia_part_" + Format(i) + U".wav");
+		}
+
 		return true;
 	}
 
@@ -1633,7 +1790,14 @@ namespace VOICEVOX
 				{
 					continue;
 				}
-				if (task.syllables.size() != task.userSyllables.size())
+				if (task.restPadding)
+				{
+					if (task.userSyllables.isEmpty() || task.userSyllables.size() > task.syllables.size())
+					{
+						continue;
+					}
+				}
+				else if (task.syllables.size() != task.userSyllables.size())
 				{
 					continue;
 				}
@@ -1659,10 +1823,41 @@ namespace VOICEVOX
 					continue;
 				}
 
-				if (OverwriteSequenceAt(
-					lyricsSeq,
-					starts[occurrence],
-					task.userSyllables))
+				const size_t start = starts[occurrence];
+				bool replaced = false;
+				if (task.restPadding)
+				{
+					for (size_t k = 0; k < task.syllables.size(); ++k)
+					{
+						const size_t lyricIndex = start + k;
+						if (lyricIndex >= lyricsSeq.size() || lyricIndex >= noteIndexMap.size())
+						{
+							continue;
+						}
+
+						const size_t noteIndex = noteIndexMap[lyricIndex];
+						if (k < task.userSyllables.size())
+						{
+							lyricsSeq[lyricIndex] = task.userSyllables[k];
+						}
+						else
+						{
+							lyricsSeq[lyricIndex].clear();
+							noteList[noteIndex][U"lyric"] = U"";
+							noteList[noteIndex][U"notelen"] = U"R";
+						}
+					}
+					replaced = true;
+				}
+				else
+				{
+					replaced = OverwriteSequenceAt(
+						lyricsSeq,
+						start,
+						task.userSyllables);
+				}
+
+				if (replaced)
 				{
 					consumedOccurrenceCount[key] = occurrence + 1;
 				}
@@ -1686,6 +1881,42 @@ namespace VOICEVOX
 		}
 
 		return modified;
+	}
+
+	JSON ApplyParodyLyricsWithCorrectness(
+		const JSON& vvprojOriginal,
+		const Array<SolvedTask>& solvedTasks
+	)
+	{
+		// 正解のsolvedTasksのみを抽出
+		Array<SolvedTask> correctTasks;
+		for (const auto& task : solvedTasks)
+		{
+			if (task.isCorrect)
+			{
+				correctTasks << task;
+			}
+		}
+
+		// 間違いのsolvedTasksのみを抽出
+		Array<SolvedTask> incorrectTasks;
+		for (const auto& task : solvedTasks)
+		{
+			if (!task.isCorrect)
+			{
+				incorrectTasks << task;
+			}
+		}
+
+		// 各々に対して ApplyParodyLyrics を適用
+		JSON correctVV = ApplyParodyLyrics(vvprojOriginal, correctTasks);
+		JSON incorrectVV = ApplyParodyLyrics(vvprojOriginal, incorrectTasks);
+
+		// 結果をJSONで返す
+		JSON result;
+		result[U"correct"] = correctVV;
+		result[U"incorrect"] = incorrectVV;
+		return result;
 	}
 
 	String BuildResultDisplayLyrics(

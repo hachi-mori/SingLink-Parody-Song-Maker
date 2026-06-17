@@ -79,6 +79,18 @@ namespace VOICEVOX
 		int keyShift = 0
 	);
 
+	// オノマトペ用：3つの問題行を正誤に応じて別 speaker で合成し、固定歌詞と結合する
+	[[nodiscard]]
+	bool SynthesizeOnomatopoeiaScoreByLine(
+		const FilePath& inputPath,
+		const FilePath& outputPath,
+		const Array<bool>& lineCorrects,
+		int32 normalSpeakerID,
+		int32 incorrectSpeakerID,
+		const URL& baseURL,
+		int keyShift = 0
+	);
+
 	// talk 音声合成の分割合成ラッパー
 	[[nodiscard]]
 	bool SynthesizeFromVVProjWrapperSplitTalkJoin(
@@ -113,6 +125,14 @@ namespace VOICEVOX
 
 	// 替え歌の歌詞を vvproj に適用する
 	JSON ApplyParodyLyrics(
+		const JSON& vvprojOriginal,
+		const Array<SolvedTask>& solvedTasks
+	);
+
+	// 正解と間違いを区別して、複数のvvprojを返す
+	// 返り値: { "correct": correctVV, "incorrect": incorrectVV }
+	// オノマトペでの使用想定
+	JSON ApplyParodyLyricsWithCorrectness(
 		const JSON& vvprojOriginal,
 		const Array<SolvedTask>& solvedTasks
 	);

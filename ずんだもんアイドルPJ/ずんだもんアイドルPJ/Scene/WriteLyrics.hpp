@@ -13,12 +13,28 @@ public:
 	void draw() const override;
 
 private:
+	struct VerbEntry
+	{
+		String word;
+		String reading;
+		String group;
+	};
+
+	struct OnomatopoeiaEntry
+	{
+		String word;
+		String reading;
+		String answer;
+		String explanation;
+	};
+
 	mutable TextEditState m_textState;
 	String m_message;
 	Vec2 m_debugPos; // デバッグ文字の位置
 	Texture frame{ Resource(U"Texture/assets/game_frame.png") };
 	Texture background{ Resource(U"Texture/assets/result_background.png") };
 	Array<String> splitSyllables(const String& text) const;
+	Array<String> splitOnomatopoeiaMoras(const String& text) const;
 	Array<String> talkLines;
 	Array<VOICEVOX::TalkProblem> m_problems;
 	size_t m_problemCount = 0;
@@ -29,6 +45,18 @@ private:
 	String replaceChoonWithVowel(const String& text) const; // 長音記号置換関数
 	int32 decideQuestionFontSize(const String& questionText) const;
 	String makeQuestionDisplayText(size_t index, const String& questionText) const;
+	void loadVerbDictionary();
+	Optional<String> parseQuestionVerbGroup(const String& questionText) const;
+	void prepareQuizChoices();
+	void submitAnswer(const String& displayText, const String& readingText);
+	Array<VerbEntry> findVerbEntries(const String& group, size_t maxSyllables, bool sameGroup) const;
+	void loadOnomatopoeiaDictionary();
+	void prepareOnomatopoeiaProblems();
+	void prepareOnomatopoeiaChoices();
+	void submitOnomatopoeiaAnswer(const String& answerText, bool isTimeUp = false);
+	void advanceOnomatopoeiaProblem();
+	Array<String> makePlaceholderSyllables(const String& syllable, size_t count) const;
+	String buildOnomatopoeiaResultLyrics() const;
 
 	const FilePath fontPath = Resource(U"Texture/Futehodo-MaruGothic.ttf");
 	Font m_font{ FontMethod::MSDF, 180, fontPath };
@@ -51,4 +79,21 @@ private:
 	double m_countdownDuration = 5.0; // カウントダウン時間（秒）
 
 	String m_errorMessage; // 入力エラー表示用メッセージ
+	Array<VerbEntry> m_verbEntries;
+	Array<VerbEntry> m_quizOptions;
+	size_t m_correctOptionIndex = 0;
+	bool m_quizMode = false;
+	bool m_isVerbQuizSong = false;
+	bool m_isOnomatopoeiaQuizSong = false;
+	Array<OnomatopoeiaEntry> m_onimatopoeiaEntries;
+	Array<OnomatopoeiaEntry> m_onimatopoeiaProblems;
+	Array<String> m_onimatopoeiaOptions;
+	Array<String> m_onimatopoeiaSelectedAnswers;
+	bool m_onomatopoeiaFeedbackActive = false;
+	bool m_onomatopoeiaFeedbackCorrect = false;
+	bool m_onomatopoeiaFeedbackTimeUp = false;
+	String m_onomatopoeiaFeedbackQuestion;
+	String m_onomatopoeiaFeedbackSelected;
+	String m_onomatopoeiaFeedbackCorrectAnswer;
+	String m_onomatopoeiaFeedbackExplanation;
 };

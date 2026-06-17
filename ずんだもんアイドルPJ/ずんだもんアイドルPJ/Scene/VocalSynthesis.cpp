@@ -49,19 +49,6 @@ VocalSynthesis::VocalSynthesis(const InitData& init)
 
 	m_timer.start(); // タイマー開始
 
-	/*
-	Console << U"===== Scene3: 受け取った結果 =====";
-
-	// 共有データを直接参照して表示
-	for (const auto& t : getData().solvedTasks)
-	{
-		Console << U"お題：" << t.phrase;
-		Console << U"  音節リスト：" << t.syllables; // 例: [え, ぶ, り, で, い]
-		Console << U"入力：" << t.userInput;
-		Console << U"  入力の音節リスト：" << t.userSyllables;
-	}
-	*/
-
 	const JSON originalVV = JSON::Load(getData().vvprojPath);
 	const String base = FileSystem::BaseName(getData().vvprojPath);
 	m_baseName = base;
@@ -69,8 +56,8 @@ VocalSynthesis::VocalSynthesis(const InitData& init)
 	getData().SingingNames << singerName;
 	const int i = 0; // ずんだもん1人のときのインデックス
 	getData().songTrackName = VOICEVOX::GetVVProjTrackName(getData().vvprojPath, i);
-	const int32 spkID = 3003; // ずんだもん（ノーマル）
-	const int32 talkSpkID = spkID - 3000;
+	const int32 normalSpkID = 3003; // ずんだもん（ノーマル）
+	const int32 namiDameSpkID = 3076; // ずんだもん（なみだめ）
 
 	// 歌詞差し替えした vvproj を作って保存
 	JSON parodyVV = VOICEVOX::ApplyParodyLyrics(
@@ -80,11 +67,17 @@ VocalSynthesis::VocalSynthesis(const InitData& init)
 
 	// 一時vvproj
 	FilePath vvTmp = U"tmp/tmp_modified_" + base + U"_track" + Format(i + 1) + U".vvproj";
-	parodyVV.save(vvTmp);
+	if (!parodyVV.save(vvTmp))
+	{
+		Console << U"一時vvprojの保存に失敗しました: " << vvTmp;
+	}
 
 	// ③ スコアJSONへの変換は、元vvprojではなくvvTmpを使う
 	FilePath score = U"tmp/tmp_" + base + U"_track" + Format(i + 1) + U".json";
-	VOICEVOX::ConvertVVProjToScoreJSON(vvTmp, score, i);
+	if (!VOICEVOX::ConvertVVProjToScoreJSON(vvTmp, score, i))
+	{
+		Console << U"スコアJSONへの変換に失敗しました: " << score;
+	}
 
 	FilePath songwav = U"Voice/" + base + U"-ずんだもん（ノーマル）_track" + Format(i + 1) + U".wav";
 
@@ -99,9 +92,36 @@ VocalSynthesis::VocalSynthesis(const InitData& init)
 	m_isLoading = true;
 	m_timer.restart();
 
+	Array<bool> onomatopoeiaLineCorrects;
+	if (base == U"オノマトペ")
+	{
+		for (const auto& task : getData().solvedTasks)
+		{
+			if (task.restPadding
+				&& task.syllables.size() == 6
+				&& !task.syllables.isEmpty()
+				&& task.syllables.front() == U"ル")
+			{
+				onomatopoeiaLineCorrects << task.isCorrect;
+			}
+		}
+	}
+
 	m_task = Async([=]()
 		{
-			return VOICEVOX::SynthesizeFromJSONFileWrapperSplit(score, songwav, spkID, getData().baseURL, 2500, keyShift);
+			if (base == U"オノマトペ")
+			{
+				return VOICEVOX::SynthesizeOnomatopoeiaScoreByLine(
+					score,
+					songwav,
+					onomatopoeiaLineCorrects,
+					normalSpkID,
+					namiDameSpkID,
+					getData().baseURL,
+					keyShift);
+			}
+
+			return VOICEVOX::SynthesizeFromJSONFileWrapperSplit(score, songwav, normalSpkID, getData().baseURL, 2500, keyShift);
 		});
 }
 

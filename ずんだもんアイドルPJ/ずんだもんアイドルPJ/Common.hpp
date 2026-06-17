@@ -25,9 +25,11 @@ struct SolvedTask
 	Array<String> syllables;        // お題の音節リスト
 	String userInput;               // ユーザー入力（補完前・表示用）
 	Array<String> userSyllables;    // 入力の音節リスト（補完後・置換用）
+	bool restPadding = false;       // 入力より長い置換枠の余りを休符にする
 	double score = 0.0;             // スコア
 	double rhymeMatchPercent = 0.0; // 韻一致率（パーセンテージ）
 	size_t matchesCount = 0;        // 個別のお題で一致した音韻の数
+	bool isCorrect = true;          // 正解フラグ（オノマトペ用、デフォルトは正解）
 };
 
 // 共有するデータ
