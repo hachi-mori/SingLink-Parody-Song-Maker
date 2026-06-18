@@ -42,7 +42,7 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
     };
     const skipTimer = window.setTimeout(() => {
       skipWithMessage('歌声生成に時間がかかっているため、音声なしでリザルトを表示しました。VOICEVOXに接続できない場合でもクイズ結果は確認できます。');
-    }, 12_000);
+    }, 180_000);
 
     const run = async () => {
       try {
@@ -57,7 +57,7 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
           solvedTasks: tasks,
           fullLyrics,
           voicevoxBaseUrl
-        });
+        }, song);
 
         if (cancelled || doneRef.current) {
           return;

@@ -6,8 +6,9 @@ import type {
   VoicevoxVersionResponse
 } from '@shared/types';
 import { fetchStaticSongDetail, fetchStaticSongs, previewStaticLyrics } from './staticSongs';
+import { checkDirectVoicevox, synthesizeDirectVoicevox } from './directVoicevox';
 
-const staticSynthesisMessage = 'この公開版では歌声生成サーバーに接続できません。クイズは遊べますが、歌声生成にはローカル版とVOICEVOXの起動が必要です。';
+const directSynthesisMessage = 'ローカルVOICEVOXへ接続できませんでした。ブラウザのローカルネットワーク権限とVOICEVOXのCORS設定を確認してください。';
 const synthesisTimeoutMessage = '歌声生成の応答がありませんでした。VOICEVOX未接続、またはブラウザからローカルVOICEVOXへ接続できない可能性があります。';
 
 function createTimeoutSignal(ms: number): AbortSignal {
@@ -73,6 +74,15 @@ export async function fetchSongDetail(songId: string): Promise<SongDetail> {
 
 export async function checkVoicevox(baseUrl: string): Promise<VoicevoxVersionResponse> {
   try {
+    if (isGitHubPagesHost()) {
+      const version = await checkDirectVoicevox(baseUrl);
+      return {
+        ok: true,
+        version,
+        baseUrl,
+        message: `VOICEVOX: OK (${version})`
+      };
+    }
     const response = await fetch(apiUrl(`/api/voicevox/version?baseUrl=${encodeURIComponent(baseUrl)}`));
     if (!response.ok) {
       throw new Error(await readError(response));
@@ -107,9 +117,19 @@ export async function previewLyrics(songId: string, solvedTasks: SynthesisReques
   }
 }
 
-export async function synthesizeSong(request: SynthesisRequest): Promise<Blob> {
+export async function synthesizeSong(request: SynthesisRequest, song: SongDetail): Promise<Blob> {
   if (isGitHubPagesHost()) {
-    throw new Error(staticSynthesisMessage);
+    try {
+      return await synthesizeDirectVoicevox(song, request.solvedTasks, request.voicevoxBaseUrl ?? 'http://localhost:50021');
+    } catch (error) {
+      if (isAbortError(error)) {
+        throw new Error(synthesisTimeoutMessage);
+      }
+      if (isNetworkOrStaticHostError(error)) {
+        throw new Error(directSynthesisMessage);
+      }
+      throw error;
+    }
   }
 
   try {
@@ -122,7 +142,7 @@ export async function synthesizeSong(request: SynthesisRequest): Promise<Blob> {
     if (!response.ok) {
       const contentType = response.headers.get('content-type') ?? '';
       if (response.status === 404 || contentType.includes('text/html')) {
-        throw new Error(staticSynthesisMessage);
+        throw new Error(directSynthesisMessage);
       }
       throw new Error(await readError(response));
     }
@@ -132,7 +152,7 @@ export async function synthesizeSong(request: SynthesisRequest): Promise<Blob> {
       throw new Error(synthesisTimeoutMessage);
     }
     if (isNetworkOrStaticHostError(error)) {
-      throw new Error(staticSynthesisMessage);
+      throw new Error(directSynthesisMessage);
     }
     throw error;
   }
