@@ -48,19 +48,33 @@ export function TitleScreen(props: TitleScreenProps) {
         <div className="title-main">
           <img className="title-logo" src={assetUrl('assets/texture/assets/title_logo.png')} alt="シングリンク" />
           <div className="song-picker">
-            <label htmlFor="song-select">あそぶ曲</label>
-            <select
-              id="song-select"
-              value={props.selectedSongId}
-              onChange={(event) => props.onSelectSong(event.target.value)}
-            >
-              <option value="">きょくをえらんでね</option>
-              {props.songs.map((song) => (
-                <option key={song.id} value={song.id}>
-                  {song.title}
-                </option>
-              ))}
-            </select>
+            <div className="song-picker-row">
+              <label htmlFor="song-select">あそぶ問題</label>
+              <select
+                id="song-select"
+                value={props.selectedSongId}
+                onChange={(event) => props.onSelectSong(event.target.value)}
+              >
+                <option value="">問題をえらんでね</option>
+                {props.songs.map((song) => (
+                  <option key={song.id} value={song.id}>
+                    {song.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="song-picker-row song-picker-row--coming-soon">
+              <label htmlFor="source-song-select">もとの曲</label>
+              <select id="source-song-select" value={props.selectedSongId} disabled>
+                <option value="">問題と同じ曲</option>
+                {props.songs.map((song) => (
+                  <option key={song.id} value={song.id}>
+                    {song.title}
+                  </option>
+                ))}
+              </select>
+              <small>今は問題と同じ曲で作ります</small>
+            </div>
             {props.error ? <p className="error-text">{props.error}</p> : null}
           </div>
 

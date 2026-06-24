@@ -113,7 +113,7 @@ export function makeTimedOutTask(problem: TalkProblem): SolvedTask {
     score: 0,
     rhymeMatchPercent: 0,
     matchesCount: 0,
-    isCorrect: true
+    isCorrect: false
   };
 }
 

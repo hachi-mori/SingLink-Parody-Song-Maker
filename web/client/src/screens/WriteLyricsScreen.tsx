@@ -24,6 +24,7 @@ type WriteLyricsScreenProps = {
 
 const timeLimit = 60;
 const countdownSeconds = 3;
+const onomatopoeiaTimeoutAnswer = 'ら'.repeat(6);
 
 function useTick(active: boolean) {
   const [, setTick] = useState(0);
@@ -168,7 +169,7 @@ export function WriteLyricsScreen({ song, onComplete, onCancel }: WriteLyricsScr
         selected: 'みかいとう',
         correctAnswer: currentOnomatopoeia.answer,
         explanation: currentOnomatopoeia.explanation || `「${currentOnomatopoeia.word}」には「${currentOnomatopoeia.answer}」がぴったりだよ。`,
-        answerForRecord: currentOnomatopoeia.answer
+        answerForRecord: onomatopoeiaTimeoutAnswer
       });
       return;
     }

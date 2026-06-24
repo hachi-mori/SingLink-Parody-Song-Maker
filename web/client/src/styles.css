@@ -183,7 +183,9 @@ button:disabled {
 .song-picker {
   width: min(680px, 100%);
   display: grid;
-  gap: clamp(8px, 1.2svh, 14px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: clamp(12px, 2vw, 20px);
   padding: clamp(14px, 2vw, 22px) clamp(18px, 3vw, 34px);
   border: 3px solid rgba(243, 174, 6, 0.88);
   border-radius: 18px;
@@ -192,9 +194,14 @@ button:disabled {
   text-align: center;
 }
 
+.song-picker-row {
+  display: grid;
+  gap: clamp(7px, 1svh, 12px);
+}
+
 .song-picker label {
   color: var(--brown);
-  font-size: clamp(26px, 3.2vw, 44px);
+  font-size: clamp(22px, 2.5vw, 36px);
   line-height: 1.05;
   text-shadow: 0 3px 0 rgba(255, 247, 217, 0.85);
 }
@@ -202,6 +209,21 @@ button:disabled {
 .song-picker select {
   min-height: clamp(48px, 5.2svh, 62px);
   font-size: clamp(17px, 1.5vw, 23px);
+}
+
+.song-picker-row--coming-soon select {
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.song-picker-row small {
+  min-height: 1.4em;
+  color: rgba(134, 79, 9, 0.82);
+  font-size: clamp(13px, 1.2vw, 16px);
+}
+
+.song-picker .error-text {
+  grid-column: 1 / -1;
+  margin: 0;
 }
 
 .title-actions {
@@ -521,6 +543,12 @@ button:disabled {
   margin: 0 0 10px;
 }
 
+.result-song-source {
+  color: var(--brown);
+  font-size: clamp(24px, 3vw, 42px);
+  line-height: 1.18;
+}
+
 .result-card h1 {
   color: var(--gold);
   font-size: clamp(32px, 5vw, 72px);
@@ -541,6 +569,11 @@ button:disabled {
   text-decoration: underline;
   text-decoration-thickness: 0.12em;
   text-underline-offset: 0.12em;
+}
+
+.incorrect-lyric,
+.incorrect-lyric-line {
+  color: #d51e1e;
 }
 
 .player-actions {
@@ -773,6 +806,7 @@ button:disabled {
 
   .song-picker {
     width: 100%;
+    grid-template-columns: 1fr;
   }
 
   .choice-grid {

@@ -17,6 +17,30 @@ type ResultScreenProps = {
   onHistory: () => void;
 };
 
+type HighlightRange = {
+  start: number;
+  end: number;
+  incorrect: boolean;
+};
+
+function findAllRanges(line: string, input: string, incorrect: boolean): HighlightRange[] {
+  const ranges: HighlightRange[] = [];
+  if (!input) {
+    return ranges;
+  }
+
+  let pos = 0;
+  while (pos <= line.length) {
+    const found = line.indexOf(input, pos);
+    if (found < 0) {
+      break;
+    }
+    ranges.push({ start: found, end: found + input.length, incorrect });
+    pos = found + input.length;
+  }
+  return ranges;
+}
+
 export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHistory }: ResultScreenProps) {
   const audioContextRef = useRef<AudioContext | undefined>(undefined);
   const voiceBufferRef = useRef<AudioBuffer | undefined>(undefined);
@@ -27,8 +51,15 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
   const [playError, setPlayError] = useState('');
   const generatedAudio = hasGeneratedAudio(result);
 
-  const userInputs = useMemo(() => tasks.map((task) => task.userInput).filter(Boolean), [tasks]);
   const lines = fullLyrics.replace(/[{}]/g, '').split('\n');
+  const onomatopoeiaIncorrectLines = useMemo(() => {
+    if (song.mode !== 'onomatopoeiaQuiz') {
+      return [];
+    }
+    return tasks
+      .filter((task) => task.restPadding && task.syllables[0] === 'ル')
+      .map((task) => task.isCorrect === false);
+  }, [song.mode, tasks]);
 
   const stopSources = useCallback(() => {
     try {
@@ -136,17 +167,26 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
       <section className="result-layout">
         <img className="result-character" src={assetUrl('assets/texture/assets/zunda_singing.gif')} alt="" aria-hidden="true" />
         <div className="result-card">
-          <p>{song.title}の曲で作った</p>
+          <p className="result-song-source">{song.title}の曲で作った</p>
           <h1>{song.trackName || song.title}</h1>
           <div className="lyrics-box">
-            {lines.map((line, lineIndex) => (
-              <p key={`${line}-${lineIndex}`}>
-                {[...line].map((char, charIndex) => {
-                  const colored = userInputs.some((input) => input && line.includes(input) && charIndex >= line.indexOf(input) && charIndex < line.indexOf(input) + input.length);
-                  return <span className={colored ? 'user-lyric' : undefined} key={`${char}-${charIndex}`}>{char}</span>;
-                })}
-              </p>
-            ))}
+            {lines.map((line, lineIndex) => {
+              const lineIncorrect = onomatopoeiaIncorrectLines[lineIndex] === true;
+              const ranges = tasks.flatMap((task) => findAllRanges(line, task.userInput, task.isCorrect === false));
+              return (
+                <p className={lineIncorrect ? 'incorrect-lyric-line' : undefined} key={`${line}-${lineIndex}`}>
+                  {[...line].map((char, charIndex) => {
+                    const range = ranges.find((item) => charIndex >= item.start && charIndex < item.end);
+                    const className = lineIncorrect || range?.incorrect
+                      ? 'incorrect-lyric'
+                      : range
+                        ? 'user-lyric'
+                        : undefined;
+                    return <span className={className} key={`${char}-${charIndex}`}>{char}</span>;
+                  })}
+                </p>
+              );
+            })}
           </div>
 
           {generatedAudio ? (
