@@ -46,7 +46,7 @@ export function parseOnomatopoeiaCardEntries(cardsJson: unknown): OnomatopoeiaEn
       reading: answer,
       answer,
       explanation,
-      questionText: `「${makeBlankQuestionText(usageText, answer)}」`
+      questionText: makeBlankQuestionText(usageText, answer)
     }];
   });
 }

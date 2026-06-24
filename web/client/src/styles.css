@@ -351,6 +351,39 @@ button:disabled {
   text-shadow: 0 3px 0 rgba(255, 247, 217, 0.75);
 }
 
+.game-question-card {
+  width: min(1120px, 88vw);
+  margin: 0;
+  display: grid;
+  justify-items: center;
+  gap: clamp(10px, 1.6vw, 18px);
+  padding: clamp(22px, 3.2vw, 40px) clamp(24px, 4vw, 56px);
+  border: 3px solid var(--panel-border);
+  border-radius: 16px;
+  background: rgba(255, 250, 231, 0.84);
+  box-shadow: var(--shadow);
+  color: var(--brown);
+  text-align: center;
+  text-shadow: 0 3px 0 rgba(255, 247, 217, 0.75);
+}
+
+.game-question-prompt,
+.game-question-example {
+  margin: 0;
+}
+
+.game-question-prompt {
+  font-size: clamp(34px, 4.2vw, 76px);
+  line-height: 1.12;
+}
+
+.game-question-example {
+  max-width: 980px;
+  font-size: clamp(46px, 5.8vw, 96px);
+  line-height: 1.14;
+  overflow-wrap: anywhere;
+}
+
 .answer-form {
   display: flex;
   gap: 12px;

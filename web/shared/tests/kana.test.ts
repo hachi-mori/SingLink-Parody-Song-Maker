@@ -37,7 +37,7 @@ describe('kana utilities', () => {
       reading: 'あつあつ',
       answer: 'あつあつ',
       explanation: '料理などができたてであついようす。',
-      questionText: '「○○のおでんはおいしいなあ。」'
+      questionText: '○○のおでんはおいしいなあ。'
     });
   });
 });

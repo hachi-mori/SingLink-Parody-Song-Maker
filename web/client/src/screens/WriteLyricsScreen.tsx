@@ -267,10 +267,9 @@ export function WriteLyricsScreen({ song, onComplete, onCancel }: WriteLyricsScr
     );
   }
 
+  const isCardOnomatopoeiaProblem = song.mode === 'onomatopoeiaQuiz' && Boolean(currentOnomatopoeia?.questionText);
   const topic = song.mode === 'onomatopoeiaQuiz'
-    ? currentOnomatopoeia?.questionText
-      ? `○○に入るオノマトペは？\n${currentOnomatopoeia.questionText}`
-      : `${currentOnomatopoeia?.word ?? ''}のオノマトペは？`
+    ? `${currentOnomatopoeia?.word ?? ''}のオノマトペは？`
     : currentProblem?.questionText ?? '';
 
   return (
@@ -280,7 +279,14 @@ export function WriteLyricsScreen({ song, onComplete, onCancel }: WriteLyricsScr
         <strong className={remainingSeconds <= 3 ? 'danger-time' : ''}>{remainingSeconds}</strong>
       </section>
       <section className="game-card">
-        <h1>{makeQuestionDisplayText(currentIndex, topic)}</h1>
+        {isCardOnomatopoeiaProblem && currentOnomatopoeia?.questionText ? (
+          <section className="game-question-card">
+            <p className="game-question-prompt">{makeQuestionDisplayText(currentIndex, '○○に入るオノマトペは？')}</p>
+            <p className="game-question-example">{currentOnomatopoeia.questionText}</p>
+          </section>
+        ) : (
+          <h1>{makeQuestionDisplayText(currentIndex, topic)}</h1>
+        )}
 
         {song.mode === 'freeText' ? (
           <form
