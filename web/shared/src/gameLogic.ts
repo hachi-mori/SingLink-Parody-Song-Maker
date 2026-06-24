@@ -172,12 +172,16 @@ export function buildOnomatopoeiaTasks(problem: OnomatopoeiaEntry, answer: strin
   ];
 }
 
+function cleanResultLyricLine(line: string): string {
+  return line.replace(/[。、]/g, '');
+}
+
 export function buildOnomatopoeiaResultLyrics(problems: OnomatopoeiaEntry[]): string {
   const lines = problems.map((problem) => {
     if (problem.questionText) {
-      return problem.questionText.replace('○○', problem.answer);
+      return cleanResultLyricLine(problem.questionText.replace('○○', problem.answer));
     }
-    return `${problem.word}　${problem.answer}`;
+    return cleanResultLyricLine(`${problem.word}　${problem.answer}`);
   });
   return `${lines.join('\n')}\nにほんごのおのまとぺ\nうたってたくさんべんきょー`;
 }

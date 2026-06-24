@@ -48,10 +48,10 @@ describe('kana utilities', () => {
       reading: 'るんるん',
       answer: 'るんるん',
       explanation: '',
-      questionText: 'うれしくて○○気分だ。'
+      questionText: '大きな犬が急に出てきて、○○する。'
     };
 
-    expect(buildOnomatopoeiaResultLyrics([problem])).toContain('うれしくてるんるん気分だ。');
+    expect(buildOnomatopoeiaResultLyrics([problem])).toContain('大きな犬が急に出てきてるんるんする');
 
     const [, answerTask] = buildOnomatopoeiaTasks(problem, 'よたよた', false);
     expect(answerTask).toMatchObject({
