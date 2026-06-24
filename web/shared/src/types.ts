@@ -37,6 +37,7 @@ export type OnomatopoeiaEntry = {
   reading: string;
   answer: string;
   explanation: string;
+  questionText?: string;
 };
 
 export type SongMode = 'freeText' | 'verbQuiz' | 'onomatopoeiaQuiz';

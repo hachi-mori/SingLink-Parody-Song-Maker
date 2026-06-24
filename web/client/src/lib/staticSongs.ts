@@ -1,6 +1,7 @@
 import { parseCsvRows } from '@shared/csv';
 import { buildResultDisplayLyrics, buildTalkProblems, extractTalkUtterances, getVvprojTrackName } from '@shared/vvproj';
 import { replaceChoonWithVowel, splitOnomatopoeiaMoras } from '@shared/kana';
+import { parseOnomatopoeiaCardEntries } from '@shared/onomatopoeiaCards';
 import type { OnomatopoeiaEntry, SongDetail, SongInfo, SongMode, SynthesisRequest, VerbEntry } from '@shared/types';
 import { assetUrl } from './assets';
 
@@ -52,6 +53,14 @@ async function fetchJson(path: string): Promise<unknown> {
   return JSON.parse(await fetchText(path)) as unknown;
 }
 
+async function fetchOptionalJson(path: string): Promise<unknown | undefined> {
+  try {
+    return await fetchJson(path);
+  } catch {
+    return undefined;
+  }
+}
+
 async function loadVerbEntries(): Promise<VerbEntry[]> {
   const rows = parseCsvRows(await fetchText('assets/dict/Verb.csv'));
   return rows.flatMap((fields) => {
@@ -63,6 +72,12 @@ async function loadVerbEntries(): Promise<VerbEntry[]> {
 }
 
 async function loadOnomatopoeiaEntries(): Promise<OnomatopoeiaEntry[]> {
+  const cardsJson = await fetchOptionalJson('assets/dict/cards_text_data.json');
+  const cardEntries = cardsJson ? parseOnomatopoeiaCardEntries(cardsJson) : [];
+  if (cardEntries.length > 0) {
+    return cardEntries;
+  }
+
   const rows = parseCsvRows(await fetchText('assets/dict/オノマトペ.csv'));
   return rows.flatMap((fields) => {
     const word = (fields[0] ?? '').trim();

@@ -6,6 +6,7 @@ import {
   extractTalkUtterances,
   getVvprojTrackName
 } from '../../shared/src/vvproj';
+import { parseOnomatopoeiaCardEntries } from '../../shared/src/onomatopoeiaCards';
 import {
   replaceChoonWithVowel,
   splitOnomatopoeiaMoras
@@ -145,6 +146,14 @@ export async function loadVerbEntries(): Promise<VerbEntry[]> {
 }
 
 export async function loadOnomatopoeiaEntries(): Promise<OnomatopoeiaEntry[]> {
+  const cardsPath = path.join(dictDir, 'cards_text_data.json');
+  if (await fileExists(cardsPath)) {
+    const entries = parseOnomatopoeiaCardEntries(await readJsonFile(cardsPath));
+    if (entries.length > 0) {
+      return entries;
+    }
+  }
+
   const text = await readDictFile('オノマトペ.csv');
   const rows = parseCsvRows(text);
   const entries: OnomatopoeiaEntry[] = [];

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getVowel, replaceChoonWithVowel, splitOnomatopoeiaMoras, splitSyllables } from '../src/kana';
+import { parseOnomatopoeiaCardEntries } from '../src/onomatopoeiaCards';
 
 describe('kana utilities', () => {
   it('拗音と促音を含む音節に分割する', () => {
@@ -20,5 +21,23 @@ describe('kana utilities', () => {
     expect(getVowel('きゃ')).toBe('a');
     expect(getVowel('ん')).toBe('N');
     expect(getVowel('っ')).toBe('Q');
+  });
+
+  it('カードJSONから穴埋めオノマトペ問題を作る', () => {
+    const entries = parseOnomatopoeiaCardEntries({
+      records: [{
+        onomatopoeia: 'あつあつ',
+        usages: [{ text: 'あつあつのおでんはおいしいなあ。' }],
+        meanings: [{ text: '料理などができたてであついようす。' }]
+      }]
+    });
+
+    expect(entries[0]).toMatchObject({
+      word: 'あつあつ',
+      reading: 'あつあつ',
+      answer: 'あつあつ',
+      explanation: '料理などができたてであついようす。',
+      questionText: '「○○のおでんはおいしいなあ。」'
+    });
   });
 });

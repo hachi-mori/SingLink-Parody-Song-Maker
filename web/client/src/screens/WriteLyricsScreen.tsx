@@ -165,7 +165,7 @@ export function WriteLyricsScreen({ song, onComplete, onCancel }: WriteLyricsScr
         active: true,
         correct: false,
         timeUp: true,
-        question: currentOnomatopoeia.word,
+        question: currentOnomatopoeia.questionText ?? currentOnomatopoeia.word,
         selected: 'みかいとう',
         correctAnswer: currentOnomatopoeia.answer,
         explanation: currentOnomatopoeia.explanation || `「${currentOnomatopoeia.word}」には「${currentOnomatopoeia.answer}」がぴったりだよ。`,
@@ -215,7 +215,7 @@ export function WriteLyricsScreen({ song, onComplete, onCancel }: WriteLyricsScr
       active: true,
       correct,
       timeUp: false,
-      question: currentOnomatopoeia.word,
+      question: currentOnomatopoeia.questionText ?? currentOnomatopoeia.word,
       selected: answer,
       correctAnswer: currentOnomatopoeia.answer,
       explanation: currentOnomatopoeia.explanation || `「${currentOnomatopoeia.word}」には「${currentOnomatopoeia.answer}」がぴったりだよ。`,
@@ -268,7 +268,9 @@ export function WriteLyricsScreen({ song, onComplete, onCancel }: WriteLyricsScr
   }
 
   const topic = song.mode === 'onomatopoeiaQuiz'
-    ? `${currentOnomatopoeia?.word ?? ''}のオノマトペは？`
+    ? currentOnomatopoeia?.questionText
+      ? `○○に入るオノマトペは？\n${currentOnomatopoeia.questionText}`
+      : `${currentOnomatopoeia?.word ?? ''}のオノマトペは？`
     : currentProblem?.questionText ?? '';
 
   return (

@@ -173,6 +173,6 @@ export function buildOnomatopoeiaTasks(problem: OnomatopoeiaEntry, answer: strin
 }
 
 export function buildOnomatopoeiaResultLyrics(problems: OnomatopoeiaEntry[], selectedAnswers: string[]): string {
-  const lines = problems.map((problem, index) => `${problem.word}　${selectedAnswers[index] ?? problem.answer}`);
+  const lines = problems.map((problem, index) => `${problem.questionText ?? problem.word}　${selectedAnswers[index] ?? problem.answer}`);
   return `${lines.join('\n')}\nにほんごのおのまとぺ\nうたってたくさんべんきょー`;
 }

@@ -347,6 +347,7 @@ button:disabled {
   color: var(--brown);
   font-size: clamp(40px, 7.4vw, 108px);
   line-height: 1.16;
+  white-space: pre-line;
   text-shadow: 0 3px 0 rgba(255, 247, 217, 0.75);
 }
 

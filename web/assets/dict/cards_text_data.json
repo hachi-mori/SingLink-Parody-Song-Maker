@@ -1,0 +1,2610 @@
+{
+  "schema_version": "2.0",
+  "record_count": 100,
+  "records": [
+    {
+      "number": 1,
+      "onomatopoeia": "あつあつ",
+      "files": {
+        "picture": "絵カード1.png",
+        "onomatopoeia": "オノマトペカード1.png",
+        "meaning": "意味カード1.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "あつあつのおでんはおいしいなあ。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "料理などができたてであついようす。"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "onomatopoeia": "いらいら",
+      "files": {
+        "picture": "絵カード2.png",
+        "onomatopoeia": "オノマトペカード2.png",
+        "meaning": "意味カード2.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "約束の時間なのに、まだ来ない。いらいらするなあ。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "自分の思いどおりにならないので、気持ちが落ち着かないようす。"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "onomatopoeia": "うきうき",
+      "files": {
+        "picture": "絵カード3.png",
+        "onomatopoeia": "オノマトペカード3.png",
+        "meaning": "意味カード3.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "あれに乗るの？うきうきするねー。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "楽しさで気持ちがはずんでいるようす。"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "onomatopoeia": "うっとりと",
+      "files": {
+        "picture": "絵カード4.png",
+        "onomatopoeia": "オノマトペカード4.png",
+        "meaning": "意味カード4.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "あこがれのサッカー選手を見てうっとりとした。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "うつくしい物やあこがれの対象に見とれて、ぼーっとしているようす。"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "onomatopoeia": "うとうと",
+      "files": {
+        "picture": "絵カード5.png",
+        "onomatopoeia": "オノマトペカード5.png",
+        "meaning": "意味カード5.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "宿題をしていると眠くてうとうとしてしまった。"
+        },
+        {
+          "index": 2,
+          "text": "朝までうとうとして、よく眠れなかった。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "眠けをもよおすようす。"
+        },
+        {
+          "index": 2,
+          "text": "眠りのあさいようす。"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "onomatopoeia": "うろうろ",
+      "files": {
+        "picture": "絵カード6.png",
+        "onomatopoeia": "オノマトペカード6.png",
+        "meaning": "意味カード6.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "道に迷ってうろうろする。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "どこに行っていいかわからず、あちらこちら動き回るようす。"
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "onomatopoeia": "おどおど",
+      "files": {
+        "picture": "絵カード7.png",
+        "onomatopoeia": "オノマトペカード7.png",
+        "meaning": "意味カード7.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "大きな犬が急に出てきて、おどおどする。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "どうしたらよいのかわからず、おびえているようす。"
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "onomatopoeia": "かさかさ",
+      "files": {
+        "picture": "絵カード8.png",
+        "onomatopoeia": "オノマトペカード8.png",
+        "meaning": "意味カード8.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "はだがかさかさする。"
+        },
+        {
+          "index": 2,
+          "text": "枯れ葉が風にゆれて、かさかさ音がする。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "表面がかわいて、なめらかでないようす。"
+        },
+        {
+          "index": 2,
+          "text": "かわいた物がこすれ合って出る音。"
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "onomatopoeia": "かんかん",
+      "files": {
+        "picture": "絵カード9.png",
+        "onomatopoeia": "オノマトペカード9.png",
+        "meaning": "意味カード9.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "太陽がかんかんと照りつける。"
+        },
+        {
+          "index": 2,
+          "text": "鐘の音がかんかんひびきわたる。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "日ざしが強いようす。"
+        },
+        {
+          "index": 2,
+          "text": "金ぞくや石などのかたい物がぶつかって出す、高くすんだ音。"
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "onomatopoeia": "がたがた",
+      "files": {
+        "picture": "絵カード10.png",
+        "onomatopoeia": "オノマトペカード10.png",
+        "meaning": "意味カード10.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "お化けがこわくて、がたがたふるえた。"
+        },
+        {
+          "index": 2,
+          "text": "バスががたがたゆれる。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "おそろしさや寒さなどのために体がふるえるようす。"
+        },
+        {
+          "index": 2,
+          "text": "重い物や大きい物がゆれるようす。"
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "onomatopoeia": "がやがや",
+      "files": {
+        "picture": "絵カード11.png",
+        "onomatopoeia": "オノマトペカード11.png",
+        "meaning": "意味カード11.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "休み時間にみんながやがやしはじめた。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "大勢が勝手に話しているようす。"
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "onomatopoeia": "がらがら",
+      "files": {
+        "picture": "絵カード12.png",
+        "onomatopoeia": "オノマトペカード12.png",
+        "meaning": "意味カード12.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "あぶない崖から岩ががらがら落ちてくる。"
+        },
+        {
+          "index": 2,
+          "text": "がらがらと音をたてて引き戸が開いた。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "物がくずれ落ちるようす。"
+        },
+        {
+          "index": 2,
+          "text": "引き戸や車輪が回転する音。"
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "onomatopoeia": "きらきら",
+      "files": {
+        "picture": "絵カード13.png",
+        "onomatopoeia": "オノマトペカード13.png",
+        "meaning": "意味カード13.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "見てー、お星様がきらきらしてるよ。"
+        },
+        {
+          "index": 2,
+          "text": "優勝した人の顔はきらきらかがやいていた。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "明るく光りかがやくようす。"
+        },
+        {
+          "index": 2,
+          "text": "とてもりっぱに見えること。"
+        }
+      ]
+    },
+    {
+      "number": 14,
+      "onomatopoeia": "きびきび",
+      "files": {
+        "picture": "絵カード14.png",
+        "onomatopoeia": "オノマトペカード14.png",
+        "meaning": "意味カード14.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "運動会でみんなきびきびと行進した。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "態度や動作にメリハリがあって元気なこと。"
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "onomatopoeia": "ぎゅっと",
+      "files": {
+        "picture": "絵カード15.png",
+        "onomatopoeia": "オノマトペカード15.png",
+        "meaning": "意味カード15.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "レモンをぎゅっと手でしぼった。"
+        },
+        {
+          "index": 2,
+          "text": "ぎゅっと抱きしめた。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "強く力でにぎるようす。"
+        },
+        {
+          "index": 2,
+          "text": "強い力で抱きしめるようす。"
+        }
+      ]
+    },
+    {
+      "number": 16,
+      "onomatopoeia": "ぎらぎら",
+      "files": {
+        "picture": "絵カード16.png",
+        "onomatopoeia": "オノマトペカード16.png",
+        "meaning": "意味カード16.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "真夏の太陽がぎらぎら照っている。"
+        },
+        {
+          "index": 2,
+          "text": "お金をもうけたいと、ぎらぎらしている人。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "強い光でかがやくようす。"
+        },
+        {
+          "index": 2,
+          "text": "強い気持ちがあらわれるようす。"
+        }
+      ]
+    },
+    {
+      "number": 17,
+      "onomatopoeia": "くしゃくしゃ",
+      "files": {
+        "picture": "絵カード17.png",
+        "onomatopoeia": "オノマトペカード17.png",
+        "meaning": "意味カード17.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "紙をくしゃくしゃ丸めた。"
+        },
+        {
+          "index": 2,
+          "text": "くしゃくしゃな髪の毛。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "布などを丸めたりもんだりして、しわだらけにするようす。"
+        },
+        {
+          "index": 2,
+          "text": "形がみだれているようす。"
+        }
+      ]
+    },
+    {
+      "number": 18,
+      "onomatopoeia": "くたくた",
+      "files": {
+        "picture": "絵カード18.png",
+        "onomatopoeia": "オノマトペカード18.png",
+        "meaning": "意味カード18.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "このジーパン、くたくたでかっこいいだろう。"
+        },
+        {
+          "index": 2,
+          "text": "遠足で歩き続けてくたくたー。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "古くなり、張りがなくなるようす。"
+        },
+        {
+          "index": 2,
+          "text": "疲れたり弱ったりして、力の抜けたようす。"
+        }
+      ]
+    },
+    {
+      "number": 19,
+      "onomatopoeia": "くるくる",
+      "files": {
+        "picture": "絵カード19.png",
+        "onomatopoeia": "オノマトペカード19.png",
+        "meaning": "意味カード19.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "指をくるくる回す。"
+        },
+        {
+          "index": 2,
+          "text": "くるくると動き回って家の手伝いをする。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "丸く円を描いて動くようす。"
+        },
+        {
+          "index": 2,
+          "text": "身軽に動き回るようす。"
+        }
+      ]
+    },
+    {
+      "number": 20,
+      "onomatopoeia": "ぐちゃぐちゃ",
+      "files": {
+        "picture": "絵カード20.png",
+        "onomatopoeia": "オノマトペカード20.png",
+        "meaning": "意味カード20.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "ぐちゃぐちゃのねんど。"
+        },
+        {
+          "index": 2,
+          "text": "彼の一言で話し合いがぐちゃぐちゃになった。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "水をたくさん含んでやわらかくなったようす。"
+        },
+        {
+          "index": 2,
+          "text": "順調に進んでいたことが途中でうまくいかなくなること。"
+        }
+      ]
+    },
+    {
+      "number": 21,
+      "onomatopoeia": "ぐっすり",
+      "files": {
+        "picture": "絵カード21.png",
+        "onomatopoeia": "オノマトペカード21.png",
+        "meaning": "意味カード21.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "ぐっすり眠っていて起きそうもない。"
+        },
+        {
+          "index": 2,
+          "text": "ぐっすり休んだので、すっかり元気になった。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "よく眠っているようす。"
+        },
+        {
+          "index": 2,
+          "text": "十分に眠ったようす。"
+        }
+      ]
+    },
+    {
+      "number": 22,
+      "onomatopoeia": "ぐったり",
+      "files": {
+        "picture": "絵カード22.png",
+        "onomatopoeia": "オノマトペカード22.png",
+        "meaning": "意味カード22.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "走り回ってぐったりしてしまった。"
+        },
+        {
+          "index": 2,
+          "text": "この鳥、ぐったりしている。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "疲れてしまって動けないようす。"
+        },
+        {
+          "index": 2,
+          "text": "熱が出たり病気で弱っているようす。"
+        }
+      ]
+    },
+    {
+      "number": 23,
+      "onomatopoeia": "ぐらぐら",
+      "files": {
+        "picture": "絵カード23.png",
+        "onomatopoeia": "オノマトペカード23.png",
+        "meaning": "意味カード23.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "積み木がぐらぐらしてくずれそう。"
+        },
+        {
+          "index": 2,
+          "text": "おなべの中でぐらぐらとシチューがにえている。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "物や気持ちがゆれて安定しないようす。"
+        },
+        {
+          "index": 2,
+          "text": "お湯などが煮え立つようす。"
+        }
+      ]
+    },
+    {
+      "number": 24,
+      "onomatopoeia": "ぐんぐん",
+      "files": {
+        "picture": "絵カード24.png",
+        "onomatopoeia": "オノマトペカード24.png",
+        "meaning": "意味カード24.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "アサガオがぐんぐん大きくなった。"
+        },
+        {
+          "index": 2,
+          "text": "森の中にぐんぐん入っていった。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "いきおいよく育っていくようす。"
+        },
+        {
+          "index": 2,
+          "text": "ためらったり、とどこおったりしないようす。"
+        }
+      ]
+    },
+    {
+      "number": 25,
+      "onomatopoeia": "げほげほ",
+      "files": {
+        "picture": "絵カード25.png",
+        "onomatopoeia": "オノマトペカード25.png",
+        "meaning": "意味カード25.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "かぜをひいて、げほげほせきこんだ。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "強くせき込む音。"
+        }
+      ]
+    },
+    {
+      "number": 26,
+      "onomatopoeia": "こそこそ",
+      "files": {
+        "picture": "絵カード26.png",
+        "onomatopoeia": "オノマトペカード26.png",
+        "meaning": "意味カード26.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "こそこそと話す。"
+        },
+        {
+          "index": 2,
+          "text": "一人でこそこそケーキを食べた。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "まわりに聞こえないほどの小さな声。"
+        },
+        {
+          "index": 2,
+          "text": "みつからないように行動するようす。"
+        }
+      ]
+    },
+    {
+      "number": 27,
+      "onomatopoeia": "こつこつ",
+      "files": {
+        "picture": "絵カード27.png",
+        "onomatopoeia": "オノマトペカード27.png",
+        "meaning": "意味カード27.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "毎日こつこつ勉強する。"
+        },
+        {
+          "index": 2,
+          "text": "こつこつ歩いて来る足音がした。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "途中でやめることなく続けるようす。"
+        },
+        {
+          "index": 2,
+          "text": "かたい物がぶつかって出る高い音。"
+        }
+      ]
+    },
+    {
+      "number": 28,
+      "onomatopoeia": "こっそりと",
+      "files": {
+        "picture": "絵カード28.png",
+        "onomatopoeia": "オノマトペカード28.png",
+        "meaning": "意味カード28.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "ふとんをかぶって、こっそりとゲーム機であそんだ。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "人に知られないように行動するようす。"
+        }
+      ]
+    },
+    {
+      "number": 29,
+      "onomatopoeia": "ころころ",
+      "files": {
+        "picture": "絵カード29.png",
+        "onomatopoeia": "オノマトペカード29.png",
+        "meaning": "意味カード29.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "ころころとビー玉が転がる。"
+        },
+        {
+          "index": 2,
+          "text": "お天気がころころ変わる。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "丸い物や小さい物などが転がるようす。"
+        },
+        {
+          "index": 2,
+          "text": "物事が簡単に変わっていくようす。"
+        }
+      ]
+    },
+    {
+      "number": 30,
+      "onomatopoeia": "ごくごく",
+      "files": {
+        "picture": "絵カード30.png",
+        "onomatopoeia": "オノマトペカード30.png",
+        "meaning": "意味カード30.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "汗をかいたので水をごくごく飲んだ。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "いきおいよく水などを飲むときのようす。"
+        }
+      ]
+    },
+    {
+      "number": 31,
+      "onomatopoeia": "ごそごそ",
+      "files": {
+        "picture": "絵カード31.png",
+        "onomatopoeia": "オノマトペカード31.png",
+        "meaning": "意味カード31.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "ひき出しの中からごそごそと帽子をとり出した。"
+        },
+        {
+          "index": 2,
+          "text": "洞穴の中からごそごそ動き回る音がした。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "物がこすれあって出る音。"
+        },
+        {
+          "index": 2,
+          "text": "正体がわからない物が動くようす。"
+        }
+      ]
+    },
+    {
+      "number": 32,
+      "onomatopoeia": "ごろごろ",
+      "files": {
+        "picture": "絵カード32.png",
+        "onomatopoeia": "オノマトペカード32.png",
+        "meaning": "意味カード32.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "ごろごろしてテレビを見ている。"
+        },
+        {
+          "index": 2,
+          "text": "大きな石がごろごろ転がる。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "なにもせず寝転んでいるようす。"
+        },
+        {
+          "index": 2,
+          "text": "大きくて重い物が音を立ててゆっくり転がるようす。"
+        }
+      ]
+    },
+    {
+      "number": 33,
+      "onomatopoeia": "さっと",
+      "files": {
+        "picture": "絵カード33.png",
+        "onomatopoeia": "オノマトペカード33.png",
+        "meaning": "意味カード33.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "さっと立ち上がって席をゆずった。"
+        },
+        {
+          "index": 2,
+          "text": "さっと顔色が変わった。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "動作がすばやく行われるようす。"
+        },
+        {
+          "index": 2,
+          "text": "物事が急に変わるようす。"
+        }
+      ]
+    },
+    {
+      "number": 34,
+      "onomatopoeia": "さやさや",
+      "files": {
+        "picture": "絵カード34.png",
+        "onomatopoeia": "オノマトペカード34.png",
+        "meaning": "意味カード34.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "草がさやさやと音をたてて風にゆれた。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "うすい物が軽くふれ合って出る音。"
+        }
+      ]
+    },
+    {
+      "number": 35,
+      "onomatopoeia": "さらさら",
+      "files": {
+        "picture": "絵カード35.png",
+        "onomatopoeia": "オノマトペカード35.png",
+        "meaning": "意味カード35.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "春の小川はさらさらと流れる。"
+        },
+        {
+          "index": 2,
+          "text": "笹の葉がさらさらと風にゆれる。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "浅い川の水がよどみなく軽やかに流れるようす。"
+        },
+        {
+          "index": 2,
+          "text": "物が軽くふれ合って出る音。"
+        }
+      ]
+    },
+    {
+      "number": 36,
+      "onomatopoeia": "しいんと",
+      "files": {
+        "picture": "絵カード36.png",
+        "onomatopoeia": "オノマトペカード36.png",
+        "meaning": "意味カード36.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "夜の森はしいんと静まりかえっている。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "物音がしないで静かなようす。"
+        }
+      ]
+    },
+    {
+      "number": 37,
+      "onomatopoeia": "しとしと",
+      "files": {
+        "picture": "絵カード37.png",
+        "onomatopoeia": "オノマトペカード37.png",
+        "meaning": "意味カード37.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "しとしとと雨がふっている。"
+        },
+        {
+          "index": 2,
+          "text": "雨にふられて髪がしとしとにぬれてしまった。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "雨が静かにふるようす。"
+        },
+        {
+          "index": 2,
+          "text": "ぬれているようす。"
+        }
+      ]
+    },
+    {
+      "number": 38,
+      "onomatopoeia": "じっくりと",
+      "files": {
+        "picture": "絵カード38.png",
+        "onomatopoeia": "オノマトペカード38.png",
+        "meaning": "意味カード38.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "じっくりと観察する。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "時間をかけ、十分に物事を行うこと。"
+        }
+      ]
+    },
+    {
+      "number": 39,
+      "onomatopoeia": "じっと",
+      "files": {
+        "picture": "絵カード39.png",
+        "onomatopoeia": "オノマトペカード39.png",
+        "meaning": "意味カード39.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "じっとえものをねらっている。"
+        },
+        {
+          "index": 2,
+          "text": "虫をじっと見つめる。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "動かないでそのままの状態を保つようす。"
+        },
+        {
+          "index": 2,
+          "text": "よく見たり観察して考えたりするようす。"
+        }
+      ]
+    },
+    {
+      "number": 40,
+      "onomatopoeia": "じめじめ",
+      "files": {
+        "picture": "絵カード40.png",
+        "onomatopoeia": "オノマトペカード40.png",
+        "meaning": "意味カード40.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "洞穴の中はじめじめしていた。"
+        },
+        {
+          "index": 2,
+          "text": "じめじめした話だ。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "気分がわるくなるほど湿気が多いようす。"
+        },
+        {
+          "index": 2,
+          "text": "気分が落ち込むような陰気なようす。"
+        }
+      ]
+    },
+    {
+      "number": 41,
+      "onomatopoeia": "すいすい",
+      "files": {
+        "picture": "絵カード41.png",
+        "onomatopoeia": "オノマトペカード41.png",
+        "meaning": "意味カード41.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "魚がすいすい泳ぐ。"
+        },
+        {
+          "index": 2,
+          "text": "すいすいと勉強がはかどる。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "いかにも軽やかにすばやく動くようす。"
+        },
+        {
+          "index": 2,
+          "text": "物事がとどこおりなく進行するようす。"
+        }
+      ]
+    },
+    {
+      "number": 42,
+      "onomatopoeia": "すくすく",
+      "files": {
+        "picture": "絵カード42.png",
+        "onomatopoeia": "オノマトペカード42.png",
+        "meaning": "意味カード42.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "赤ちゃんがすくすく育つ。"
+        },
+        {
+          "index": 2,
+          "text": "空に向かってすくすくと木が伸びている。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "いきおいよく成長するようす。"
+        },
+        {
+          "index": 2,
+          "text": "草や木がまっすぐに伸びているようす。"
+        }
+      ]
+    },
+    {
+      "number": 43,
+      "onomatopoeia": "すっかり",
+      "files": {
+        "picture": "絵カード43.png",
+        "onomatopoeia": "オノマトペカード43.png",
+        "meaning": "意味カード43.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "すっかり皿のいちごがなくなった。"
+        },
+        {
+          "index": 2,
+          "text": "体がすっかり元気になった。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "残り物がない、全部。"
+        },
+        {
+          "index": 2,
+          "text": "完全に、全部。"
+        }
+      ]
+    },
+    {
+      "number": 44,
+      "onomatopoeia": "すらすら",
+      "files": {
+        "picture": "絵カード44.png",
+        "onomatopoeia": "オノマトペカード44.png",
+        "meaning": "意味カード44.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "本をすらすらと読み上げる。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "つまずかないでなめらかに進むようす。"
+        }
+      ]
+    },
+    {
+      "number": 45,
+      "onomatopoeia": "すべすべ",
+      "files": {
+        "picture": "絵カード45.png",
+        "onomatopoeia": "オノマトペカード45.png",
+        "meaning": "意味カード45.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "赤ちゃんのはだはすべすべだ。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "物の表面の手ざわりがなめらかで心地よいようす。"
+        }
+      ]
+    },
+    {
+      "number": 46,
+      "onomatopoeia": "せかせか",
+      "files": {
+        "picture": "絵カード46.png",
+        "onomatopoeia": "オノマトペカード46.png",
+        "meaning": "意味カード46.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "リスがせかせかと物をはこんでいる。"
+        },
+        {
+          "index": 2,
+          "text": "いつもせかせかしている人だね。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "あわただしく動いているようす。"
+        },
+        {
+          "index": 2,
+          "text": "気分が落ち着かないようす。"
+        }
+      ]
+    },
+    {
+      "number": 47,
+      "onomatopoeia": "せっせと",
+      "files": {
+        "picture": "絵カード47.png",
+        "onomatopoeia": "オノマトペカード47.png",
+        "meaning": "意味カード47.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "わき目もふらず、せっせとはたらいた。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "休むことなくがんばって仕事をしているようす。"
+        }
+      ]
+    },
+    {
+      "number": 48,
+      "onomatopoeia": "そっと",
+      "files": {
+        "picture": "絵カード48.png",
+        "onomatopoeia": "オノマトペカード48.png",
+        "meaning": "意味カード48.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "そっとのぞいた。"
+        },
+        {
+          "index": 2,
+          "text": "かなしんでいる人をそっとしておいた。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "音を立てないように行動するようす。"
+        },
+        {
+          "index": 2,
+          "text": "干渉しないでそのままにしておくこと。"
+        }
+      ]
+    },
+    {
+      "number": 49,
+      "onomatopoeia": "そよそよ",
+      "files": {
+        "picture": "絵カード49.png",
+        "onomatopoeia": "オノマトペカード49.png",
+        "meaning": "意味カード49.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "そよそよと風が吹いている。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "風が静かに吹き続けるようす。"
+        }
+      ]
+    },
+    {
+      "number": 50,
+      "onomatopoeia": "ぞろぞろ",
+      "files": {
+        "picture": "絵カード50.png",
+        "onomatopoeia": "オノマトペカード50.png",
+        "meaning": "意味カード50.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "アリがぞろぞろと歩いていた。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "大勢で連れだって歩いているようす。"
+        }
+      ]
+    },
+    {
+      "number": 51,
+      "onomatopoeia": "だんだん",
+      "files": {
+        "picture": "絵カード51.png",
+        "onomatopoeia": "オノマトペカード51.png",
+        "meaning": "意味カード51.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "だんだん眠くなる。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "物事が少しずつ順を追って進んでいくようす。"
+        }
+      ]
+    },
+    {
+      "number": 52,
+      "onomatopoeia": "ちょこんと",
+      "files": {
+        "picture": "絵カード52.png",
+        "onomatopoeia": "オノマトペカード52.png",
+        "meaning": "意味カード52.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "トラの赤ちゃんがちょこんと岩にすわっている。"
+        },
+        {
+          "index": 2,
+          "text": "球をちょこんと当てた。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "小さくかしこまっているようす。"
+        },
+        {
+          "index": 2,
+          "text": "少しだけ、ちょっとという意味。"
+        }
+      ]
+    },
+    {
+      "number": 53,
+      "onomatopoeia": "ちらちら",
+      "files": {
+        "picture": "絵カード53.png",
+        "onomatopoeia": "オノマトペカード53.png",
+        "meaning": "意味カード53.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "ちらちらと雪がまって積もった。"
+        },
+        {
+          "index": 2,
+          "text": "画面がちらちらする。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "小さい物が飛びちるようす。"
+        },
+        {
+          "index": 2,
+          "text": "光が強まったり弱まったりするようす。"
+        }
+      ]
+    },
+    {
+      "number": 54,
+      "onomatopoeia": "つるつる",
+      "files": {
+        "picture": "絵カード54.png",
+        "onomatopoeia": "オノマトペカード54.png",
+        "meaning": "意味カード54.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "氷の表面がつるつるですべりやすい。"
+        },
+        {
+          "index": 2,
+          "text": "つるつるした石。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "なめらかですべりやすいようす。"
+        },
+        {
+          "index": 2,
+          "text": "表面がなめらかでつやのあるようす。"
+        }
+      ]
+    },
+    {
+      "number": 55,
+      "onomatopoeia": "つんと",
+      "files": {
+        "picture": "絵カード55.png",
+        "onomatopoeia": "オノマトペカード55.png",
+        "meaning": "意味カード55.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "つんとつついてみた。"
+        },
+        {
+          "index": 2,
+          "text": "つんとすましている。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "軽くつつくこと。"
+        },
+        {
+          "index": 2,
+          "text": "かわいげなくとりすましているようす。"
+        }
+      ]
+    },
+    {
+      "number": 56,
+      "onomatopoeia": "つぶつぶ",
+      "files": {
+        "picture": "絵カード56.png",
+        "onomatopoeia": "オノマトペカード56.png",
+        "meaning": "意味カード56.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "つぶつぶの食感がたまらない。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "たくさんの粒があるようす。"
+        }
+      ]
+    },
+    {
+      "number": 57,
+      "onomatopoeia": "どきどき",
+      "files": {
+        "picture": "絵カード57.png",
+        "onomatopoeia": "オノマトペカード57.png",
+        "meaning": "意味カード57.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "あのうさぎ、とってもかわいくてどきどきする。"
+        },
+        {
+          "index": 2,
+          "text": "校庭を十周して心臓のどきどきがとまらない。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "気持ちが高ぶるようす。"
+        },
+        {
+          "index": 2,
+          "text": "はげしい運動で心臓がはげしく打ち続けるようす。"
+        }
+      ]
+    },
+    {
+      "number": 58,
+      "onomatopoeia": "どっさり",
+      "files": {
+        "picture": "絵カード58.png",
+        "onomatopoeia": "オノマトペカード58.png",
+        "meaning": "意味カード58.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "どっさりお菓子がある。"
+        },
+        {
+          "index": 2,
+          "text": "棚から本がどっさりと落ちた。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "物の量が多いこと。"
+        },
+        {
+          "index": 2,
+          "text": "重い物が落ちたりたおれたりするときの音。"
+        }
+      ]
+    },
+    {
+      "number": 59,
+      "onomatopoeia": "どろどろ",
+      "files": {
+        "picture": "絵カード59.png",
+        "onomatopoeia": "オノマトペカード59.png",
+        "meaning": "意味カード59.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "どろどろの溶岩が流れ出た。"
+        },
+        {
+          "index": 2,
+          "text": "洋服がどろどろになるまであそんだ。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "物が溶けてどろのようになったようす。"
+        },
+        {
+          "index": 2,
+          "text": "どろがつき、よごれているようす。"
+        }
+      ]
+    },
+    {
+      "number": 60,
+      "onomatopoeia": "どんどん",
+      "files": {
+        "picture": "絵カード60.png",
+        "onomatopoeia": "オノマトペカード60.png",
+        "meaning": "意味カード60.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "たいこをどんどんたたく。"
+        },
+        {
+          "index": 2,
+          "text": "解体工事がどんどん進む。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "続けて聞こえる大きな音。"
+        },
+        {
+          "index": 2,
+          "text": "物事がいきおいよく進んでいくようす。"
+        }
+      ]
+    },
+    {
+      "number": 61,
+      "onomatopoeia": "にこにこ",
+      "files": {
+        "picture": "絵カード61.png",
+        "onomatopoeia": "オノマトペカード61.png",
+        "meaning": "意味カード61.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "にこにこと笑顔で話す。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "楽しそうに笑顔を浮かべているようす。"
+        }
+      ]
+    },
+    {
+      "number": 62,
+      "onomatopoeia": "ぬるぬる",
+      "files": {
+        "picture": "絵カード62.png",
+        "onomatopoeia": "オノマトペカード62.png",
+        "meaning": "意味カード62.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "かたつむりが歩いたあとがぬるぬるしている。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "ねばねばしてすべりやすいようす。"
+        }
+      ]
+    },
+    {
+      "number": 63,
+      "onomatopoeia": "ねばねば",
+      "files": {
+        "picture": "絵カード63.png",
+        "onomatopoeia": "オノマトペカード63.png",
+        "meaning": "意味カード63.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "かき回すとねばねばするよ。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "物につきやすいようす。"
+        }
+      ]
+    },
+    {
+      "number": 64,
+      "onomatopoeia": "のろのろ",
+      "files": {
+        "picture": "絵カード64.png",
+        "onomatopoeia": "オノマトペカード64.png",
+        "meaning": "意味カード64.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "かめがのろのろと歩く。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "動きがにぶく、ゆっくりしているようす。"
+        }
+      ]
+    },
+    {
+      "number": 65,
+      "onomatopoeia": "はきはき",
+      "files": {
+        "picture": "絵カード65.png",
+        "onomatopoeia": "オノマトペカード65.png",
+        "meaning": "意味カード65.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "質問にはきはきと答える。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "行動や話し方がてきぱきしているようす。"
+        }
+      ]
+    },
+    {
+      "number": 66,
+      "onomatopoeia": "はっと",
+      "files": {
+        "picture": "絵カード66.png",
+        "onomatopoeia": "オノマトペカード66.png",
+        "meaning": "意味カード66.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "とつぜん雨が降ってきて、はっとした。"
+        },
+        {
+          "index": 2,
+          "text": "大きな音にはっとして飛び起きた。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "急に気づいたり思い出すこと。"
+        },
+        {
+          "index": 2,
+          "text": "思いがけない出来事にびっくりするようす。"
+        }
+      ]
+    },
+    {
+      "number": 67,
+      "onomatopoeia": "はらはら",
+      "files": {
+        "picture": "絵カード67.png",
+        "onomatopoeia": "オノマトペカード67.png",
+        "meaning": "意味カード67.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "枯れ葉がはらはらと舞い落ちる。"
+        },
+        {
+          "index": 2,
+          "text": "二人がけんかにならないか、はらはらした。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "軽い物がたくさん落ちるようす。"
+        },
+        {
+          "index": 2,
+          "text": "なにが起こるか心配するようす。"
+        }
+      ]
+    },
+    {
+      "number": 68,
+      "onomatopoeia": "ぱくぱく",
+      "files": {
+        "picture": "絵カード68.png",
+        "onomatopoeia": "オノマトペカード68.png",
+        "meaning": "意味カード68.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "金魚が口をぱくぱくさせている。"
+        },
+        {
+          "index": 2,
+          "text": "ご飯をぱくぱく食べる。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "口を大きく何度も開けたり閉めたりするようす。"
+        },
+        {
+          "index": 2,
+          "text": "さかんに食べ物を食べるようす。"
+        }
+      ]
+    },
+    {
+      "number": 69,
+      "onomatopoeia": "ぱちぱち",
+      "files": {
+        "picture": "絵カード69.png",
+        "onomatopoeia": "オノマトペカード69.png",
+        "meaning": "意味カード69.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "ぱちぱちと手をたたく。"
+        },
+        {
+          "index": 2,
+          "text": "たき火がぱちぱちと音を立てて燃えている。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "手をたたくときに出る音。"
+        },
+        {
+          "index": 2,
+          "text": "物が燃えるときに出る音。"
+        }
+      ]
+    },
+    {
+      "number": 70,
+      "onomatopoeia": "ぱっと",
+      "files": {
+        "picture": "絵カード70.png",
+        "onomatopoeia": "オノマトペカード70.png",
+        "meaning": "意味カード70.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "マジシャンはハンカチからぱっと花を出した。"
+        },
+        {
+          "index": 2,
+          "text": "明るいニュースがぱっと広がった。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "すばやく動作をするようす。"
+        },
+        {
+          "index": 2,
+          "text": "またたく間に広がるようす。"
+        }
+      ]
+    },
+    {
+      "number": 71,
+      "onomatopoeia": "ぱんぱん",
+      "files": {
+        "picture": "絵カード71.png",
+        "onomatopoeia": "オノマトペカード71.png",
+        "meaning": "意味カード71.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "食べ過ぎておなかがぱんぱんだ。"
+        },
+        {
+          "index": 2,
+          "text": "ぱんぱんと手を打つ。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "はち切れそうにふくらんでいるようす。"
+        },
+        {
+          "index": 2,
+          "text": "手をたたいたり物をたたいたりするときに出る音。"
+        }
+      ]
+    },
+    {
+      "number": 72,
+      "onomatopoeia": "ばたばた",
+      "files": {
+        "picture": "絵カード72.png",
+        "onomatopoeia": "オノマトペカード72.png",
+        "meaning": "意味カード72.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "鳥がばたばたと羽ばたいて飛んでいった。"
+        },
+        {
+          "index": 2,
+          "text": "熱中症で多くの人がばたばたとたおれた。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "羽やうちわを動かすときに出る音。"
+        },
+        {
+          "index": 2,
+          "text": "物が続けてたおれるようす。"
+        }
+      ]
+    },
+    {
+      "number": 73,
+      "onomatopoeia": "ひらひら",
+      "files": {
+        "picture": "絵カード73.png",
+        "onomatopoeia": "オノマトペカード73.png",
+        "meaning": "意味カード73.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "スカートがひらひらゆれる。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "うすくて軽い物がゆれ動くようす。"
+        }
+      ]
+    },
+    {
+      "number": 74,
+      "onomatopoeia": "ひりひり",
+      "files": {
+        "picture": "絵カード74.png",
+        "onomatopoeia": "オノマトペカード74.png",
+        "meaning": "意味カード74.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "日焼けして肌がひりひりする。"
+        },
+        {
+          "index": 2,
+          "text": "カレーを食べたら口の中がひりひりする。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "肌が少し痛い感じがするようす。"
+        },
+        {
+          "index": 2,
+          "text": "口の中が辛味で刺激されるようす。"
+        }
+      ]
+    },
+    {
+      "number": 75,
+      "onomatopoeia": "ぴかぴか",
+      "files": {
+        "picture": "絵カード75.png",
+        "onomatopoeia": "オノマトペカード75.png",
+        "meaning": "意味カード75.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "新しい車はぴかぴかだ。"
+        },
+        {
+          "index": 2,
+          "text": "ぴかぴかの一年生。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "つやがあってかがやくようす。"
+        },
+        {
+          "index": 2,
+          "text": "新しさでまぶしく感じるようす。"
+        }
+      ]
+    },
+    {
+      "number": 76,
+      "onomatopoeia": "ぴったり",
+      "files": {
+        "picture": "絵カード76.png",
+        "onomatopoeia": "オノマトペカード76.png",
+        "meaning": "意味カード76.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "あの鳥たちはぴったりくっついている。"
+        },
+        {
+          "index": 2,
+          "text": "くつがぴったり合う。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "すき間なくくっついているようす。"
+        },
+        {
+          "index": 2,
+          "text": "サイズや意見が完全に合っているようす。"
+        }
+      ]
+    },
+    {
+      "number": 77,
+      "onomatopoeia": "びしょびしょ",
+      "files": {
+        "picture": "絵カード77.png",
+        "onomatopoeia": "オノマトペカード77.png",
+        "meaning": "意味カード77.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "ひどい雨でびしょびしょにぬれてしまった。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "全体がすっかりぬれてしまうようす。"
+        }
+      ]
+    },
+    {
+      "number": 78,
+      "onomatopoeia": "びっくり",
+      "files": {
+        "picture": "絵カード78.png",
+        "onomatopoeia": "オノマトペカード78.png",
+        "meaning": "意味カード78.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "箱をあけてびっくり。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "突然のことや意外なことにおどろくようす。"
+        }
+      ]
+    },
+    {
+      "number": 79,
+      "onomatopoeia": "ふかふか",
+      "files": {
+        "picture": "絵カード79.png",
+        "onomatopoeia": "オノマトペカード79.png",
+        "meaning": "意味カード79.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "ふかふかのふとんは気持ちがいい。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "やわらかくふっくらしているようす。"
+        }
+      ]
+    },
+    {
+      "number": 80,
+      "onomatopoeia": "ふらふら",
+      "files": {
+        "picture": "絵カード80.png",
+        "onomatopoeia": "オノマトペカード80.png",
+        "meaning": "意味カード80.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "暑さで体がふらふらする。"
+        },
+        {
+          "index": 2,
+          "text": "森の中をふらふら歩く。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "体に力が入らず意識もはっきりしないようす。"
+        },
+        {
+          "index": 2,
+          "text": "あてもなく動き回るようす。"
+        }
+      ]
+    },
+    {
+      "number": 81,
+      "onomatopoeia": "ふわふわ",
+      "files": {
+        "picture": "絵カード81.png",
+        "onomatopoeia": "オノマトペカード81.png",
+        "meaning": "意味カード81.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "ふわふわのホイップクリームができた。"
+        },
+        {
+          "index": 2,
+          "text": "夢を見ているようで気持ちがふわふわしている。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "浮かぶように軽くやわらかいようす。"
+        },
+        {
+          "index": 2,
+          "text": "心が落ち着かないようす。"
+        }
+      ]
+    },
+    {
+      "number": 82,
+      "onomatopoeia": "ぷんぷん",
+      "files": {
+        "picture": "絵カード82.png",
+        "onomatopoeia": "オノマトペカード82.png",
+        "meaning": "意味カード82.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "大事な人形を壊され、ぷんぷんする。"
+        },
+        {
+          "index": 2,
+          "text": "香水のにおいがぷんぷんする。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "ひどく怒ってきげんのわるいようす。"
+        },
+        {
+          "index": 2,
+          "text": "強いにおいがしきりに鼻をつくようす。"
+        }
+      ]
+    },
+    {
+      "number": 83,
+      "onomatopoeia": "ぶつぶつ",
+      "files": {
+        "picture": "絵カード83.png",
+        "onomatopoeia": "オノマトペカード83.png",
+        "meaning": "意味カード83.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "ぶつぶつひとり言を言っている人がいた。"
+        },
+        {
+          "index": 2,
+          "text": "親からぶつぶつ言われる。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "小声でなにかをつぶやくようす。"
+        },
+        {
+          "index": 2,
+          "text": "不平や不満を言うようす。"
+        }
+      ]
+    },
+    {
+      "number": 84,
+      "onomatopoeia": "ぶるぶる",
+      "files": {
+        "picture": "絵カード84.png",
+        "onomatopoeia": "オノマトペカード84.png",
+        "meaning": "意味カード84.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "犬が体をぶるぶるして水を飛ばした。"
+        },
+        {
+          "index": 2,
+          "text": "暗やみにぶるぶるふるえる。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "続けて体を動かすようす。"
+        },
+        {
+          "index": 2,
+          "text": "恐怖や怒りでふるえるようす。"
+        }
+      ]
+    },
+    {
+      "number": 85,
+      "onomatopoeia": "ぶんぶん",
+      "files": {
+        "picture": "絵カード85.png",
+        "onomatopoeia": "オノマトペカード85.png",
+        "meaning": "意味カード85.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "ぶんぶんとハチが飛ぶ音がする。"
+        },
+        {
+          "index": 2,
+          "text": "鬼が金棒をぶんぶんふりまわす。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "虫が飛ぶときに出る羽の音。"
+        },
+        {
+          "index": 2,
+          "text": "物をふり回したときに出る音。"
+        }
+      ]
+    },
+    {
+      "number": 86,
+      "onomatopoeia": "ぺこぺこ",
+      "files": {
+        "picture": "絵カード86.png",
+        "onomatopoeia": "オノマトペカード86.png",
+        "meaning": "意味カード86.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "くまはおなかがぺこぺこだ。"
+        },
+        {
+          "index": 2,
+          "text": "頭をぺこぺこ下げてあやまった。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "おなかがへっているようす。"
+        },
+        {
+          "index": 2,
+          "text": "頭をしきりに下げるようす。"
+        }
+      ]
+    },
+    {
+      "number": 87,
+      "onomatopoeia": "ぺらぺら",
+      "files": {
+        "picture": "絵カード87.png",
+        "onomatopoeia": "オノマトペカード87.png",
+        "meaning": "意味カード87.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "あの子は英語がぺらぺらだ。"
+        },
+        {
+          "index": 2,
+          "text": "うわさ話をぺらぺらと言いふらす。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "外国語を自由に話すようす。"
+        },
+        {
+          "index": 2,
+          "text": "人の気持ちを考えないでしゃべってしまうようす。"
+        }
+      ]
+    },
+    {
+      "number": 88,
+      "onomatopoeia": "ほかほか",
+      "files": {
+        "picture": "絵カード88.png",
+        "onomatopoeia": "オノマトペカード88.png",
+        "meaning": "意味カード88.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "カイロがほかほかしてあたたかい。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "心地よいあたたかさを感じるようす。"
+        }
+      ]
+    },
+    {
+      "number": 89,
+      "onomatopoeia": "ぽかぽか",
+      "files": {
+        "picture": "絵カード89.png",
+        "onomatopoeia": "オノマトペカード89.png",
+        "meaning": "意味カード89.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "春の太陽はぽかぽかしてあたたかい。"
+        },
+        {
+          "index": 2,
+          "text": "頭をぽかぽかたたかれた。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "あたたかくて気持ちのよいようす。"
+        },
+        {
+          "index": 2,
+          "text": "何回も物をたたくようす。"
+        }
+      ]
+    },
+    {
+      "number": 90,
+      "onomatopoeia": "ぽつんと",
+      "files": {
+        "picture": "絵カード90.png",
+        "onomatopoeia": "オノマトペカード90.png",
+        "meaning": "意味カード90.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "道路に花が一輪ぽつんと咲いていた。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "ひとつだけほかの物と離れているようす。"
+        }
+      ]
+    },
+    {
+      "number": 91,
+      "onomatopoeia": "ぼうっと",
+      "files": {
+        "picture": "絵カード91.png",
+        "onomatopoeia": "オノマトペカード91.png",
+        "meaning": "意味カード91.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "ぼうっと南の島を想像した。"
+        },
+        {
+          "index": 2,
+          "text": "目が疲れて景色がぼうっと見える。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "ぼんやりして緊張していないようす。"
+        },
+        {
+          "index": 2,
+          "text": "物がぼやけて見えるようす。"
+        }
+      ]
+    },
+    {
+      "number": 92,
+      "onomatopoeia": "みしみし",
+      "files": {
+        "picture": "絵カード92.png",
+        "onomatopoeia": "オノマトペカード92.png",
+        "meaning": "意味カード92.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "床が古くて歩くとみしみしと音がする。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "床や家が歩いたり風で揺れて出る音。"
+        }
+      ]
+    },
+    {
+      "number": 93,
+      "onomatopoeia": "むかむか",
+      "files": {
+        "picture": "絵カード93.png",
+        "onomatopoeia": "オノマトペカード93.png",
+        "meaning": "意味カード93.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "からかわれてむかむかする。"
+        },
+        {
+          "index": 2,
+          "text": "食べすぎて胃がむかむかする。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "心の底から怒りがこみ上げてくるようす。"
+        },
+        {
+          "index": 2,
+          "text": "吐き気がして気持ちのわるいようす。"
+        }
+      ]
+    },
+    {
+      "number": 94,
+      "onomatopoeia": "もりもり",
+      "files": {
+        "picture": "絵カード94.png",
+        "onomatopoeia": "オノマトペカード94.png",
+        "meaning": "意味カード94.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "うでの筋肉がもりもりしている。"
+        },
+        {
+          "index": 2,
+          "text": "お腹がへっていたので、もりもりごはんを食べた。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "物がもり上がっているようす。"
+        },
+        {
+          "index": 2,
+          "text": "いきおいよくたくさん食べるようす。"
+        }
+      ]
+    },
+    {
+      "number": 95,
+      "onomatopoeia": "もぐもぐ",
+      "files": {
+        "picture": "絵カード95.png",
+        "onomatopoeia": "オノマトペカード95.png",
+        "meaning": "意味カード95.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "りすが木の実をもぐもぐ食べる。"
+        },
+        {
+          "index": 2,
+          "text": "もぐもぐ言っても話が伝わらない。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "口を開けずに物をかむようす。"
+        },
+        {
+          "index": 2,
+          "text": "口を十分に開けずに物を言うようす。"
+        }
+      ]
+    },
+    {
+      "number": 96,
+      "onomatopoeia": "ゆらゆら",
+      "files": {
+        "picture": "絵カード96.png",
+        "onomatopoeia": "オノマトペカード96.png",
+        "meaning": "意味カード96.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "ハンモックがゆらゆらゆれている。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "物がゆっくりと大きくくり返しゆれ動くようす。"
+        }
+      ]
+    },
+    {
+      "number": 97,
+      "onomatopoeia": "よたよた",
+      "files": {
+        "picture": "絵カード97.png",
+        "onomatopoeia": "オノマトペカード97.png",
+        "meaning": "意味カード97.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "アヒルのひな鳥がよたよた歩いている。"
+        },
+        {
+          "index": 2,
+          "text": "よたよたでもう歩けない。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "足の動きがしっかりしていないようす。"
+        },
+        {
+          "index": 2,
+          "text": "疲れ切って弱っているようす。"
+        }
+      ]
+    },
+    {
+      "number": 98,
+      "onomatopoeia": "るんるん",
+      "files": {
+        "picture": "絵カード98.png",
+        "onomatopoeia": "オノマトペカード98.png",
+        "meaning": "意味カード98.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "うれしくてるんるん気分だ。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "気分が明るくはずむようなようす。"
+        }
+      ]
+    },
+    {
+      "number": 99,
+      "onomatopoeia": "わいわい",
+      "files": {
+        "picture": "絵カード99.png",
+        "onomatopoeia": "オノマトペカード99.png",
+        "meaning": "意味カード99.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "みんなでわいわい楽しくごはんを食べる。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "大勢で話しているようす。"
+        }
+      ]
+    },
+    {
+      "number": 100,
+      "onomatopoeia": "わくわく",
+      "files": {
+        "picture": "絵カード100.png",
+        "onomatopoeia": "オノマトペカード100.png",
+        "meaning": "意味カード100.png"
+      },
+      "usages": [
+        {
+          "index": 1,
+          "text": "わくわくしながらプレゼントの箱を開ける。"
+        }
+      ],
+      "meanings": [
+        {
+          "index": 1,
+          "text": "期待や喜びで心が落ち着かないようす。"
+        }
+      ]
+    }
+  ]
+}
