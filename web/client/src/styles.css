@@ -605,8 +605,7 @@ button:disabled {
   text-underline-offset: 0.12em;
 }
 
-.incorrect-lyric,
-.incorrect-lyric-line {
+.incorrect-lyric {
   color: #d51e1e;
 }
 

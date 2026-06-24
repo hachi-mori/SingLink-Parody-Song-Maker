@@ -125,10 +125,7 @@ export function WriteLyricsScreen({ song, onComplete, onCancel }: WriteLyricsScr
 
   const finish = async (nextTasks: SolvedTask[], nextInputTexts: string[]) => {
     if (song.mode === 'onomatopoeiaQuiz') {
-      const answers = nextTasks
-        .filter((task) => task.restPadding && task.syllables[0] === 'ル')
-        .map((task) => task.userInput);
-      onComplete(nextTasks, buildOnomatopoeiaResultLyrics(onomatopoeiaProblems, answers), nextInputTexts);
+      onComplete(nextTasks, buildOnomatopoeiaResultLyrics(onomatopoeiaProblems), nextInputTexts);
       return;
     }
 

@@ -159,10 +159,10 @@ export function buildOnomatopoeiaTasks(problem: OnomatopoeiaEntry, answer: strin
       isCorrect: true
     },
     {
-      phrase: '',
+      phrase: problem.answer,
       syllables: makePlaceholderSyllables('ル', 6),
       userInput: answer,
-      userSyllables: splitOnomatopoeiaMoras(replaceChoonWithVowel(answer)),
+      userSyllables: splitOnomatopoeiaMoras(replaceChoonWithVowel(problem.answer)),
       restPadding: true,
       score: 0,
       rhymeMatchPercent: 0,
@@ -172,7 +172,12 @@ export function buildOnomatopoeiaTasks(problem: OnomatopoeiaEntry, answer: strin
   ];
 }
 
-export function buildOnomatopoeiaResultLyrics(problems: OnomatopoeiaEntry[], selectedAnswers: string[]): string {
-  const lines = problems.map((problem, index) => `${problem.questionText ?? problem.word}　${selectedAnswers[index] ?? problem.answer}`);
+export function buildOnomatopoeiaResultLyrics(problems: OnomatopoeiaEntry[]): string {
+  const lines = problems.map((problem) => {
+    if (problem.questionText) {
+      return problem.questionText.replace('○○', problem.answer);
+    }
+    return `${problem.word}　${problem.answer}`;
+  });
   return `${lines.join('\n')}\nにほんごのおのまとぺ\nうたってたくさんべんきょー`;
 }

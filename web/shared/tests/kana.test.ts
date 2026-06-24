@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { buildOnomatopoeiaResultLyrics, buildOnomatopoeiaTasks } from '../src/gameLogic';
 import { getVowel, replaceChoonWithVowel, splitOnomatopoeiaMoras, splitSyllables } from '../src/kana';
 import { parseOnomatopoeiaCardEntries } from '../src/onomatopoeiaCards';
 
@@ -38,6 +39,26 @@ describe('kana utilities', () => {
       answer: 'あつあつ',
       explanation: '料理などができたてであついようす。',
       questionText: '○○のおでんはおいしいなあ。'
+    });
+  });
+
+  it('オノマトペのリザルト歌詞は正解で穴埋めする', () => {
+    const problem = {
+      word: 'るんるん',
+      reading: 'るんるん',
+      answer: 'るんるん',
+      explanation: '',
+      questionText: 'うれしくて○○気分だ。'
+    };
+
+    expect(buildOnomatopoeiaResultLyrics([problem])).toContain('うれしくてるんるん気分だ。');
+
+    const [, answerTask] = buildOnomatopoeiaTasks(problem, 'よたよた', false);
+    expect(answerTask).toMatchObject({
+      phrase: 'るんるん',
+      userInput: 'よたよた',
+      userSyllables: ['る', 'ん', 'る', 'ん'],
+      isCorrect: false
     });
   });
 });

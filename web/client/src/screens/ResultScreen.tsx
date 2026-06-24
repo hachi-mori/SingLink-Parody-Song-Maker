@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Download, Pause, Play, RotateCcw } from 'lucide-react';
 import type { SolvedTask, SongDetail } from '@shared/types';
 import { AssetButton } from '../components/AssetButton';
@@ -41,6 +41,16 @@ function findAllRanges(line: string, input: string, incorrect: boolean): Highlig
   return ranges;
 }
 
+function makeHighlightRanges(line: string, tasks: SolvedTask[], song: SongDetail): HighlightRange[] {
+  const highlightTasks = song.mode === 'onomatopoeiaQuiz'
+    ? tasks.filter((task) => task.restPadding && task.syllables[0] === 'ル')
+    : tasks;
+
+  return highlightTasks
+    .flatMap((task) => findAllRanges(line, task.phrase || task.userInput, task.isCorrect === false))
+    .sort((a, b) => Number(b.incorrect) - Number(a.incorrect));
+}
+
 export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHistory }: ResultScreenProps) {
   const audioContextRef = useRef<AudioContext | undefined>(undefined);
   const voiceBufferRef = useRef<AudioBuffer | undefined>(undefined);
@@ -52,14 +62,6 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
   const generatedAudio = hasGeneratedAudio(result);
 
   const lines = fullLyrics.replace(/[{}]/g, '').split('\n');
-  const onomatopoeiaIncorrectLines = useMemo(() => {
-    if (song.mode !== 'onomatopoeiaQuiz') {
-      return [];
-    }
-    return tasks
-      .filter((task) => task.restPadding && task.syllables[0] === 'ル')
-      .map((task) => task.isCorrect === false);
-  }, [song.mode, tasks]);
 
   const stopSources = useCallback(() => {
     try {
@@ -171,13 +173,12 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
           <h1>{song.trackName || song.title}</h1>
           <div className="lyrics-box">
             {lines.map((line, lineIndex) => {
-              const lineIncorrect = onomatopoeiaIncorrectLines[lineIndex] === true;
-              const ranges = tasks.flatMap((task) => findAllRanges(line, task.userInput, task.isCorrect === false));
+              const ranges = makeHighlightRanges(line, tasks, song);
               return (
-                <p className={lineIncorrect ? 'incorrect-lyric-line' : undefined} key={`${line}-${lineIndex}`}>
+                <p key={`${line}-${lineIndex}`}>
                   {[...line].map((char, charIndex) => {
                     const range = ranges.find((item) => charIndex >= item.start && charIndex < item.end);
-                    const className = lineIncorrect || range?.incorrect
+                    const className = range?.incorrect
                       ? 'incorrect-lyric'
                       : range
                         ? 'user-lyric'
