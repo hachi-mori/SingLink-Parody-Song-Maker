@@ -1,5 +1,14 @@
 import type { JsonObject, SolvedTask, SongDetail } from '@shared/types';
 import {
+  buildMemorizationSynthesisPlan,
+  buildOnomatopoeiaLyricsRows,
+  createMemorizationScore,
+  extractOnomatopoeiaLineCorrects,
+  type MemorizationScoreJson,
+  type PhraseRange
+} from '@shared/memorizationScore';
+import { trimWavLeadingFrames } from '@shared/wav';
+import {
   applyParodyLyrics,
   convertVVProjToScoreJSON,
   getKeyAdjustment,
@@ -10,13 +19,13 @@ import {
 } from '@shared/vvproj';
 
 const normalSpeakerId = 3003;
-const incorrectSpeakerId = 3076;
 const singingQuerySpeakerId = 6000;
 
 type SynthesisSegment = {
   score: ScoreJson;
   speakerId: number;
   keyShift: number;
+  leadingPaddingFrames: number;
 };
 
 type WavParts = {
@@ -106,42 +115,24 @@ function splitScore(score: ScoreJson, maxFrames: number): ScoreJson[] {
   return segments.length > 0 ? segments : [{ notes: score.notes }];
 }
 
-function extractOnomatopoeiaLineCorrects(tasks: SolvedTask[]): boolean[] {
-  return tasks
-    .filter((task) => task.restPadding && task.syllables.length === 6 && task.syllables[0] === 'ル')
-    .map((task) => task.isCorrect !== false);
-}
-
-function buildSegments(score: ScoreJson, tasks: SolvedTask[], songTitle: string): SynthesisSegment[] {
+function buildSegments(
+  score: ScoreJson,
+  tasks: SolvedTask[],
+  songTitle: string,
+  phraseRanges?: ReadonlyArray<PhraseRange>
+): SynthesisSegment[] {
   const keyShift = getKeyAdjustment('ずんだもん', 'ノーマル');
-  if (songTitle !== 'オノマトペ' || score.notes.length < 48) {
+  if (songTitle !== 'オノマトペ' || !phraseRanges?.length) {
     return splitScore(applyKeyShiftToScore(score, keyShift), 2500)
-      .map((segment) => ({ score: segment, speakerId: normalSpeakerId, keyShift }));
+      .map((segment) => ({ score: segment, speakerId: normalSpeakerId, keyShift, leadingPaddingFrames: 0 }));
   }
 
   const shiftedScore = keyShift !== 0 ? transposeScoreJSON(score, -keyShift) : score;
-  const lineCorrects = extractOnomatopoeiaLineCorrects(tasks);
-  const ranges: Array<[number, number]> = [
-    [0, 16],
-    [16, 31],
-    [31, 47],
-    [47, shiftedScore.notes.length]
-  ];
-
-  return ranges.flatMap(([start, end], index) => {
-    const notes = shiftedScore.notes.slice(start, Math.min(end, shiftedScore.notes.length)).map((note) => ({ ...note }));
-    if (notes.length === 0) {
-      return [];
-    }
-    if (notes[0]?.notelen !== 'R') {
-      notes.unshift({ frame_length: 2, key: null, lyric: '', notelen: 'R' });
-    }
-    return [{
-      score: { notes },
-      speakerId: index < 3 && lineCorrects[index] === false ? incorrectSpeakerId : normalSpeakerId,
-      keyShift
-    }];
-  });
+  return buildMemorizationSynthesisPlan(
+    shiftedScore,
+    phraseRanges,
+    extractOnomatopoeiaLineCorrects(tasks)
+  ).map((segment) => ({ ...segment, keyShift }));
 }
 
 function readAscii(bytes: Uint8Array, offset: number, length: number): string {
@@ -258,19 +249,42 @@ export async function synthesizeDirectVoicevox(
   tasks: SolvedTask[],
   baseUrlRaw: string
 ): Promise<Blob> {
-  const vvprojResponse = await fetch(song.vvprojUrl);
-  if (!vvprojResponse.ok) {
-    throw new Error('曲のvvprojデータを読み込めませんでした');
+  let score: ScoreJson;
+  let phraseRanges: PhraseRange[] | undefined;
+  if (song.mode === 'onomatopoeiaQuiz' && song.baseScoreUrl) {
+    const scoreResponse = await fetch(song.baseScoreUrl);
+    if (!scoreResponse.ok) {
+      throw new Error('曲の基礎Scoreデータを読み込めませんでした');
+    }
+    const text = (await scoreResponse.text()).replace(/^\uFEFF/, '');
+    const generated = createMemorizationScore(
+      buildOnomatopoeiaLyricsRows(tasks),
+      JSON.parse(text) as MemorizationScoreJson
+    );
+    score = generated.score;
+    phraseRanges = generated.phraseRanges;
+  } else {
+    const vvprojResponse = await fetch(song.vvprojUrl);
+    if (!vvprojResponse.ok) {
+      throw new Error('曲のvvprojデータを読み込めませんでした');
+    }
+    const vvproj = await vvprojResponse.json() as unknown;
+    score = convertVVProjToScoreJSON(applyParodyLyrics(vvproj, tasks), 0);
   }
-  const vvproj = await vvprojResponse.json() as unknown;
-  const modified = applyParodyLyrics(vvproj, tasks);
-  const score = convertVVProjToScoreJSON(modified, 0);
-  const segments = buildSegments(score, tasks, song.title);
+  const segments = buildSegments(score, tasks, song.title, phraseRanges);
   const baseUrl = normalizeBaseUrl(baseUrlRaw);
   const wavs: ArrayBuffer[] = [];
+  let processedPaddingFrames = 0;
 
   for (const segment of segments) {
-    wavs.push(await synthesizeSegment(segment, baseUrl));
+    const wav = await synthesizeSegment(segment, baseUrl);
+    const trimmed = trimWavLeadingFrames(
+      new Uint8Array(wav),
+      segment.leadingPaddingFrames,
+      processedPaddingFrames
+    );
+    wavs.push(trimmed.buffer.slice(trimmed.byteOffset, trimmed.byteOffset + trimmed.byteLength) as ArrayBuffer);
+    processedPaddingFrames += segment.leadingPaddingFrames;
   }
   return concatWavBuffers(wavs);
 }

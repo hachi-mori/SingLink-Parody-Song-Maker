@@ -4,6 +4,13 @@ import fastifyStatic from '@fastify/static';
 import fs from 'node:fs/promises';
 import { z } from 'zod';
 import { applyParodyLyrics, buildResultDisplayLyrics, convertVVProjToScoreJSON } from '../../shared/src/vvproj';
+import {
+  buildOnomatopoeiaLyricsRows,
+  createMemorizationScore,
+  type MemorizationScoreJson,
+  type PhraseRange
+} from '../../shared/src/memorizationScore';
+import type { ScoreJson } from '../../shared/src/vvproj';
 import type { SynthesisErrorResponse, SynthesisRequest } from '../../shared/src/types';
 import { getConfig } from './config';
 import { assetsDir } from './paths';
@@ -29,7 +36,8 @@ const synthesisSchema = z.object({
     score: z.number().optional(),
     rhymeMatchPercent: z.number().optional(),
     matchesCount: z.number().optional(),
-    isCorrect: z.boolean().optional()
+    isCorrect: z.boolean().optional(),
+    singingReading: z.string().optional()
   })),
   fullLyrics: z.string(),
   voicevoxBaseUrl: z.string().optional()
@@ -131,9 +139,25 @@ app.post('/api/synthesis', async (request, reply) => {
   }
 
   try {
-    const modified = applyParodyLyrics(resolved.vvproj, body.solvedTasks);
-    const score = convertVVProjToScoreJSON(modified, 0);
-    const wav = await synthesizeSongScore(score, body.voicevoxBaseUrl ?? config.voicevoxBaseUrl, body.solvedTasks, resolved.info.title);
+    let score: ScoreJson;
+    let phraseRanges: PhraseRange[] | undefined;
+    if (resolved.info.mode === 'onomatopoeiaQuiz' && resolved.baseScore) {
+      const generated = createMemorizationScore(
+        buildOnomatopoeiaLyricsRows(body.solvedTasks),
+        resolved.baseScore as MemorizationScoreJson
+      );
+      score = generated.score;
+      phraseRanges = generated.phraseRanges;
+    } else {
+      score = convertVVProjToScoreJSON(applyParodyLyrics(resolved.vvproj, body.solvedTasks), 0);
+    }
+    const wav = await synthesizeSongScore(
+      score,
+      body.voicevoxBaseUrl ?? config.voicevoxBaseUrl,
+      body.solvedTasks,
+      resolved.info.title,
+      phraseRanges
+    );
     const encodedTitle = encodeURIComponent(resolved.info.title);
     return reply
       .header('Content-Type', 'audio/wav')

@@ -6,11 +6,7 @@ import {
   extractTalkUtterances,
   getVvprojTrackName
 } from '../../shared/src/vvproj';
-import { parseOnomatopoeiaCardEntries } from '../../shared/src/onomatopoeiaCards';
-import {
-  replaceChoonWithVowel,
-  splitOnomatopoeiaMoras
-} from '../../shared/src/kana';
+import { onomatopoeiaExamples } from '../../shared/src/memorizationScore';
 import type { OnomatopoeiaEntry, SongDetail, SongInfo, SongMode, VerbEntry } from '../../shared/src/types';
 import { dictDir, instDir, scoreDir, toAssetUrl } from './paths';
 
@@ -47,7 +43,7 @@ async function listScoreFiles(): Promise<string[]> {
 }
 
 async function readJsonFile(filePath: string): Promise<unknown> {
-  const text = await fs.readFile(filePath, 'utf8');
+  const text = (await fs.readFile(filePath, 'utf8')).replace(/^\uFEFF/, '');
   return JSON.parse(text) as unknown;
 }
 
@@ -62,7 +58,11 @@ function detectMode(title: string): SongMode {
 }
 
 async function resolveInstFile(title: string): Promise<string | undefined> {
-  const specialCandidates = title === 'ハッピーバースデー' ? ['HappyBirthday.wav'] : [];
+  const specialCandidates = title === 'ハッピーバースデー'
+    ? ['HappyBirthday.wav']
+    : title === 'オノマトペ'
+      ? ['幸せなら手をたたこう.wav']
+      : [];
   const candidates = [
     ...specialCandidates,
     ...instExtensions.map((ext) => `${title}${ext}`)
@@ -100,15 +100,22 @@ export async function listSongs(): Promise<SongInfo[]> {
       vvprojUrl: toAssetUrl('score', vvprojFileName),
       instFileName,
       instUrl: instFileName ? toAssetUrl('inst', instFileName) : undefined,
+      baseScoreFileName: title === 'オノマトペ' ? '幸せなら手をたたこう.json' : undefined,
+      baseScoreUrl: title === 'オノマトペ' ? toAssetUrl('score', '幸せなら手をたたこう.json') : undefined,
       mode: detectMode(title),
-      trackName
+      trackName: title === 'オノマトペ' ? '幸せなら手をたたこう' : trackName
     });
   }
 
   return songs;
 }
 
-export async function resolveSong(id: string): Promise<{ info: SongInfo; vvprojPath: string; vvproj: unknown } | undefined> {
+export async function resolveSong(id: string): Promise<{
+  info: SongInfo;
+  vvprojPath: string;
+  vvproj: unknown;
+  baseScore?: unknown;
+} | undefined> {
   const title = decodeSongId(id);
   const songs = await listSongs();
   const info = songs.find((song) => song.title === title);
@@ -118,7 +125,10 @@ export async function resolveSong(id: string): Promise<{ info: SongInfo; vvprojP
 
   const vvprojPath = path.join(scoreDir, info.vvprojFileName);
   const vvproj = await readJsonFile(vvprojPath);
-  return { info, vvprojPath, vvproj };
+  const baseScore = info.baseScoreFileName
+    ? await readJsonFile(path.join(scoreDir, info.baseScoreFileName))
+    : undefined;
+  return { info, vvprojPath, vvproj, baseScore };
 }
 
 async function readDictFile(fileName: string): Promise<string> {
@@ -146,35 +156,7 @@ export async function loadVerbEntries(): Promise<VerbEntry[]> {
 }
 
 export async function loadOnomatopoeiaEntries(): Promise<OnomatopoeiaEntry[]> {
-  const cardsPath = path.join(dictDir, 'cards_text_data.json');
-  if (await fileExists(cardsPath)) {
-    const entries = parseOnomatopoeiaCardEntries(await readJsonFile(cardsPath));
-    if (entries.length > 0) {
-      return entries;
-    }
-  }
-
-  const text = await readDictFile('オノマトペ.csv');
-  const rows = parseCsvRows(text);
-  const entries: OnomatopoeiaEntry[] = [];
-
-  for (const fields of rows) {
-    if (fields.length < 3) {
-      continue;
-    }
-    const word = (fields[0] ?? '').trim();
-    const reading = (fields[1] ?? '').trim();
-    const answer = (fields[2] ?? '').trim();
-    const explanation = (fields[3] ?? '').trim();
-    const readingMoraCount = splitOnomatopoeiaMoras(replaceChoonWithVowel(reading)).length;
-    const answerMoraCount = splitOnomatopoeiaMoras(replaceChoonWithVowel(answer)).length;
-
-    if (word && reading && answer && readingMoraCount <= 8 && answerMoraCount <= 6) {
-      entries.push({ word, reading, answer, explanation });
-    }
-  }
-
-  return entries;
+  return onomatopoeiaExamples.map((example) => ({ ...example }));
 }
 
 export async function getSongDetail(id: string): Promise<SongDetail | undefined> {

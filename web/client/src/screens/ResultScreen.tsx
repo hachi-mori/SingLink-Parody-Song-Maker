@@ -57,6 +57,7 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
   const instBufferRef = useRef<AudioBuffer | undefined>(undefined);
   const voiceSourceRef = useRef<AudioBufferSourceNode | undefined>(undefined);
   const instSourceRef = useRef<AudioBufferSourceNode | undefined>(undefined);
+  const playbackGenerationRef = useRef(0);
   const [playing, setPlaying] = useState(false);
   const [playError, setPlayError] = useState('');
   const generatedAudio = hasGeneratedAudio(result);
@@ -64,11 +65,13 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
   const lines = fullLyrics.replace(/[{}]/g, '').split('\n');
 
   const stopSources = useCallback(() => {
-    try {
-      voiceSourceRef.current?.stop();
-      instSourceRef.current?.stop();
-    } catch {
-      // Already-stopped Web Audio sources can throw in some browsers.
+    playbackGenerationRef.current += 1;
+    for (const source of [voiceSourceRef.current, instSourceRef.current]) {
+      try {
+        source?.stop();
+      } catch {
+        // Already-stopped Web Audio sources can throw in some browsers.
+      }
     }
     voiceSourceRef.current = undefined;
     instSourceRef.current = undefined;
@@ -115,19 +118,29 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
     }
 
     const startAt = context.currentTime + 0.08;
-    const voiceSource = new AudioBufferSourceNode(context, { buffer: voiceBuffer, loop: true });
+    const generation = playbackGenerationRef.current;
+    const voiceSource = new AudioBufferSourceNode(context, { buffer: voiceBuffer });
     voiceSource.connect(context.destination);
     voiceSource.start(startAt);
     voiceSourceRef.current = voiceSource;
 
     const instBuffer = instBufferRef.current;
+    let completionSource = voiceSource;
     if (instBuffer) {
-      const instSource = new AudioBufferSourceNode(context, { buffer: instBuffer, loop: true });
+      const instSource = new AudioBufferSourceNode(context, { buffer: instBuffer });
       const instGain = new GainNode(context, { gain: 0.4 });
       instSource.connect(instGain).connect(context.destination);
       instSource.start(startAt);
       instSourceRef.current = instSource;
+      completionSource = instSource;
     }
+    completionSource.onended = () => {
+      if (playbackGenerationRef.current === generation) {
+        voiceSourceRef.current = undefined;
+        instSourceRef.current = undefined;
+        setPlaying(false);
+      }
+    };
   };
 
   const restart = () => {

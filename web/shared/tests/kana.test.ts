@@ -51,7 +51,10 @@ describe('kana utilities', () => {
       questionText: '大きな犬が急に出てきて、○○する。'
     };
 
-    expect(buildOnomatopoeiaResultLyrics([problem])).toContain('大きな犬が急に出てきてるんるんする');
+    const resultLyrics = buildOnomatopoeiaResultLyrics([problem]);
+    expect(resultLyrics).toBe('大きな犬が急に出てきてるんるんする');
+    expect(resultLyrics).not.toContain('にほんごのおのまとぺ');
+    expect(resultLyrics).not.toContain('うたってたくさんべんきょー');
 
     const [, answerTask] = buildOnomatopoeiaTasks(problem, 'よたよた', false);
     expect(answerTask).toMatchObject({

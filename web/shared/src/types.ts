@@ -24,6 +24,7 @@ export type SolvedTask = {
   rhymeMatchPercent?: number;
   matchesCount?: number;
   isCorrect?: boolean;
+  singingReading?: string;
 };
 
 export type VerbEntry = {
@@ -38,6 +39,8 @@ export type OnomatopoeiaEntry = {
   answer: string;
   explanation: string;
   questionText?: string;
+  displayText?: string;
+  singingReading?: string;
 };
 
 export type SongMode = 'freeText' | 'verbQuiz' | 'onomatopoeiaQuiz';
@@ -49,6 +52,8 @@ export type SongInfo = {
   vvprojUrl: string;
   instFileName?: string;
   instUrl?: string;
+  baseScoreFileName?: string;
+  baseScoreUrl?: string;
   mode: SongMode;
   trackName?: string;
 };

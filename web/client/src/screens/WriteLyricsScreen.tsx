@@ -88,7 +88,7 @@ export function WriteLyricsScreen({ song, onComplete, onCancel }: WriteLyricsScr
   }>();
 
   const onomatopoeiaProblems = useMemo(() => {
-    return song.mode === 'onomatopoeiaQuiz' ? takeShuffled(song.onomatopoeiaEntries ?? [], 3) : [];
+    return song.mode === 'onomatopoeiaQuiz' ? [...(song.onomatopoeiaEntries ?? [])] : [];
   }, [song]);
 
   const problemCount = song.mode === 'onomatopoeiaQuiz' ? onomatopoeiaProblems.length : song.problems.length;
