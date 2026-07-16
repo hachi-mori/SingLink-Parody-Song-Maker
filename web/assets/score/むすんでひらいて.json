@@ -1,0 +1,359 @@
+﻿{
+  "16thnoteframe_length": 12,
+  "notes": [
+    {
+      "frame_length": 2,
+      "key": null,
+      "lyric": "",
+      "notelen": "R"
+    },
+    {
+      "frame_length": 47,
+      "key": 64,
+      "lyric": "い",
+      "notelen": "E4"
+    },
+    {
+      "frame_length": 23,
+      "key": 64,
+      "lyric": "い",
+      "notelen": "E4"
+    },
+    {
+      "frame_length": 23,
+      "key": 62,
+      "lyric": "い",
+      "notelen": "D4"
+    },
+    {
+      "frame_length": 47,
+      "key": 60,
+      "lyric": "い",
+      "notelen": "C4"
+    },
+    {
+      "frame_length": 47,
+      "key": 60,
+      "lyric": "い",
+      "notelen": "C4"
+    },
+    {
+      "frame_length": 47,
+      "key": 62,
+      "lyric": "い",
+      "notelen": "D4"
+    },
+    {
+      "frame_length": 47,
+      "key": 62,
+      "lyric": "い",
+      "notelen": "D4"
+    },
+    {
+      "frame_length": 23,
+      "key": 64,
+      "lyric": "い",
+      "notelen": "E4"
+    },
+    {
+      "frame_length": 23,
+      "key": 62,
+      "lyric": "い",
+      "notelen": "D4"
+    },
+    {
+      "frame_length": 47,
+      "key": 60,
+      "lyric": "い",
+      "notelen": "C4"
+    },
+    {
+      "frame_length": 47,
+      "key": 67,
+      "lyric": "ろ",
+      "notelen": "G4"
+    },
+    {
+      "frame_length": 23,
+      "key": 67,
+      "lyric": "ろ",
+      "notelen": "G4"
+    },
+    {
+      "frame_length": 23,
+      "key": 65,
+      "lyric": "ろ",
+      "notelen": "F4"
+    },
+    {
+      "frame_length": 47,
+      "key": 64,
+      "lyric": "ろ",
+      "notelen": "E4"
+    },
+    {
+      "frame_length": 47,
+      "key": 64,
+      "lyric": "ろ",
+      "notelen": "E4"
+    },
+    {
+      "frame_length": 23,
+      "key": 62,
+      "lyric": "ろ",
+      "notelen": "D4"
+    },
+    {
+      "frame_length": 23,
+      "key": 60,
+      "lyric": "ろ",
+      "notelen": "C4"
+    },
+    {
+      "frame_length": 23,
+      "key": 62,
+      "lyric": "ろ",
+      "notelen": "D4"
+    },
+    {
+      "frame_length": 23,
+      "key": 64,
+      "lyric": "ろ",
+      "notelen": "E4"
+    },
+    {
+      "frame_length": 94,
+      "key": 60,
+      "lyric": "ろ",
+      "notelen": "C4"
+    },
+    {
+      "frame_length": 47,
+      "key": 64,
+      "lyric": "は",
+      "notelen": "E4"
+    },
+    {
+      "frame_length": 23,
+      "key": 64,
+      "lyric": "は",
+      "notelen": "E4"
+    },
+    {
+      "frame_length": 23,
+      "key": 65,
+      "lyric": "は",
+      "notelen": "F4"
+    },
+    {
+      "frame_length": 47,
+      "key": 67,
+      "lyric": "は",
+      "notelen": "G4"
+    },
+    {
+      "frame_length": 47,
+      "key": 67,
+      "lyric": "は",
+      "notelen": "G4"
+    },
+    {
+      "frame_length": 47,
+      "key": 69,
+      "lyric": "は",
+      "notelen": "A4"
+    },
+    {
+      "frame_length": 47,
+      "key": 69,
+      "lyric": "は",
+      "notelen": "A4"
+    },
+    {
+      "frame_length": 23,
+      "key": 67,
+      "lyric": "は",
+      "notelen": "G4"
+    },
+    {
+      "frame_length": 23,
+      "key": 65,
+      "lyric": "は",
+      "notelen": "F4"
+    },
+    {
+      "frame_length": 47,
+      "key": 64,
+      "lyric": "は",
+      "notelen": "E4"
+    },
+    {
+      "frame_length": 47,
+      "key": 64,
+      "lyric": "に",
+      "notelen": "E4"
+    },
+    {
+      "frame_length": 23,
+      "key": 64,
+      "lyric": "に",
+      "notelen": "E4"
+    },
+    {
+      "frame_length": 23,
+      "key": 65,
+      "lyric": "に",
+      "notelen": "F4"
+    },
+    {
+      "frame_length": 47,
+      "key": 67,
+      "lyric": "に",
+      "notelen": "G4"
+    },
+    {
+      "frame_length": 47,
+      "key": 67,
+      "lyric": "に",
+      "notelen": "G4"
+    },
+    {
+      "frame_length": 47,
+      "key": 69,
+      "lyric": "に",
+      "notelen": "A4"
+    },
+    {
+      "frame_length": 47,
+      "key": 69,
+      "lyric": "に",
+      "notelen": "A4"
+    },
+    {
+      "frame_length": 94,
+      "key": 67,
+      "lyric": "に",
+      "notelen": "G4"
+    },
+    {
+      "frame_length": 47,
+      "key": 64,
+      "lyric": "ほ",
+      "notelen": "E4"
+    },
+    {
+      "frame_length": 23,
+      "key": 64,
+      "lyric": "ほ",
+      "notelen": "E4"
+    },
+    {
+      "frame_length": 23,
+      "key": 62,
+      "lyric": "ほ",
+      "notelen": "D4"
+    },
+    {
+      "frame_length": 47,
+      "key": 60,
+      "lyric": "ほ",
+      "notelen": "C4"
+    },
+    {
+      "frame_length": 47,
+      "key": 60,
+      "lyric": "ほ",
+      "notelen": "C4"
+    },
+    {
+      "frame_length": 47,
+      "key": 62,
+      "lyric": "ほ",
+      "notelen": "D4"
+    },
+    {
+      "frame_length": 47,
+      "key": 62,
+      "lyric": "ほ",
+      "notelen": "D4"
+    },
+    {
+      "frame_length": 23,
+      "key": 64,
+      "lyric": "ほ",
+      "notelen": "E4"
+    },
+    {
+      "frame_length": 23,
+      "key": 62,
+      "lyric": "ほ",
+      "notelen": "D4"
+    },
+    {
+      "frame_length": 47,
+      "key": 60,
+      "lyric": "ほ",
+      "notelen": "C4"
+    },
+    {
+      "frame_length": 47,
+      "key": 67,
+      "lyric": "へ",
+      "notelen": "G4"
+    },
+    {
+      "frame_length": 23,
+      "key": 67,
+      "lyric": "へ",
+      "notelen": "G4"
+    },
+    {
+      "frame_length": 23,
+      "key": 65,
+      "lyric": "へ",
+      "notelen": "F4"
+    },
+    {
+      "frame_length": 47,
+      "key": 64,
+      "lyric": "へ",
+      "notelen": "E4"
+    },
+    {
+      "frame_length": 47,
+      "key": 64,
+      "lyric": "へ",
+      "notelen": "E4"
+    },
+    {
+      "frame_length": 23,
+      "key": 62,
+      "lyric": "へ",
+      "notelen": "D4"
+    },
+    {
+      "frame_length": 23,
+      "key": 60,
+      "lyric": "へ",
+      "notelen": "C4"
+    },
+    {
+      "frame_length": 23,
+      "key": 62,
+      "lyric": "へ",
+      "notelen": "D4"
+    },
+    {
+      "frame_length": 23,
+      "key": 64,
+      "lyric": "へ",
+      "notelen": "E4"
+    },
+    {
+      "frame_length": 94,
+      "key": 60,
+      "lyric": "へ",
+      "notelen": "C4"
+    }
+  ]
+}

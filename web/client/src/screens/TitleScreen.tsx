@@ -1,5 +1,5 @@
 import { RefreshCw } from 'lucide-react';
-import type { SongInfo, VoicevoxVersionResponse } from '@shared/types';
+import type { SongInfo, SourceSongInfo, VoicevoxVersionResponse } from '@shared/types';
 import { AssetButton } from '../components/AssetButton';
 import { ScreenShell } from '../components/ScreenShell';
 import { assetUrl } from '../lib/assets';
@@ -7,11 +7,15 @@ import { assetUrl } from '../lib/assets';
 type TitleScreenProps = {
   songs: SongInfo[];
   selectedSongId: string;
+  sourceSongs: SourceSongInfo[];
+  selectedSourceSongId: string;
+  sourceSelectionEnabled: boolean;
   voicevoxBaseUrl: string;
   voicevoxStatus?: VoicevoxVersionResponse;
   loading: boolean;
   error?: string;
   onSelectSong: (songId: string) => void;
+  onSelectSourceSong: (songId: string) => void;
   onBaseUrlChange: (baseUrl: string) => void;
   onCheckVoicevox: () => void;
   onStart: () => void;
@@ -63,17 +67,21 @@ export function TitleScreen(props: TitleScreenProps) {
                 ))}
               </select>
             </div>
-            <div className="song-picker-row song-picker-row--coming-soon">
+            <div className="song-picker-row">
               <label htmlFor="source-song-select">もとの曲</label>
-              <select id="source-song-select" value={props.selectedSongId} disabled>
-                <option value="">問題と同じ曲</option>
-                {props.songs.map((song) => (
+              <select
+                id="source-song-select"
+                value={props.selectedSourceSongId}
+                disabled={!props.sourceSelectionEnabled || props.loading}
+                onChange={(event) => props.onSelectSourceSong(event.target.value)}
+              >
+                {props.sourceSongs.map((song) => (
                   <option key={song.id} value={song.id}>
                     {song.title}
                   </option>
                 ))}
               </select>
-              <small>今は問題と同じ曲で作ります</small>
+              <small>{props.sourceSelectionEnabled ? '5曲からもとの曲を選べます' : 'オノマトペで選べます'}</small>
             </div>
             {props.error ? <p className="error-text">{props.error}</p> : null}
           </div>

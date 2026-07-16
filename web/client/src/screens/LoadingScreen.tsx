@@ -54,6 +54,7 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
         setMessage('VOICEVOXに歌声をお願いしています...');
         const blob = await synthesizeSong({
           songId: song.id,
+          sourceSongId: song.sourceSong?.id,
           solvedTasks: tasks,
           fullLyrics,
           voicevoxBaseUrl

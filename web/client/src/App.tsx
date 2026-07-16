@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { SolvedTask, SongDetail, SongInfo, VoicevoxVersionResponse } from '@shared/types';
+import { defaultMemorizationSourceSongId } from '@shared/memorizationSongs';
+import type { SolvedTask, SongDetail, SongInfo, SourceSongInfo, VoicevoxVersionResponse } from '@shared/types';
 import { fetchSongDetail, fetchSongs, checkVoicevox } from './lib/api';
+import { getStaticMemorizationSourceSongs } from './lib/staticSongs';
 import { TitleScreen } from './screens/TitleScreen';
 import { WriteLyricsScreen } from './screens/WriteLyricsScreen';
 import { LoadingScreen } from './screens/LoadingScreen';
@@ -13,9 +15,11 @@ import type { GeneratedResult } from './lib/generatedResult';
 type Screen = 'title' | 'write' | 'loading' | 'result' | 'story' | 'howto' | 'credit' | 'history';
 
 export function App() {
+  const sourceSongs = getStaticMemorizationSourceSongs();
   const [screen, setScreen] = useState<Screen>('title');
   const [songs, setSongs] = useState<SongInfo[]>([]);
   const [selectedSongId, setSelectedSongId] = useState('');
+  const [selectedSourceSongId, setSelectedSourceSongId] = useState(defaultMemorizationSourceSongId);
   const [songDetail, setSongDetail] = useState<SongDetail>();
   const [voicevoxBaseUrl, setVoicevoxBaseUrl] = useState('http://localhost:50021');
   const [voicevoxStatus, setVoicevoxStatus] = useState<VoicevoxVersionResponse>();
@@ -55,7 +59,23 @@ export function App() {
     setTitleError('');
     try {
       const detail = await fetchSongDetail(selectedSongId);
-      setSongDetail(detail);
+      let selectedDetail: SongDetail = detail;
+      if (detail.mode === 'onomatopoeiaQuiz') {
+        const sourceSong = sourceSongs.find((song) => song.id === selectedSourceSongId);
+        if (!sourceSong) {
+          throw new Error('もとの曲が見つかりませんでした');
+        }
+        selectedDetail = {
+          ...detail,
+          sourceSong,
+          instFileName: sourceSong.instFileName,
+          instUrl: sourceSong.instUrl,
+          baseScoreFileName: sourceSong.scoreFileName,
+          baseScoreUrl: sourceSong.scoreUrl,
+          trackName: sourceSong.title
+        };
+      }
+      setSongDetail(selectedDetail);
       setSolvedTasks([]);
       setFullLyrics('');
       setInputTexts([]);
@@ -134,11 +154,15 @@ export function App() {
     <TitleScreen
       songs={songs}
       selectedSongId={selectedSongId}
+      sourceSongs={sourceSongs}
+      selectedSourceSongId={selectedSourceSongId}
+      sourceSelectionEnabled={songs.find((song) => song.id === selectedSongId)?.mode === 'onomatopoeiaQuiz'}
       voicevoxBaseUrl={voicevoxBaseUrl}
       voicevoxStatus={voicevoxStatus}
       loading={loading}
       error={titleError}
       onSelectSong={setSelectedSongId}
+      onSelectSourceSong={setSelectedSourceSongId}
       onBaseUrlChange={setVoicevoxBaseUrl}
       onCheckVoicevox={refreshVoicevox}
       onStart={startGame}

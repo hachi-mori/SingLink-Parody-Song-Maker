@@ -143,6 +143,7 @@ function determinePhrases(score: ScoreJson): ScoreNote[][] {
 
 function handleMoreMoraThanNotes(score: MemorizationScoreJson, moras: string[], notes: ScoreNote[]): void {
   const sixteenth = score['16thnoteframe_length'];
+  const minimumSplitFrame = Math.max(1, Math.floor(sixteenth / 2));
   while (moras.length > notes.length) {
     const index = moras.findIndex((mora) => mora === 'っ' || mora === 'ッ');
     if (index < 0) break;
@@ -170,12 +171,13 @@ function handleMoreMoraThanNotes(score: MemorizationScoreJson, moras: string[], 
       const targetIndex = index - 1;
       const target = notes[targetIndex];
       if (!target || targetIndex >= longestIndex || notes[index]?.frame_length === sixteenth) break;
-      if (target.frame_length >= sixteenth * 2) {
-        const precedingLength = target.frame_length - sixteenth;
-        if (precedingLength >= sixteenth) {
+      if (target.frame_length >= minimumSplitFrame * 2) {
+        const lengthForN = Math.min(sixteenth, target.frame_length - minimumSplitFrame);
+        const precedingLength = target.frame_length - lengthForN;
+        if (precedingLength >= minimumSplitFrame) {
           target.frame_length = precedingLength;
           notes.splice(targetIndex + 1, 0, {
-            frame_length: sixteenth,
+            frame_length: lengthForN,
             key: target.key,
             notelen: target.notelen,
             lyric: 'ん'
@@ -186,10 +188,10 @@ function handleMoreMoraThanNotes(score: MemorizationScoreJson, moras: string[], 
       break;
     }
     if (handledN) continue;
-    if (maxFrame < sixteenth * 2) break;
+    if (maxFrame < minimumSplitFrame * 2) break;
 
     if (longestIndex === notes.length - 1) {
-      const alternative = notes.findIndex((note, index) => index < notes.length - 1 && note.frame_length >= sixteenth * 2);
+      const alternative = notes.findIndex((note, index) => index < notes.length - 1 && note.frame_length >= minimumSplitFrame * 2);
       if (alternative >= 0) {
         longestIndex = alternative;
       }

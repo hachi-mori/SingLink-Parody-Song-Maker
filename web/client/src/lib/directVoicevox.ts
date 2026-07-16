@@ -251,8 +251,9 @@ export async function synthesizeDirectVoicevox(
 ): Promise<Blob> {
   let score: ScoreJson;
   let phraseRanges: PhraseRange[] | undefined;
-  if (song.mode === 'onomatopoeiaQuiz' && song.baseScoreUrl) {
-    const scoreResponse = await fetch(song.baseScoreUrl);
+  const selectedBaseScoreUrl = song.sourceSong?.scoreUrl ?? song.baseScoreUrl;
+  if (song.mode === 'onomatopoeiaQuiz' && selectedBaseScoreUrl) {
+    const scoreResponse = await fetch(selectedBaseScoreUrl);
     if (!scoreResponse.ok) {
       throw new Error('曲の基礎Scoreデータを読み込めませんでした');
     }

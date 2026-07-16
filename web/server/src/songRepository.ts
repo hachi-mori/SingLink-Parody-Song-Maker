@@ -7,6 +7,7 @@ import {
   getVvprojTrackName
 } from '../../shared/src/vvproj';
 import { onomatopoeiaExamples } from '../../shared/src/memorizationScore';
+import { findMemorizationSourceSong, type MemorizationSourceSongAsset } from '../../shared/src/memorizationSongs';
 import type { OnomatopoeiaEntry, SongDetail, SongInfo, SongMode, VerbEntry } from '../../shared/src/types';
 import { dictDir, instDir, scoreDir, toAssetUrl } from './paths';
 
@@ -129,6 +130,18 @@ export async function resolveSong(id: string): Promise<{
     ? await readJsonFile(path.join(scoreDir, info.baseScoreFileName))
     : undefined;
   return { info, vvprojPath, vvproj, baseScore };
+}
+
+export async function resolveMemorizationSourceScore(sourceSongId?: string): Promise<{
+  sourceSong: MemorizationSourceSongAsset;
+  baseScore: unknown;
+} | undefined> {
+  const sourceSong = findMemorizationSourceSong(sourceSongId);
+  if (!sourceSong) {
+    return undefined;
+  }
+  const baseScore = await readJsonFile(path.join(scoreDir, sourceSong.scoreFileName));
+  return { sourceSong, baseScore };
 }
 
 async function readDictFile(fileName: string): Promise<string> {

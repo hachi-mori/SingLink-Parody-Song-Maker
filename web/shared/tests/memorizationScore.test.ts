@@ -8,13 +8,16 @@ import {
   onomatopoeiaExamples,
   type MemorizationScoreJson
 } from '../src/memorizationScore';
+import { memorizationSourceSongs } from '../src/memorizationSongs';
 import { buildOnomatopoeiaTasks, buildOnomatopoeiaResultLyrics } from '../src/gameLogic';
 
-const scorePath = path.resolve('assets/score/幸せなら手をたたこう.json');
+function loadScore(fileName: string): MemorizationScoreJson {
+  const text = fs.readFileSync(path.resolve('assets/score', fileName), 'utf8').replace(/^\uFEFF/, '');
+  return JSON.parse(text) as MemorizationScoreJson;
+}
 
 function loadBaseScore(): MemorizationScoreJson {
-  const text = fs.readFileSync(scorePath, 'utf8').replace(/^\uFEFF/, '');
-  return JSON.parse(text) as MemorizationScoreJson;
+  return loadScore('幸せなら手をたたこう.json');
 }
 
 function generate() {
@@ -29,6 +32,21 @@ function expandKeys(score: MemorizationScoreJson): Array<number | null> {
 }
 
 describe('memorization score', () => {
+  it('5曲すべてで指定3文を3フレーズへ割り当てる', () => {
+    const rows = onomatopoeiaExamples.map((example) => [example.displayText, example.singingReading] as const);
+
+    for (const sourceSong of memorizationSourceSongs) {
+      const base = loadScore(sourceSong.scoreFileName);
+      const result = createMemorizationScore(rows, base);
+      const totalFrames = result.score.notes.reduce((sum, note) => sum + note.frame_length, 0);
+      expect(result.phraseRanges, sourceSong.title).toHaveLength(3);
+      expect(result.phraseRanges.at(-1)?.[1], sourceSong.title).toBe(result.score.notes.length);
+      expect(result.phraseRanges.every(([start, end]) => end > start), sourceSong.title).toBe(true);
+      expect(expandKeys(result.score), sourceSong.title).toEqual(expandKeys(base).slice(0, totalFrames));
+      expect(result.score.notes.at(-1)?.lyric, sourceSong.title).toBe('る');
+    }
+  });
+
   it('指定3文をゴールデン歌詞と期待範囲へ割り当てる', () => {
     const result = generate();
 

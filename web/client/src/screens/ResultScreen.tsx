@@ -182,8 +182,8 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
       <section className="result-layout">
         <img className="result-character" src={assetUrl('assets/texture/assets/zunda_singing.gif')} alt="" aria-hidden="true" />
         <div className="result-card">
-          <p className="result-song-source">{song.title}の曲で作った</p>
-          <h1>{song.trackName || song.title}</h1>
+          <p className="result-song-source">{song.sourceSong ? `${song.title}を` : `${song.title}の曲で作った`}</p>
+          <h1>{song.sourceSong ? `${song.sourceSong.title}の曲で作った` : (song.trackName || song.title)}</h1>
           <div className="lyrics-box">
             {lines.map((line, lineIndex) => {
               const ranges = makeHighlightRanges(line, tasks, song);

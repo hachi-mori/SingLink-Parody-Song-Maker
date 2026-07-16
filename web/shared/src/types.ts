@@ -58,14 +58,25 @@ export type SongInfo = {
   trackName?: string;
 };
 
+export type SourceSongInfo = {
+  id: string;
+  title: string;
+  scoreFileName: string;
+  scoreUrl: string;
+  instFileName: string;
+  instUrl: string;
+};
+
 export type SongDetail = SongInfo & {
   problems: TalkProblem[];
   verbEntries?: VerbEntry[];
   onomatopoeiaEntries?: OnomatopoeiaEntry[];
+  sourceSong?: SourceSongInfo;
 };
 
 export type SynthesisRequest = {
   songId: string;
+  sourceSongId?: string;
   solvedTasks: SolvedTask[];
   fullLyrics: string;
   voicevoxBaseUrl?: string;

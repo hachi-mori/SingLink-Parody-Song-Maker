@@ -14,7 +14,7 @@ import type { ScoreJson } from '../../shared/src/vvproj';
 import type { SynthesisErrorResponse, SynthesisRequest } from '../../shared/src/types';
 import { getConfig } from './config';
 import { assetsDir } from './paths';
-import { getSongDetail, listSongs, resolveSong } from './songRepository';
+import { getSongDetail, listSongs, resolveMemorizationSourceScore, resolveSong } from './songRepository';
 import { getVoicevoxVersion, synthesizeSongScore } from './voicevox';
 
 const config = getConfig();
@@ -27,6 +27,7 @@ const app = Fastify({
 
 const synthesisSchema = z.object({
   songId: z.string().min(1),
+  sourceSongId: z.string().min(1).optional(),
   solvedTasks: z.array(z.object({
     phrase: z.string(),
     syllables: z.array(z.string()),
@@ -141,10 +142,17 @@ app.post('/api/synthesis', async (request, reply) => {
   try {
     let score: ScoreJson;
     let phraseRanges: PhraseRange[] | undefined;
-    if (resolved.info.mode === 'onomatopoeiaQuiz' && resolved.baseScore) {
+    if (resolved.info.mode === 'onomatopoeiaQuiz') {
+      const selectedSource = await resolveMemorizationSourceScore(body.sourceSongId);
+      if (!selectedSource) {
+        return reply.code(400).send({
+          ok: false,
+          message: '選択したもとの曲が見つかりません'
+        } satisfies SynthesisErrorResponse);
+      }
       const generated = createMemorizationScore(
         buildOnomatopoeiaLyricsRows(body.solvedTasks),
-        resolved.baseScore as MemorizationScoreJson
+        selectedSource.baseScore as MemorizationScoreJson
       );
       score = generated.score;
       phraseRanges = generated.phraseRanges;

@@ -1,7 +1,16 @@
 import { parseCsvRows } from '@shared/csv';
 import { buildResultDisplayLyrics, buildTalkProblems, extractTalkUtterances, getVvprojTrackName } from '@shared/vvproj';
 import { onomatopoeiaExamples } from '@shared/memorizationScore';
-import type { OnomatopoeiaEntry, SongDetail, SongInfo, SongMode, SynthesisRequest, VerbEntry } from '@shared/types';
+import { memorizationSourceSongs } from '@shared/memorizationSongs';
+import type {
+  OnomatopoeiaEntry,
+  SongDetail,
+  SongInfo,
+  SongMode,
+  SourceSongInfo,
+  SynthesisRequest,
+  VerbEntry
+} from '@shared/types';
 import { assetUrl } from './assets';
 
 type StaticSongAsset = {
@@ -69,6 +78,14 @@ async function loadVerbEntries(): Promise<VerbEntry[]> {
 
 async function loadOnomatopoeiaEntries(): Promise<OnomatopoeiaEntry[]> {
   return onomatopoeiaExamples.map((example) => ({ ...example }));
+}
+
+export function getStaticMemorizationSourceSongs(): SourceSongInfo[] {
+  return memorizationSourceSongs.map((song) => ({
+    ...song,
+    scoreUrl: assetUrl(`assets/score/${song.scoreFileName}`),
+    instUrl: assetUrl(`assets/inst/${song.instFileName}`)
+  }));
 }
 
 export async function fetchStaticSongs(): Promise<SongInfo[]> {

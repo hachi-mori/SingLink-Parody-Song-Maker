@@ -3,6 +3,7 @@ export * from './gameLogic';
 export * from './kana';
 export * from './onomatopoeiaCards';
 export * from './memorizationScore';
+export * from './memorizationSongs';
 export * from './wav';
 export * from './types';
 export * from './vvproj';
