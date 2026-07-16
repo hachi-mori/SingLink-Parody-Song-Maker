@@ -25,6 +25,7 @@ type WriteLyricsScreenProps = {
 const timeLimit = 60;
 const countdownSeconds = 3;
 const onomatopoeiaTimeoutAnswer = 'ら'.repeat(6);
+const onomatopoeiaQuestionsPerGame = 3;
 
 function useTick(active: boolean) {
   const [, setTick] = useState(0);
@@ -88,7 +89,9 @@ export function WriteLyricsScreen({ song, onComplete, onCancel }: WriteLyricsScr
   }>();
 
   const onomatopoeiaProblems = useMemo(() => {
-    return song.mode === 'onomatopoeiaQuiz' ? [...(song.onomatopoeiaEntries ?? [])] : [];
+    return song.mode === 'onomatopoeiaQuiz'
+      ? takeShuffled(song.onomatopoeiaEntries ?? [], onomatopoeiaQuestionsPerGame)
+      : [];
   }, [song]);
 
   const problemCount = song.mode === 'onomatopoeiaQuiz' ? onomatopoeiaProblems.length : song.problems.length;

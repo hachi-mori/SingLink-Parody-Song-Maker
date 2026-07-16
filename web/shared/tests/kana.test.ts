@@ -31,6 +31,8 @@ describe('kana utilities', () => {
         usages: [{ text: 'あつあつのおでんはおいしいなあ。' }],
         meanings: [{ text: '料理などができたてであついようす。' }]
       }]
+    }, {
+      readings: { あつあつ: 'あつあつのおでんわおいしいなあ' }
     });
 
     expect(entries[0]).toMatchObject({
@@ -38,7 +40,9 @@ describe('kana utilities', () => {
       reading: 'あつあつ',
       answer: 'あつあつ',
       explanation: '料理などができたてであついようす。',
-      questionText: '○○のおでんはおいしいなあ。'
+      questionText: '○○のおでんはおいしいなあ。',
+      displayText: 'あつあつのおでんはおいしいなあ。',
+      singingReading: 'あつあつのおでんわおいしいなあ'
     });
   });
 

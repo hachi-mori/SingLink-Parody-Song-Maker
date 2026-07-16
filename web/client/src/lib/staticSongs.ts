@@ -1,6 +1,6 @@
 import { parseCsvRows } from '@shared/csv';
 import { buildResultDisplayLyrics, buildTalkProblems, extractTalkUtterances, getVvprojTrackName } from '@shared/vvproj';
-import { onomatopoeiaExamples } from '@shared/memorizationScore';
+import { parseOnomatopoeiaCardEntries } from '@shared/onomatopoeiaCards';
 import { memorizationSourceSongs } from '@shared/memorizationSongs';
 import type {
   OnomatopoeiaEntry,
@@ -77,7 +77,11 @@ async function loadVerbEntries(): Promise<VerbEntry[]> {
 }
 
 async function loadOnomatopoeiaEntries(): Promise<OnomatopoeiaEntry[]> {
-  return onomatopoeiaExamples.map((example) => ({ ...example }));
+  const [cards, singingReadings] = await Promise.all([
+    fetchJson('assets/dict/cards_text_data.json'),
+    fetchJson('assets/dict/cards_singing_readings.json')
+  ]);
+  return parseOnomatopoeiaCardEntries(cards, singingReadings);
 }
 
 export function getStaticMemorizationSourceSongs(): SourceSongInfo[] {

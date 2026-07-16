@@ -6,7 +6,7 @@ import {
   extractTalkUtterances,
   getVvprojTrackName
 } from '../../shared/src/vvproj';
-import { onomatopoeiaExamples } from '../../shared/src/memorizationScore';
+import { parseOnomatopoeiaCardEntries } from '../../shared/src/onomatopoeiaCards';
 import { findMemorizationSourceSong, type MemorizationSourceSongAsset } from '../../shared/src/memorizationSongs';
 import type { OnomatopoeiaEntry, SongDetail, SongInfo, SongMode, VerbEntry } from '../../shared/src/types';
 import { dictDir, instDir, scoreDir, toAssetUrl } from './paths';
@@ -169,7 +169,11 @@ export async function loadVerbEntries(): Promise<VerbEntry[]> {
 }
 
 export async function loadOnomatopoeiaEntries(): Promise<OnomatopoeiaEntry[]> {
-  return onomatopoeiaExamples.map((example) => ({ ...example }));
+  const [cards, singingReadings] = await Promise.all([
+    readJsonFile(path.join(dictDir, 'cards_text_data.json')),
+    readJsonFile(path.join(dictDir, 'cards_singing_readings.json'))
+  ]);
+  return parseOnomatopoeiaCardEntries(cards, singingReadings);
 }
 
 export async function getSongDetail(id: string): Promise<SongDetail | undefined> {

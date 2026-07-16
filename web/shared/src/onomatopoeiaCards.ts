@@ -23,9 +23,11 @@ function makeBlankQuestionText(usageText: string, answer: string): string {
   return usageText.replace(answer, '○○');
 }
 
-export function parseOnomatopoeiaCardEntries(cardsJson: unknown): OnomatopoeiaEntry[] {
+export function parseOnomatopoeiaCardEntries(cardsJson: unknown, singingReadingsJson?: unknown): OnomatopoeiaEntry[] {
   const root = isRecord(cardsJson) ? cardsJson : undefined;
   const records = Array.isArray(root?.records) ? root.records : [];
+  const readingsRoot = isRecord(singingReadingsJson) ? singingReadingsJson : undefined;
+  const singingReadings = isRecord(readingsRoot?.readings) ? readingsRoot.readings : undefined;
 
   return records.flatMap((record): OnomatopoeiaEntry[] => {
     if (!isRecord(record)) {
@@ -36,6 +38,7 @@ export function parseOnomatopoeiaCardEntries(cardsJson: unknown): OnomatopoeiaEn
     const usageText = getTextItems(record.usages).find((text) => text.includes(answer)) ?? '';
     const explanation = getTextItems(record.meanings).join(' / ');
     const answerMoraCount = splitOnomatopoeiaMoras(replaceChoonWithVowel(answer)).length;
+    const singingReading = getString(singingReadings?.[answer]);
 
     if (!answer || !usageText || answerMoraCount > 6) {
       return [];
@@ -46,7 +49,9 @@ export function parseOnomatopoeiaCardEntries(cardsJson: unknown): OnomatopoeiaEn
       reading: answer,
       answer,
       explanation,
-      questionText: makeBlankQuestionText(usageText, answer)
+      questionText: makeBlankQuestionText(usageText, answer),
+      displayText: usageText,
+      singingReading: singingReading || undefined
     }];
   });
 }

@@ -143,7 +143,7 @@ function determinePhrases(score: ScoreJson): ScoreNote[][] {
 
 function handleMoreMoraThanNotes(score: MemorizationScoreJson, moras: string[], notes: ScoreNote[]): void {
   const sixteenth = score['16thnoteframe_length'];
-  const minimumSplitFrame = Math.max(1, Math.floor(sixteenth / 2));
+  const minimumSplitFrame = Math.max(1, Math.floor(sixteenth / 4));
   while (moras.length > notes.length) {
     const index = moras.findIndex((mora) => mora === 'っ' || mora === 'ッ');
     if (index < 0) break;
@@ -268,34 +268,20 @@ function processLyrics(score: MemorizationScoreJson, lyricListSource: string[][]
     if (!notes) break;
     let adjusted = false;
     while (!adjusted) {
-      let bestCount = 0;
-      let smallestDifference = Number.MAX_SAFE_INTEGER;
-      let moraCount = 0;
-      for (let count = 1; count <= lyricList.length - lyricIndex; count += 1) {
-        moraCount += lyricList[lyricIndex + count - 1]?.length ?? 0;
-        const candidateDifference = Math.abs(moraCount - notes.length);
-        if (candidateDifference < smallestDifference) {
-          smallestDifference = candidateDifference;
-          bestCount = count;
-        } else {
-          break;
-        }
-      }
-      if (bestCount === 0) break;
-      const moras = lyricList.slice(lyricIndex, lyricIndex + bestCount).flat();
+      const moras = [...(lyricList[lyricIndex] ?? [])];
+      if (moras.length === 0) break;
       difference += Math.abs(moras.length - notes.length);
       if (adjustMoraAndNotes(score, moras, notes)) {
-        lyricIndex += bestCount;
+        lyricIndex += 1;
         adjusted = true;
         phraseEnds.push(phraseIndex);
         break;
       }
 
-      const lastWordIndex = lyricIndex + bestCount - 1;
+      const lastWordIndex = lyricIndex;
       const lastWord = lyricList[lastWordIndex];
       if (!lastWord) break;
-      const precedingMoras = lyricList.slice(lyricIndex, lastWordIndex).flat().length;
-      const neededFromLastWord = notes.length - precedingMoras;
+      const neededFromLastWord = notes.length;
       if (neededFromLastWord <= 0 || neededFromLastWord >= lastWord.length) break;
       lyricList.splice(lastWordIndex, 1, lastWord.slice(0, neededFromLastWord), lastWord.slice(neededFromLastWord));
     }
@@ -317,13 +303,11 @@ function replaceLongVowelMarks(phrases: ScoreNote[][]): void {
 }
 
 export function buildOnomatopoeiaLyricsRows(tasks: SolvedTask[]): Array<[string, string]> {
-  const taskReadings = tasks
-    .filter((task) => typeof task.singingReading === 'string' && task.singingReading.length > 0)
-    .map((task) => task.singingReading as string);
-  return onomatopoeiaExamples.map((example, index) => [
-    example.displayText,
-    taskReadings[index] ?? example.singingReading
-  ]);
+  return tasks.flatMap((task): Array<[string, string]> => {
+    return typeof task.singingReading === 'string' && task.singingReading.length > 0
+      ? [[task.userInput, task.singingReading]]
+      : [];
+  });
 }
 
 export function createMemorizationScore(
