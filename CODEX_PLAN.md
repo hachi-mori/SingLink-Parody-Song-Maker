@@ -65,17 +65,17 @@ Web版へ旧「Memorization song creator」の替え歌スコア生成ロジッ�
 
 - [x] 現状と旧実装を読み取り専用で調査する
 - [x] 受け入れ基準と変更範囲を確定する
-- [ ] 基礎スコアとゴールデンfixtureを追加する
-- [ ] 純粋なスコア生成関数と単体テストを追加する
-- [ ] 指定3例文の表示文・歌唱用読みを統合する
-- [ ] 旧伴奏と基礎スコアを曲情報へ関連付ける
-- [ ] server/direct両経路を共有スコア・合成計画へ切り替える
-- [ ] 結果画面の再生同期をワンショットへ変更する
-- [ ] 関連テスト、全テスト、型チェック、Webビルドを実行する
-- [ ] 可能ならVOICEVOX実合成を確認する
-- [ ] 読み取り専用レビューを行い、必要な指摘を最大3巡で修正する
-- [ ] `CODEX_STATUS.md` とバックログを最終更新する
-- [ ] 意味のある単位でコミットする
+- [x] 本番基礎Scoreアセットを読み込むゴールデン相当テストを追加する
+- [x] 純粋なスコア生成関数と単体テストを追加する
+- [x] 指定3例文の表示文・歌唱用読みを統合する
+- [x] 旧伴奏と基礎スコアを曲情報へ関連付ける
+- [x] server/direct両経路を共有スコア・合成計画へ切り替える
+- [x] 結果画面の再生同期をワンショットへ変更する
+- [x] 関連テスト、全テスト、型チェック、Webビルドを実行する
+- [x] VOICEVOX 0.25.1でserver経路の実合成を確認する
+- [x] 読み取り専用レビューを行い、指摘を修正する
+- [x] `CODEX_STATUS.md` とバックログを最終更新する
+- [x] 意味のある単位でコミットする
 
 ## 受け入れ基準
 
@@ -109,7 +109,7 @@ Web版へ旧「Memorization song creator」の替え歌スコア生成ロジッ�
 
 ```powershell
 cd web
-npx vitest run --config vitest.config.ts shared/tests/memorizationScore.test.ts
+npx vitest run --config vitest.config.ts shared/tests/memorizationScore.test.ts shared/tests/wav.test.ts
 npm run test
 npm run typecheck
 npm run build
