@@ -21,6 +21,7 @@
 - [ ] 動画の音声で「何を作ったか」「Codexをどう使ったか」「GPT-5.6をどう使ったか」を説明する
 - [ ] 動画に許諾のない第三者商標・音楽・素材を含めていないことを確認する
 - [ ] コードリポジトリURL
+- [ ] 審査URLとして `https://hachi-mori.github.io/SingLink-Parody-Song-Maker/openai-build-week/?demo=1` を未ログイン環境で確認する
 - [ ] READMEのセットアップ、サンプルデータ、実行、Codex/GPT-5.6利用説明
 - [ ] コア機能を主に実装したCodexタスクで `/feedback` を実行し、返された正式Session IDを入力する
 
@@ -47,13 +48,16 @@ Session IDはGit SHA、CodexタスクID、会話URLから推測しないでく�
 - [ ] 335語の入力元CSV第3列を利用できる根拠を保存する
 - [ ] VOICEVOXとずんだもん音源の最新規約を本人が確認する
 - [ ] README、アプリ紹介画面、動画内または概要欄へ **`VOICEVOX:ずんだもん`** を記載する
+- [ ] `web/assets/demo/zundamon-shiawase-demo.wav` のGitHub Pages配信、動画利用、ユーザーダウンロード、再配布条件を確認する
+- [ ] デモWAVが参照する「幸せなら手をたたこう」のScore・伴奏について、公開Pagesと動画で使える証拠を確認する
+- [ ] デモ音源を再生成した場合はVOICEVOX版、speaker/style、manifest、WAV hash、台帳を更新する
 - [ ] 動画内の歌声・伴奏・キャラクター画像も各条件を満たすことを確認する
 
 権利の最終判断はこのドキュメントやCodexではなく、提出者本人が根拠資料を読んで行います。
 
 ## デモ動画の推奨確認順
 
-- [ ] 0:00–0:20 問題と対象学習者
+- [ ] 0:00–0:20 公開固定デモのURL、問題と対象学習者、事前生成であること
 - [ ] 0:20–0:40 英語タイトル、5曲、4問、How to
 - [ ] 0:40–1:20 4問クイズ
 - [ ] 1:20–2:00 ずんだもんの歌声、日本語歌詞、英訳、カラオケ同期
@@ -72,6 +76,7 @@ Session IDはGit SHA、CodexタスクID、会話URLから推測しないでく�
 - [ ] CategoryにEducationを選ぶ
 - [ ] リポジトリURLを入力する
 - [ ] 必要なら審査URL・ローカル手順欄へ [judge-testing-guide.md](judge-testing-guide.md) の要点を本人の言葉で記載する
+- [ ] 審査URLへGitHub Pagesの `?demo=1` 直リンクを入力し、通常モードはローカルVOICEVOXが必要と補足する
 - [ ] `/feedback` Session IDを入力する
 - [ ] 動画URLを入力する
 - [ ] サムネイルとチーム情報を確認する

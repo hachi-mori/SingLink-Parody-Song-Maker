@@ -4,7 +4,11 @@
 
 [日本語 README](README.ja.md) · [Judge quick start](docs/judge-testing-guide.md) · [Build Week development record](docs/build-week-development.md) · [Third-party notices](THIRD_PARTY_NOTICES.md)
 
-![SingLink English title screen](docs/images/build-week/title-en.png)
+## Try the live demo (no setup)
+
+[Start the fixed four-question demo on GitHub Pages](https://hachi-mori.github.io/SingLink-Parody-Song-Maker/openai-build-week/?demo=1). It loads the four fixed questions immediately and needs neither a local server nor a running VOICEVOX instance. After the quiz, play the bundled, pre-generated Zundamon singing and accompaniment with karaoke highlighting. The title page at the [public Build Week URL](https://hachi-mori.github.io/SingLink-Parody-Song-Maker/openai-build-week/) also provides a `Try fixed quiz demo` button.
+
+This is a reproducible presentation path, not real-time generation: its song is the same pre-generated sample regardless of quiz input. For an answer-derived singing result, use the local Windows path with VOICEVOX described below.
 
 ## Screenshots
 
@@ -20,7 +24,7 @@ SingLink turns that review into a short karaoke-style experience. The learner do
 
 This is an **Education** track project. It uses karaoke presentation as a memory aid, not as a singing assessment.
 
-## How it works
+## How normal mode works
 
 1. Choose one of five source melodies.
 2. Answer four randomly selected Japanese onomatopoeia questions.
@@ -48,7 +52,7 @@ The included dataset contains 335 onomatopoeia learning records with newly writt
 
 ## What was built during OpenAI Build Week
 
-[OpenAI Build Week on Devpost](https://openai.devpost.com/) lists the submission period as July 13, 2026 09:00 PT through July 21, 2026 17:00 PT. The last commit before that window is [`c1aab5f`](https://github.com/hachi-mori/Tohoku-procon2025/commit/c1aab5fac5e139ce10ffc8532fd655cbddbade81).
+[OpenAI Build Week on Devpost](https://openai.devpost.com/) lists the submission period as July 13, 2026 09:00 PT through July 21, 2026 17:00 PT. The last commit before that window is [`c1aab5f`](https://github.com/hachi-mori/SingLink-Parody-Song-Maker/commit/c1aab5fac5e139ce10ffc8532fd655cbddbade81).
 
 ### Before the submission period
 
@@ -61,14 +65,17 @@ The C++ / Siv3D application remains in the repository for history and reference;
 
 ### Added during the submission period
 
-- [`2916f58`](https://github.com/hachi-mori/Tohoku-procon2025/commit/2916f58): ported dynamic onomatopoeia Score generation to the Web app
-- [`416fe42`](https://github.com/hachi-mori/Tohoku-procon2025/commit/416fe42): added five selectable source melodies
-- [`f7da284`](https://github.com/hachi-mori/Tohoku-procon2025/commit/f7da284): connected 100 onomatopoeia records to both questions and singing
-- [`759273d`](https://github.com/hachi-mori/Tohoku-procon2025/commit/759273d): removed publisher-derived submission text and replaced it with newly written examples, meanings, and singing readings
-- [`67e63f8`](https://github.com/hachi-mori/Tohoku-procon2025/commit/67e63f8): expanded that newly written learning content to 335 vocabulary records
-- [`2391294`](https://github.com/hachi-mori/Tohoku-procon2025/commit/2391294): added English learning data, i18n, subtitle auditing, and Score-derived karaoke timing
-- [`a654981`](https://github.com/hachi-mori/Tohoku-procon2025/commit/a654981): changed a play session to four questions and added note-level lyric progress
-- [`44d87fc`](https://github.com/hachi-mori/Tohoku-procon2025/commit/44d87fc) through [`2ae471f`](https://github.com/hachi-mori/Tohoku-procon2025/commit/2ae471f): refined wide, portrait, mobile, English-first, and language-specific presentation
+- [`2916f58`](https://github.com/hachi-mori/SingLink-Parody-Song-Maker/commit/2916f58): ported dynamic onomatopoeia Score generation to the Web app
+- [`416fe42`](https://github.com/hachi-mori/SingLink-Parody-Song-Maker/commit/416fe42): added five selectable source melodies
+- [`f7da284`](https://github.com/hachi-mori/SingLink-Parody-Song-Maker/commit/f7da284): connected 100 onomatopoeia records to both questions and singing
+- [`759273d`](https://github.com/hachi-mori/SingLink-Parody-Song-Maker/commit/759273d): removed publisher-derived submission text and replaced it with newly written examples, meanings, and singing readings
+- [`67e63f8`](https://github.com/hachi-mori/SingLink-Parody-Song-Maker/commit/67e63f8): expanded that newly written learning content to 335 vocabulary records
+- [`2391294`](https://github.com/hachi-mori/SingLink-Parody-Song-Maker/commit/2391294): added English learning data, i18n, subtitle auditing, and Score-derived karaoke timing
+- [`a654981`](https://github.com/hachi-mori/SingLink-Parody-Song-Maker/commit/a654981): changed a play session to four questions and added note-level lyric progress
+- [`44d87fc`](https://github.com/hachi-mori/SingLink-Parody-Song-Maker/commit/44d87fc) through [`2ae471f`](https://github.com/hachi-mori/SingLink-Parody-Song-Maker/commit/2ae471f): refined wide, portrait, mobile, English-first, and language-specific presentation
+- [`d33da28`](https://github.com/hachi-mori/SingLink-Parody-Song-Maker/commit/d33da28): added the pre-generated, VOICEVOX-free demo bundle
+- [`019a132`](https://github.com/hachi-mori/SingLink-Parody-Song-Maker/commit/019a132): made the demo a fixed four-question quiz that leads to its bundled result
+- [`2bc0f00`](https://github.com/hachi-mori/SingLink-Parody-Song-Maker/commit/2bc0f00): switched that sample to the existing `幸せなら手をたたこう` score and accompaniment
 
 The complete timeline and evidence are in [docs/build-week-development.md](docs/build-week-development.md).
 
@@ -88,6 +95,7 @@ The project owner decided:
 - to remove publisher-derived text and write new examples, meanings, and singing readings;
 - to start the submission branch in English;
 - to use real Score frames, rather than a fixed timer, for highlighting; and
+- to provide a clearly labeled fixed public demo while keeping answer-derived generation as the normal mode; and
 - how the layout should respond on wide, portrait, and mobile screens.
 
 Codex session identifiers are not inferred from Git history. The owner must enter the exact ID returned by `/feedback` in the Devpost submission.
@@ -101,7 +109,7 @@ Codex session identifiers are not inferred from Git history. The owner must ente
 | Shared logic | Dataset parsing, kana/mora handling, Score generation, timing, WAV processing |
 | Speech/singing | Local VOICEVOX; tested with 0.25.1 and Zundamon |
 | Persistence | Browser IndexedDB; no server database |
-| Assets | Local dictionaries, five Score files, five accompaniment WAV files, UI textures |
+| Assets | Local dictionaries, five Score files, five accompaniment WAV files, UI textures, and a pre-generated demo manifest/WAV |
 
 The client normally uses the local Fastify server. A browser-direct VOICEVOX path also exists for compatible local deployments. Both paths share the same Score and phrase plan.
 
@@ -115,8 +123,8 @@ Requirements:
 - [VOICEVOX](https://voicevox.hiroshiba.jp/) running locally for synthesized singing; version 0.25.1 is the verified version
 
 ```powershell
-git clone https://github.com/hachi-mori/Tohoku-procon2025.git
-cd Tohoku-procon2025
+git clone https://github.com/hachi-mori/SingLink-Parody-Song-Maker.git
+cd SingLink-Parody-Song-Maker
 git switch openai-build-week
 cd web
 npm ci
@@ -125,7 +133,7 @@ npm.cmd run dev
 
 Open [http://127.0.0.1:5173/](http://127.0.0.1:5173/). The client runs on port 5173, the local API server on port 5174, and the default VOICEVOX endpoint is `http://localhost:50021`.
 
-The repository already includes the 335-record sample dataset and the five local song assets; no demo account or environment file is needed. Choose `Try fixed quiz demo` (or open `http://127.0.0.1:5173/?demo=1`) to answer four fixed questions and then inspect the fixed all-correct singing, subtitles, and karaoke timing without running VOICEVOX. The screen clearly identifies this as pre-generated; normal mode still generates singing in real time from quiz answers. See the [judge testing guide](docs/judge-testing-guide.md) for the shortest test path and expected states.
+The repository already includes the 335-record sample dataset and the five local song assets; no demo account or environment file is needed. Choose `Try fixed quiz demo` (or open `http://127.0.0.1:5173/?demo=1`) to answer four fixed questions and then inspect the bundled singing, subtitles, and karaoke timing without running VOICEVOX. The screen identifies it as pre-generated; quiz input does not produce a new demo audio file. Normal mode still generates singing in real time from quiz answers. See the [judge testing guide](docs/judge-testing-guide.md) for the shortest test path and expected states.
 
 ## VOICEVOX setup
 
@@ -177,7 +185,7 @@ These commands are run again for the submission-document commit; see the final r
 
 ## Known limitations
 
-- GitHub Pages can serve the static UI and the pre-generated instant demo, but cannot run the Fastify server or real-time local VOICEVOX synthesis by itself. The supported real-time generation path is the local Windows setup above.
+- GitHub Pages can serve the static UI and the pre-generated instant demo, but cannot run the Fastify server or create answer-derived VOICEVOX singing by itself. The supported real-time generation path is the local Windows setup above.
 - Local VOICEVOX from a phone is not a supported synthesis path.
 - There is no user account, cloud synchronization, or server-side history database.
 - English learning records are structurally audited, but educational wording should continue to receive human language review.
@@ -185,7 +193,7 @@ These commands are run again for the submission-document commit; see the final r
 
 ## Privacy and local storage
 
-SingLink sends synthesis requests only to the VOICEVOX URL chosen on the title screen. Generated WAV data and its metadata are stored in the browser's IndexedDB. Clearing site data removes that history. The application does not include analytics, authentication, a cloud database, or an OpenAI API call at runtime.
+SingLink sends normal-mode synthesis requests only to the VOICEVOX URL chosen on the title screen. Generated normal-mode WAV data and its metadata are stored in the browser's IndexedDB. The bundled fixed-demo WAV is fetched as a static asset and is not added to Saved songs. Clearing site data removes generated history. The application does not include analytics, authentication, a cloud database, or an OpenAI API call at runtime.
 
 ## License and credits
 

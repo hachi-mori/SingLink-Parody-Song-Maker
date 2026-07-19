@@ -25,8 +25,9 @@ There is no repository-wide `LICENSE` file. No code license is selected or grant
 | --- | --- | --- | --- | --- | --- |
 | VOICEVOX software/engine | Local singing synthesis, version endpoint, `audio_query`, singing/frame synthesis | [VOICEVOX software terms](https://voicevox.hiroshiba.jp/term/) require a credit that makes VOICEVOX use identifiable and require following the selected voice-library terms | VOICEVOX binaries are **not bundled** | VOICEVOX credit required | Verified source; not bundled |
 | Zundamon voice library | Singing voice/style IDs used by server and browser-direct paths | [Official Zundamon voice terms](https://zunko.jp/con_ongen_kiyaku.html) give `VOICEVOX:ずんだもん` as the credit example | Generated WAV can be stored/downloaded; the owner must confirm the current terms for publication and redistribution | **`VOICEVOX:ずんだもん`** | Verified source; owner final review required |
+| `web/assets/demo/zundamon-shiawase-demo.wav` | Bundled singing used by the public fixed-question demo | Generated with VOICEVOX 0.25.1, speaker 3003, Zundamon normal style; metadata and credit are recorded in `web/assets/demo/manifest.json` | Tracked in Git, copied into the Pages artifact, playable and downloadable from the result screen | **`VOICEVOX:ずんだもん`** | Generated-file provenance recorded; owner must confirm publication, video use, download, and redistribution conditions |
 
-The current legacy `credit.png` says `ずんだもん（VOICEVOX）`, which differs from the official example. The submission README uses the exact `VOICEVOX:ずんだもん` form. The owner must also place it in the app introduction/credits and in the demo video or description as required by the applicable current terms. See the official [VOICEVOX Q&A](https://voicevox.hiroshiba.jp/qa/).
+The public demo result displays `VOICEVOX:ずんだもん`. The current legacy `credit.png` says `ずんだもん（VOICEVOX）`, which differs from the official example. The submission README uses the exact `VOICEVOX:ずんだもん` form. The owner must also place it in the app introduction/credits and in the demo video or description as required by the applicable current terms. See the official [VOICEVOX Q&A](https://voicevox.hiroshiba.jp/qa/).
 
 ## Zundamon character images
 
@@ -52,6 +53,8 @@ The Web build publishes five accompaniment WAV files and five base Score JSON fi
 It also publishes `web/assets/score/オノマトペ.vvproj`.
 
 The prior rights-audit record says the owner stated that the accompaniment and music were safe to use. The repository does not contain the source recording, arranger/performer, score creator, permission document, or source URL. A song title alone is not evidence for the composition, arrangement, recording, or data file. Status: **Recorded owner statement / Needs evidence**.
+
+The public fixed-question demo specifically uses `web/assets/score/幸せなら手をたたこう.json` and `web/assets/inst/幸せなら手をたたこう.wav`. Its generated Zundamon WAV and manifest therefore depend on both the VOICEVOX/Zundamon conditions above and the unresolved source/permission evidence for that Score and accompaniment. The manifest credit is a provenance label, not proof of rights clearance.
 
 ## UI images and GIFs
 
@@ -133,4 +136,5 @@ The unresolved evidence is tracked in [docs/submission-owner-checklist.md](docs/
 3. source and permission for every accompaniment recording and Score;
 4. source-column permission for the 335 vocabulary inputs;
 5. exact VOICEVOX/Zundamon credits in the app and video; and
-6. full notices policy for the dependency tree.
+6. publication, demo-video, download, and redistribution conditions for the bundled pre-generated demo WAV; and
+7. full notices policy for the dependency tree.

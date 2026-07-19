@@ -14,7 +14,9 @@
 
 VOICEVOX 0.25.1で実音声確認済みです。アプリ実行にOpenAI APIキー、デモアカウント、`.env` は不要です。
 
-タイトルの「固定問題デモを遊ぶ」は、順序固定の自作4問に答えた後、プロジェクト内の「幸せなら手をたたこう」の楽譜で事前生成したずんだもんの替え歌と、同曲の伴奏を結果画面で再生します。回答内容にかかわらず、固定の全問正解版の歌声を使います。実行時のVOICEVOX接続は不要です。`http://127.0.0.1:5173/?demo=1` でも同じ問題フローを開始します。画面には、通常モードがクイズ回答からリアルタイム生成することとの違いを明記しています。
+タイトルの「固定問題デモを遊ぶ」は、順序固定の自作4問に答えた後、プロジェクト内の「幸せなら手をたたこう」の楽譜で事前生成したずんだもんの替え歌と、同曲の伴奏を結果画面で再生します。実行時のVOICEVOX接続は不要です。回答内容はクイズ表示に使われますが、再生する歌唱は入力に応じて生成し直さない固定サンプルです。`http://127.0.0.1:5173/?demo=1` でも同じ問題フローを開始します。画面には、通常モードがクイズ回答からリアルタイム生成することとの違いを明記しています。
+
+公開審査用の最短導線は [GitHub Pagesの固定4問デモ](https://hachi-mori.github.io/SingLink-Parody-Song-Maker/openai-build-week/?demo=1) です。タイトルの[公開ページ](https://hachi-mori.github.io/SingLink-Parody-Song-Maker/openai-build-week/)から「固定問題デモを遊ぶ」を押しても開始できます。Pagesではこの事前生成デモを再生できますが、通常モードの回答由来歌声を生成するにはローカルFastifyとVOICEVOXが必要です。
 
 ## インストールと起動
 
@@ -77,7 +79,7 @@ Browser :5173 -> /api proxy -> Fastify :5174 -> VOICEVOX :50021
 事前生成デモ経路:
 
 ```text
-Browser :5173 -> /assets/demo（VOICEVOXへの実行時通信なし）
+Browser -> /assets/demo（VOICEVOXへの実行時通信なし）
 ```
 
 静的配置向けにブラウザからVOICEVOXへ直接接続するコードもあります。両経路は `createMemorizationScore` と `buildMemorizationSynthesisPlan` を共有します。GitHub Pagesだけではリアルタイム生成を保証できませんが、事前生成デモはVOICEVOXなしで再生できます。リアルタイム生成の正式な審査経路はFastifyとVOICEVOXを含むローカル起動です。
@@ -178,7 +180,7 @@ Build Week提出版の確認範囲:
 
 ## GitHub Pages
 
-静的UI、教材、曲選択、クイズ、音声なし結果、事前生成デモを配信できます。Fastifyは動かず、ブラウザからローカルVOICEVOXへの接続も環境依存のため、Pages単体ではリアルタイム生成を提供しません。`web/dist/client/` が静的配置対象です。
+静的UI、教材、曲選択、クイズ、音声なし結果、事前生成デモを配信できます。Fastifyは動かず、ブラウザからローカルVOICEVOXへの接続も環境依存のため、Pages単体では回答に基づくリアルタイム生成を提供しません。`web/dist/client/` が静的配置対象です。
 
 ## クレジット
 

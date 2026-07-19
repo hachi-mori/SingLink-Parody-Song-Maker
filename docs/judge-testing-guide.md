@@ -15,7 +15,13 @@
 - IndexedDBへ保存される生成履歴
 - VOICEVOX不要の事前生成デモ（自作例文・既存の「幸せなら手をたたこう」楽譜と伴奏・英語字幕・カラオケ同期）
 
-## 必要環境
+## 1. 公開デモ（最短・準備不要）
+
+[固定4問デモをGitHub Pagesで開始する](https://hachi-mori.github.io/SingLink-Parody-Song-Maker/openai-build-week/?demo=1)。ローカルサーバー、VOICEVOX、認証情報、APIキー、デモアカウントは不要です。固定順の4問に回答すると、事前生成済みのずんだもん歌唱と「幸せなら手をたたこう」の同梱伴奏を、字幕・カラオケ同期とともに結果画面で再生できます。
+
+この公開経路は、毎回同じ事前生成サンプルを再生するデモです。回答から新しい歌声を作る機能ではありません。タイトルの[公開ページ](https://hachi-mori.github.io/SingLink-Parody-Song-Maker/openai-build-week/)から `Try fixed quiz demo` / `固定問題デモを遊ぶ` を選んでも同じ経路を開始できます。
+
+## 2. 必要環境（通常モードのリアルタイム生成）
 
 - Windows
 - ChromeまたはEdge
@@ -25,11 +31,11 @@
 
 動作確認済みのVOICEVOXは0.25.1です。認証情報、APIキー、デモアカウント、`.env` は不要です。
 
-## 1. 起動
+## 3. ローカル起動（通常モードのリアルタイム生成）
 
 ```powershell
-git clone https://github.com/hachi-mori/Tohoku-procon2025.git
-cd Tohoku-procon2025
+git clone https://github.com/hachi-mori/SingLink-Parody-Song-Maker.git
+cd SingLink-Parody-Song-Maker
 git switch openai-build-week
 cd web
 npm ci
@@ -62,7 +68,7 @@ $env:VOICEVOX_BASE_URL = "http://localhost:50021"
 npm.cmd run dev
 ```
 
-## 2. 30秒の事前生成デモ
+## 4. 固定4問の事前生成デモ（ローカルでも確認可）
 
 タイトルの `Try fixed quiz demo` を押してください。VOICEVOXの起動やURL設定は不要です。固定順の4問に回答すると、既存の結果画面で次を確認できます。回答内容にかかわらず、固定の全問正解版の歌声を再生します。
 
@@ -72,9 +78,9 @@ npm.cmd run dev
 - 「事前生成サンプルであり、通常モードはクイズ回答からリアルタイム生成する」という表示
 - `VOICEVOX:ずんだもん` と自作素材のクレジット
 
-直接URLは `http://127.0.0.1:5173/?demo=1` です。このURLでも固定順の問題画面から開始します。デモ結果は生成履歴へ保存しません。
+ローカルの直接URLは `http://127.0.0.1:5173/?demo=1` です。公開URLは [GitHub Pagesの固定4問デモ](https://hachi-mori.github.io/SingLink-Parody-Song-Maker/openai-build-week/?demo=1) です。どちらも固定順の問題画面から開始します。デモ結果は生成履歴へ保存しません。
 
-## 3. 5分の通常モード審査経路
+## 5. 5分の通常モード審査経路
 
 1. タイトルが英語で表示され、`Language` が `English` であることを確認します。
 2. `How to play` を開き、4つの英語ステップを確認してタイトルへ戻ります。
@@ -96,7 +102,7 @@ npm.cmd run dev
 
 日本語表示の差分を確認する場合は、タイトルで `Language` を `日本語` に変更します。日本語結果では英訳例文と英語意味を表示しません。
 
-## 4. VOICEVOXなしの確認
+## 6. VOICEVOXなしの確認
 
 VOICEVOXが起動していなくても、アプリは次の範囲を確認できます。
 
@@ -108,9 +114,9 @@ VOICEVOXが起動していなくても、アプリは次の範囲を確認でき
 
 タイトルには未接続の案内が表示されます。4問後は生成をスキップして音声なし結果へ進めます。これはエラーによるクラッシュではなく、実装済みのフォールバックです。歌声・伴奏・再生同期・音声履歴は確認できません。
 
-GitHub Pagesの静的版ではリアルタイム生成を行えませんが、事前生成デモでは歌声・伴奏・再生同期まで確認できます。リアルタイム生成の正式なテスト経路は **ローカルWindows + VOICEVOX** です。
+GitHub Pagesの静的版では回答に基づくリアルタイム生成を行えませんが、事前生成デモでは歌声・伴奏・再生同期まで確認できます。リアルタイム生成の正式なテスト経路は **ローカルWindows + VOICEVOX** です。
 
-## 5. サンプルデータ
+## 7. サンプルデータ
 
 追加のダウンロードは不要です。
 
@@ -121,9 +127,9 @@ GitHub Pagesの静的版ではリアルタイム生成を行えませんが、�
 - `web/assets/inst/`: 5曲の伴奏WAV
 - `web/assets/demo/`: 「幸せなら手をたたこう」のメロディーで事前生成した歌唱WAV、字幕・同期manifest（伴奏は `web/assets/inst/幸せなら手をたたこう.wav`）
 
-問題は毎回ランダムです。特定の語、固定アカウント、固定回答はありません。
+通常モードの問題は毎回ランダムです。公開デモだけは比較可能な審査経路にするため、4語と順序が固定されています。固定アカウントはありません。
 
-## 6. 自動テスト
+## 8. 自動テスト
 
 開発サーバーを終了してから実行して構いません。
 
@@ -143,7 +149,7 @@ npm.cmd run audit:english-subtitles
 - `English subtitles: 335/335`
 - 監査候補は情報表示であり、欠損・重複・例文不一致ではない
 
-## 7. 停止
+## 9. 停止
 
 `npm.cmd run dev` を実行したPowerShellで `Ctrl+C` を押します。VOICEVOXも通常どおり終了できます。
 
@@ -154,7 +160,7 @@ npm.cmd run audit:english-subtitles
 | `npm ci` がNode.js要件で失敗 | `node --version` が `^20.19.0` または `>=22.12.0` か確認 |
 | 5173または5174が使用中 | 既に起動している `npm.cmd run dev` を終了 |
 | VOICEVOX未接続 | VOICEVOXを起動し、URLが `http://localhost:50021` か確認して `Recheck` |
-| 歌声が生成されない | GitHub Pagesではなくローカル起動か確認 |
+| 通常モードで歌声が生成されない | GitHub Pagesではなくローカル起動か確認。公開デモの歌声は事前生成済み |
 | 保存履歴がない | 音声なし結果ではなく、VOICEVOXで音声を生成したか確認 |
 | 言語が日本語で始まる | 過去の選択が `localStorage` に保存済み。タイトルでEnglishへ戻すかサイトデータを消去 |
 
