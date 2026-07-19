@@ -3,3 +3,16 @@
 ずんだもんアイドルPJ/ずんだもんアイドルPJ/App/Inst/ハッピーバースデー.mp3
 ずんだもんアイドルPJ/ずんだもんアイドルPJ/App/Score/ハッピーバースデー.wav
 SingLink-Parody-Song-Maker\AGENTS.md
+local-only/
+web/assets/dict/Verb.csv
+web/assets/dict/オノマトペ.csv
+web/assets/score/ハッピーバースデー.vvproj
+web/assets/score/動詞グループ.vvproj
+web/assets/score/呼び込みくん.vvproj
+web/assets/score/呼び込みくんっぽい曲.vvproj
+web/assets/inst/HappyBirthday.wav
+web/assets/inst/オノマトペ.mp3
+web/assets/inst/ハッピーバースデー.mp3
+web/assets/inst/動詞グループ.mp3
+web/assets/inst/呼び込みくん.mp3
+web/assets/inst/呼び込みくんっぽい曲.mp3

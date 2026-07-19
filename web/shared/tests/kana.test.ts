@@ -27,22 +27,22 @@ describe('kana utilities', () => {
   it('カードJSONから穴埋めオノマトペ問題を作る', () => {
     const entries = parseOnomatopoeiaCardEntries({
       records: [{
-        onomatopoeia: 'あつあつ',
-        usages: [{ text: 'あつあつのおでんはおいしいなあ。' }],
-        meanings: [{ text: '料理などができたてであついようす。' }]
+        onomatopoeia: 'てすとてすと',
+        usages: [{ text: 'てすとてすとをうたう。' }],
+        meanings: [{ text: 'パーサーの動きを確かめるための合成データ。' }]
       }]
     }, {
-      readings: { あつあつ: 'あつあつのおでんわおいしいなあ' }
+      readings: { てすとてすと: 'てすとてすとおうたう' }
     });
 
     expect(entries[0]).toMatchObject({
-      word: 'あつあつ',
-      reading: 'あつあつ',
-      answer: 'あつあつ',
-      explanation: '料理などができたてであついようす。',
-      questionText: '○○のおでんはおいしいなあ。',
-      displayText: 'あつあつのおでんはおいしいなあ。',
-      singingReading: 'あつあつのおでんわおいしいなあ'
+      word: 'てすとてすと',
+      reading: 'てすとてすと',
+      answer: 'てすとてすと',
+      explanation: 'パーサーの動きを確かめるための合成データ。',
+      questionText: '○○をうたう。',
+      displayText: 'てすとてすとをうたう。',
+      singingReading: 'てすとてすとおうたう'
     });
   });
 

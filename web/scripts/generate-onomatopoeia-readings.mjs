@@ -8,10 +8,6 @@ const cardsPath = path.join(webDir, 'assets', 'dict', 'cards_text_data.json');
 const outputPath = path.join(webDir, 'assets', 'dict', 'cards_singing_readings.json');
 const voicevoxBaseUrl = (process.env.VOICEVOX_BASE_URL ?? 'http://127.0.0.1:50021').replace(/\/+$/, '');
 const speakerId = Number(process.env.VOICEVOX_READING_SPEAKER_ID ?? '2');
-const readingOverrides = {
-  かさかさ: 'はだがかさかさする'
-};
-
 function katakanaToHiragana(text) {
   return Array.from(text, (character) => {
     const code = character.codePointAt(0);
@@ -57,7 +53,7 @@ for (const record of cards.records) {
   if (word in readings) {
     throw new Error(`オノマトペが重複しています: ${word}`);
   }
-  readings[word] = readingOverrides[word] ?? await makeSingingReading(usage);
+  readings[word] = await makeSingingReading(usage);
 }
 
 const output = {

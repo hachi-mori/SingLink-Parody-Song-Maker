@@ -13,8 +13,79 @@ function readJson(filePath: string): unknown {
 const cardsJson = readJson('assets/dict/cards_text_data.json');
 const readingsJson = readJson('assets/dict/cards_singing_readings.json');
 const entries = parseOnomatopoeiaCardEntries(cardsJson, readingsJson);
+const expectedWords = [
+  'あたふた', 'あっさり', 'あやふや', 'いそいそ', 'いらいら', 'うきうき', 'うじゃうじゃ', 'うだうだ', 'うっかり', 'うっすら',
+  'うっとり', 'うつらうつら', 'うとうと', 'うろうろ', 'うんざり', 'うんと', 'おいおい', 'おずおず', 'おそるおそる', 'おっとり',
+  'かさかさ', 'がさがさ', 'かたかた', 'がたがた', 'かちかち', 'がちゃがちゃ', 'がつがつ', 'がっかり', 'がっくり', 'がっちり',
+  'かっと', 'がみがみ', 'からから', 'からっと', 'がらりと', 'かりかり', 'がりがり', 'かんかん', 'がんがん', 'ぎくしゃく',
+  'ぎざぎざ', 'ぎすぎす', 'きちんと', 'ぎっしり', 'きっちり', 'きっと', 'きっぱり', 'きびきび', 'ぎゅっと', 'ぎょっと',
+  'きょろきょろ', 'きらきら', 'ぎらぎら', 'ぎりぎり', 'ぐいぐい', 'ぐうぐう', 'くしゃくしゃ', 'ぐしゃぐしゃ', 'くすくす', 'くたくた',
+  'ぐちゃぐちゃ', 'くっきり', 'ぐつぐつ', 'ぐっすり', 'ぐったり', 'ぐっと', 'くよくよ', 'ぐらぐら', 'くりくり', 'くるくる',
+  'ぐるぐる', 'くるり', 'ぐんぐん', 'ぐんと', 'げっそり', 'げらげら', 'けろっと', 'げんなり', 'ごくごく', 'ごしごし',
+  'こそこそ', 'ごそごそ', 'ごたごた', 'ごちゃごちゃ', 'こつこつ', 'ごつごつ', 'こっそり', 'ごっちゃ', 'こってり', 'ことこと',
+  'ころころ', 'ごろごろ', 'ごわごわ', 'こんがり', 'こんこん', 'こんもり', 'さくさく', 'ざっくばらん', 'ざっくり', 'さっさと'
+] as const;
+
+function getRecord(value: unknown): Record<string, unknown> {
+  expect(value).toBeTypeOf('object');
+  expect(value).not.toBeNull();
+  expect(Array.isArray(value)).toBe(false);
+  return value as Record<string, unknown>;
+}
+
+function containsInOrder(text: string, expected: string): boolean {
+  let expectedIndex = 0;
+  for (const character of text) {
+    if (character === expected[expectedIndex]) {
+      expectedIndex += 1;
+    }
+  }
+  return expectedIndex === expected.length;
+}
 
 describe('100語のオノマトペカード', () => {
+  it('許可済みCSVの第3列先頭100件を順番どおり使い、自作教材の必須項目をそろえる', () => {
+    const cardsRoot = getRecord(cardsJson);
+    const readingsRoot = getRecord(readingsJson);
+    const records = cardsRoot.records;
+    const readings = getRecord(readingsRoot.readings);
+
+    expect(cardsRoot.record_count).toBe(100);
+    expect(cardsRoot.provenance).toMatchObject({
+      vocabulary: 'ユーザー提供CSVの第3列のみ',
+      selection: '先頭100件を元の順番で採用',
+      normalization: 'カタカナをひらがなへ機械変換'
+    });
+    expect(readingsRoot.record_count).toBe(100);
+    expect(Array.isArray(records)).toBe(true);
+    expect(records).toHaveLength(100);
+
+    const words = (records as unknown[]).map((rawRecord, index) => {
+      const record = getRecord(rawRecord);
+      const word = record.onomatopoeia;
+      const usages = record.usages;
+      const meanings = record.meanings;
+      expect(record.number).toBe(index + 1);
+      expect(word).toBe(expectedWords[index]);
+      expect(Array.isArray(usages)).toBe(true);
+      expect(Array.isArray(meanings)).toBe(true);
+      const usage = getRecord((usages as unknown[])[0]);
+      const meaning = getRecord((meanings as unknown[])[0]);
+      expect(usage.text).toEqual(expect.stringContaining(word as string));
+      expect(meaning.text).toEqual(expect.any(String));
+      expect((meaning.text as string).length).toBeGreaterThan(0);
+      return word;
+    });
+
+    expect(words).toEqual(expectedWords);
+    expect(new Set(words).size).toBe(100);
+    expect(Object.keys(readings)).toEqual(expectedWords);
+    for (const word of expectedWords) {
+      expect(readings[word]).toEqual(expect.stringMatching(/^[ぁ-ゖー]+$/u));
+      expect(readings[word]).toEqual(expect.stringContaining(word));
+    }
+  });
+
   it('100語すべてに問題文・表示文・歌唱用読みを用意する', () => {
     expect(entries).toHaveLength(100);
     expect(new Set(entries.map((entry) => entry.word)).size).toBe(100);
@@ -39,6 +110,11 @@ describe('100語のオノマトペカード', () => {
           .toBe(result.score.notes.length);
         expect(result.phraseRanges.every(([start, end]) => end > start), `${sourceSong.title}: ${entry.word}`)
           .toBe(true);
+        const expectedSignature = entry.answer.replace(/[っー]/g, '');
+        for (const [start, end] of result.phraseRanges) {
+          const phraseLyrics = result.score.notes.slice(start, end).map((note) => note.lyric).join('').replace(/[っー]/g, '');
+          expect(containsInOrder(phraseLyrics, expectedSignature), `${sourceSong.title}: ${entry.word}`).toBe(true);
+        }
       }
     }
   });

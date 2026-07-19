@@ -1,4 +1,3 @@
-import { parseCsvRows } from '@shared/csv';
 import { buildResultDisplayLyrics, buildTalkProblems, extractTalkUtterances, getVvprojTrackName } from '@shared/vvproj';
 import { parseOnomatopoeiaCardEntries } from '@shared/onomatopoeiaCards';
 import { memorizationSourceSongs } from '@shared/memorizationSongs';
@@ -8,8 +7,7 @@ import type {
   SongInfo,
   SongMode,
   SourceSongInfo,
-  SynthesisRequest,
-  VerbEntry
+  SynthesisRequest
 } from '@shared/types';
 import { assetUrl } from './assets';
 
@@ -24,11 +22,7 @@ const staticSongAssets: StaticSongAsset[] = [
     vvprojFileName: 'オノマトペ.vvproj',
     instFileName: '幸せなら手をたたこう.wav',
     baseScoreFileName: '幸せなら手をたたこう.json'
-  },
-  { vvprojFileName: 'ハッピーバースデー.vvproj', instFileName: 'HappyBirthday.wav' },
-  { vvprojFileName: '動詞グループ.vvproj', instFileName: '動詞グループ.mp3' },
-  { vvprojFileName: '呼び込みくん.vvproj', instFileName: '呼び込みくん.mp3' },
-  { vvprojFileName: '呼び込みくんっぽい曲.vvproj', instFileName: '呼び込みくんっぽい曲.mp3' }
+  }
 ];
 
 function makeSongId(title: string): string {
@@ -44,14 +38,8 @@ function titleFromVvproj(fileName: string): string {
   return fileName.replace(/\.vvproj$/i, '');
 }
 
-function detectMode(title: string): SongMode {
-  if (title === '動詞グループ') {
-    return 'verbQuiz';
-  }
-  if (title === 'オノマトペ') {
-    return 'onomatopoeiaQuiz';
-  }
-  return 'freeText';
+function detectMode(_title: string): SongMode {
+  return 'onomatopoeiaQuiz';
 }
 
 async function fetchText(path: string): Promise<string> {
@@ -64,16 +52,6 @@ async function fetchText(path: string): Promise<string> {
 
 async function fetchJson(path: string): Promise<unknown> {
   return JSON.parse(await fetchText(path)) as unknown;
-}
-
-async function loadVerbEntries(): Promise<VerbEntry[]> {
-  const rows = parseCsvRows(await fetchText('assets/dict/Verb.csv'));
-  return rows.flatMap((fields) => {
-    const word = (fields[1] ?? '').trim();
-    const reading = (fields[2] ?? '').trim();
-    const group = (fields[4] ?? '').trim();
-    return word && reading && group.includes('動詞') ? [{ word, reading, group }] : [];
-  });
 }
 
 async function loadOnomatopoeiaEntries(): Promise<OnomatopoeiaEntry[]> {
@@ -132,9 +110,6 @@ export async function fetchStaticSongDetail(songId: string): Promise<SongDetail>
     problems: info.mode === 'onomatopoeiaQuiz' ? [] : buildTalkProblems(extractTalkUtterances(vvproj))
   };
 
-  if (info.mode === 'verbQuiz') {
-    detail.verbEntries = await loadVerbEntries();
-  }
   if (info.mode === 'onomatopoeiaQuiz') {
     detail.onomatopoeiaEntries = await loadOnomatopoeiaEntries();
   }

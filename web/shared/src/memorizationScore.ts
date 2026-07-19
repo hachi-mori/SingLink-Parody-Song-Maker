@@ -72,36 +72,6 @@ export type MemorizationSynthesisSegment = {
   leadingPaddingFrames: number;
 };
 
-export const onomatopoeiaExamples = [
-  {
-    word: 'しとしと',
-    reading: 'しとしと',
-    answer: 'しとしと',
-    explanation: '雨が静かに降り続く様子を表すオノマトペです。',
-    questionText: '○○と雨がふっている。',
-    displayText: 'しとしとと雨がふっている。',
-    singingReading: 'しとしととあめがふっている'
-  },
-  {
-    word: 'ぶんぶん',
-    reading: 'ぶんぶん',
-    answer: 'ぶんぶん',
-    explanation: 'ハチなどが飛ぶ音を表すオノマトペです。',
-    questionText: '○○とハチが飛ぶ音がする。',
-    displayText: 'ぶんぶんとハチが飛ぶ音がする。',
-    singingReading: 'ぶんぶんとはちがとぶおとがする'
-  },
-  {
-    word: 'わくわく',
-    reading: 'わくわく',
-    answer: 'わくわく',
-    explanation: '楽しみで心が弾む様子を表すオノマトペです。',
-    questionText: '○○しながらプレゼントの箱を開ける。',
-    displayText: 'わくわくしながらプレゼントの箱を開ける。',
-    singingReading: 'わくわくしながらぷれぜんとのはこをあける'
-  }
-] as const;
-
 function cloneNote(note: ScoreNote): ScoreNote {
   return { ...note };
 }

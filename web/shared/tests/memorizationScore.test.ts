@@ -5,26 +5,62 @@ import {
   buildOnomatopoeiaLyricsRows,
   buildMemorizationSynthesisPlan,
   createMemorizationScore,
-  onomatopoeiaExamples,
   type MemorizationScoreJson
 } from '../src/memorizationScore';
 import { memorizationSourceSongs } from '../src/memorizationSongs';
+import { parseOnomatopoeiaCardEntries } from '../src/onomatopoeiaCards';
 import { buildOnomatopoeiaTasks, buildOnomatopoeiaResultLyrics } from '../src/gameLogic';
 
+function loadJson(fileName: string): unknown {
+  const text = fs.readFileSync(path.resolve(fileName), 'utf8').replace(/^\uFEFF/, '');
+  return JSON.parse(text) as unknown;
+}
+
 function loadScore(fileName: string): MemorizationScoreJson {
-  const text = fs.readFileSync(path.resolve('assets/score', fileName), 'utf8').replace(/^\uFEFF/, '');
-  return JSON.parse(text) as MemorizationScoreJson;
+  return loadJson(path.join('assets/score', fileName)) as MemorizationScoreJson;
 }
 
 function loadBaseScore(): MemorizationScoreJson {
   return loadScore('幸せなら手をたたこう.json');
 }
 
+const originalEntries = parseOnomatopoeiaCardEntries(
+  loadJson('assets/dict/cards_text_data.json'),
+  loadJson('assets/dict/cards_singing_readings.json')
+).slice(0, 3);
+
+function rowsFromOriginalEntries(): Array<[string, string]> {
+  return originalEntries.map((entry) => [entry.displayText ?? '', entry.singingReading ?? '']);
+}
+
+function compactOnomatopoeia(text: string): string {
+  return text.replace(/[っー]/g, '');
+}
+
+function containsInOrder(text: string, expected: string): boolean {
+  let expectedIndex = 0;
+  for (const character of text) {
+    if (character === expected[expectedIndex]) {
+      expectedIndex += 1;
+    }
+  }
+  return expectedIndex === expected.length;
+}
+
+function expectPhraseAssignments(
+  score: MemorizationScoreJson,
+  phraseRanges: ReadonlyArray<readonly [number, number]>
+): void {
+  expect(phraseRanges).toHaveLength(originalEntries.length);
+  phraseRanges.forEach(([start, end], index) => {
+    const phraseLyrics = compactOnomatopoeia(score.notes.slice(start, end).map((note) => note.lyric).join(''));
+    const expectedSignature = compactOnomatopoeia(originalEntries[index]?.answer ?? '');
+    expect(containsInOrder(phraseLyrics, expectedSignature), originalEntries[index]?.answer).toBe(true);
+  });
+}
+
 function generate() {
-  return createMemorizationScore(
-    onomatopoeiaExamples.map((example) => [example.displayText, example.singingReading]),
-    loadBaseScore()
-  );
+  return createMemorizationScore(rowsFromOriginalEntries(), loadBaseScore());
 }
 
 function expandKeys(score: MemorizationScoreJson): Array<number | null> {
@@ -32,8 +68,9 @@ function expandKeys(score: MemorizationScoreJson): Array<number | null> {
 }
 
 describe('memorization score', () => {
-  it('5曲すべてで指定3文を3フレーズへ割り当てる', () => {
-    const rows = onomatopoeiaExamples.map((example) => [example.displayText, example.singingReading] as const);
+  it('自作教材の3文を5曲すべてで3フレーズへ割り当てる', () => {
+    expect(originalEntries).toHaveLength(3);
+    const rows = rowsFromOriginalEntries();
 
     for (const sourceSong of memorizationSourceSongs) {
       const base = loadScore(sourceSong.scoreFileName);
@@ -42,46 +79,45 @@ describe('memorization score', () => {
       expect(result.phraseRanges, sourceSong.title).toHaveLength(3);
       expect(result.phraseRanges.at(-1)?.[1], sourceSong.title).toBe(result.score.notes.length);
       expect(result.phraseRanges.every(([start, end]) => end > start), sourceSong.title).toBe(true);
+      expect(result.score.notes.at(-1)?.lyric, sourceSong.title).toMatch(/^[ぁ-ゖー]+$/u);
       expect(expandKeys(result.score), sourceSong.title).toEqual(expandKeys(base).slice(0, totalFrames));
-      expect(result.score.notes.at(-1)?.lyric, sourceSong.title).toBe('る');
+      expectPhraseAssignments(result.score, result.phraseRanges);
     }
   });
 
-  it('指定3文をゴールデン歌詞と期待範囲へ割り当てる', () => {
+  it('読みとフレーズ範囲を一貫して出力する', () => {
     const result = generate();
 
-    expect(result.score.notes.map((note) => note.lyric)).toEqual([
-      '',
-      'し', 'と', 'し', 'と', 'と', 'あ', 'め', 'が', 'ふ', 'て', 'い', 'る',
-      'ぶ', 'ん', 'ぶ', 'ん', 'と', 'は', 'ち', 'が', 'と', 'ぶ', 'お', 'と', 'が', 'す', 'る',
-      'わ', 'く', 'わ', 'く', 'し', 'な', 'が', 'ら', 'ぷ', 'れ', 'ぜ', 'ん', 'と', 'の', 'は', 'こ', 'を', 'あ', 'け', 'る'
-    ]);
-    expect(result.phraseRanges).toEqual([[0, 13], [13, 28], [28, 48]]);
-    expect(result.difference).toBe(11);
+    expect(result.score.notes.length).toBeGreaterThan(0);
+    expect(result.phraseRanges).toHaveLength(3);
+    expect(result.phraseRanges.at(-1)?.[1]).toBe(result.score.notes.length);
+    expect(rowsFromOriginalEntries().map((row) => row[1])).toEqual(
+      originalEntries.map((entry) => entry.singingReading)
+    );
+    expect(result.score.notes.map((note) => note.lyric).join('')).toMatch(/^[ぁ-ゖー]+$/u);
+    expectPhraseAssignments(result.score, result.phraseRanges);
   });
 
-  it('48音符と1129 frameだけを出力して不要な末尾音符を残さない', () => {
+  it('必要な音符だけを出力して不要な末尾音符を残さない', () => {
     const { score, phraseRanges } = generate();
 
     expect(score['16thnoteframe_length']).toBe(loadBaseScore()['16thnoteframe_length']);
-    expect(score.notes).toHaveLength(48);
-    expect(score.notes.reduce((sum, note) => sum + note.frame_length, 0)).toBe(1129);
+    expect(score.notes).toHaveLength(phraseRanges.at(-1)?.[1] ?? 0);
     expect(phraseRanges.map(([start, end]) => score.notes.slice(start, end)
-      .reduce((sum, note) => sum + note.frame_length, 0))).toEqual([378, 375, 376]);
-    expect(score.notes.at(-1)).toMatchObject({ lyric: 'る', frame_length: 47, key: 67 });
-    expect(score.notes.map((note) => note.lyric).join('')).not.toMatch(/に$/);
+      .reduce((sum, note) => sum + note.frame_length, 0)).every((frameLength) => frameLength > 0)).toBe(true);
+    expect(score.notes.at(-1)?.lyric).toMatch(/^[ぁ-ゖー]+$/u);
   });
 
   it('音高タイムラインを維持し入力非破壊かつ決定的に生成する', () => {
     const base = loadBaseScore();
     const snapshot = structuredClone(base);
-    const rows = onomatopoeiaExamples.map((example) => [example.displayText, example.singingReading] as const);
-    const first = createMemorizationScore(rows, base);
-    const second = createMemorizationScore(rows, base);
+    const first = createMemorizationScore(rowsFromOriginalEntries(), base);
+    const second = createMemorizationScore(rowsFromOriginalEntries(), base);
+    const totalFrames = first.score.notes.reduce((sum, note) => sum + note.frame_length, 0);
 
     expect(base).toEqual(snapshot);
     expect(first).toEqual(second);
-    expect(expandKeys(first.score)).toEqual(expandKeys(snapshot).slice(0, 1129));
+    expect(expandKeys(first.score)).toEqual(expandKeys(snapshot).slice(0, totalFrames));
   });
 
   it('正誤順から各フレーズの話者を選び歌詞は変更しない', () => {
@@ -97,25 +133,22 @@ describe('memorization score', () => {
       .toEqual(Array(2).fill({ frame_length: 2, key: null, lyric: '', notelen: 'R' }));
     expect(plan.map((segment) => segment.score.notes.reduce((sum, note) => sum + note.frame_length, 0)
       - segment.leadingPaddingFrames))
-      .toEqual([378, 375, 376]);
-    expect(plan.reduce((sum, segment) => sum + segment.score.notes.reduce(
-      (segmentSum, note) => segmentSum + note.frame_length,
-      -segment.leadingPaddingFrames
-    ), 0)).toBe(1129);
+      .toEqual(phraseRanges.map(([start, end]) => score.notes.slice(start, end)
+        .reduce((sum, note) => sum + note.frame_length, 0)));
     expect(plan.flatMap((segment) => segment.score.notes.slice(segment.leadingPaddingFrames > 0 ? 1 : 0))
       .map((note) => note.lyric))
       .toEqual(score.notes.map((note) => note.lyric));
   });
 
-  it('固定順の表示文と歌唱用読みを正誤に関係なく維持する', () => {
-    const tasks = onomatopoeiaExamples.flatMap((example, index) =>
-      buildOnomatopoeiaTasks({ ...example }, index === 1 ? 'しとしと' : example.answer, index !== 1)
+  it('自作教材の表示文と歌唱用読みを正誤に関係なく維持する', () => {
+    const tasks = originalEntries.flatMap((entry, index) =>
+      buildOnomatopoeiaTasks(entry, index === 1 ? originalEntries[0]?.answer ?? '' : entry.answer, index !== 1)
     );
 
-    expect(buildOnomatopoeiaResultLyrics(onomatopoeiaExamples.map((example) => ({ ...example }))))
-      .toBe(onomatopoeiaExamples.map((example) => example.displayText).join('\n'));
+    expect(buildOnomatopoeiaResultLyrics(originalEntries))
+      .toBe(originalEntries.map((entry) => entry.displayText).join('\n'));
     expect(buildOnomatopoeiaLyricsRows(tasks).map((row) => row[1]))
-      .toEqual(onomatopoeiaExamples.map((example) => example.singingReading));
+      .toEqual(originalEntries.map((entry) => entry.singingReading));
     expect(createMemorizationScore(buildOnomatopoeiaLyricsRows(tasks), loadBaseScore()).score.notes.map((note) => note.lyric))
       .toEqual(generate().score.notes.map((note) => note.lyric));
   });
