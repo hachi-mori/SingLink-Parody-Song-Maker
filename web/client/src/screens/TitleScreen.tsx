@@ -44,25 +44,27 @@ export function TitleScreen(props: TitleScreenProps) {
   return (
     <ScreenShell background={assetUrl('assets/texture/assets/title_background.png')} fit="cover">
       <section className="title-layout">
-        <div className="voicevox-panel">
-          <div className={statusClass}>{props.voicevoxStatus
-            ? props.voicevoxStatus.ok
-              ? t('voicevoxConnected', { version: props.voicevoxStatus.version ? ` (${props.voicevoxStatus.version})` : '' })
-              : t('voicevoxDisconnected')
-            : t('voicevoxChecking')}</div>
-          <label>
-            <span>{t('voicevoxUrl')}</span>
-            <input
-              value={props.voicevoxBaseUrl}
-              onChange={(event) => props.onBaseUrlChange(event.target.value)}
-              onBlur={props.onCheckVoicevox}
-            />
-          </label>
-          <button className="small-button" onClick={props.onCheckVoicevox}>
-            <RefreshCw size={16} />
-            {t('recheck')}
-          </button>
-          <label>
+        <div className="title-settings">
+          <div className="voicevox-panel">
+            <div className={statusClass}>{props.voicevoxStatus
+              ? props.voicevoxStatus.ok
+                ? t('voicevoxConnected', { version: props.voicevoxStatus.version ? ` (${props.voicevoxStatus.version})` : '' })
+                : t('voicevoxDisconnected')
+              : t('voicevoxChecking')}</div>
+            <label>
+              <span>{t('voicevoxUrl')}</span>
+              <input
+                value={props.voicevoxBaseUrl}
+                onChange={(event) => props.onBaseUrlChange(event.target.value)}
+                onBlur={props.onCheckVoicevox}
+              />
+            </label>
+            <button className="small-button" onClick={props.onCheckVoicevox}>
+              <RefreshCw size={16} />
+              {t('recheck')}
+            </button>
+          </div>
+          <label className="language-panel">
             <span>{t('language')}</span>
             <select value={language} onChange={(event) => setLanguage(event.target.value as 'en' | 'ja')}>
               <option value="en">English</option>

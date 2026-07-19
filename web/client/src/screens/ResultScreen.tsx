@@ -242,11 +242,6 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
         <div className="result-card">
           <p className="result-song-source">{t('songSourceEyebrow')}</p>
           <h1>{t('songMadeWith', { song: song.sourceSong?.title ?? song.trackName ?? song.title })}</h1>
-          <div className="karaoke-legend" aria-label="Karaoke lyric states">
-            <span data-state="pending">○ {t('pendingLyric')}</span>
-            <span data-state="active">▶ {t('currentLyric')}</span>
-            <span data-state="completed">✓ {t('completedLyric')}</span>
-          </div>
           <div className="lyrics-box karaoke-lyrics" aria-live="polite">
             {lines.map((line, lineIndex) => {
               const timing = timings[lineIndex];
@@ -260,7 +255,7 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
                   key={`${line}-${lineIndex}`}
                   ref={(element) => { lyricLineRefs.current[lineIndex] = element; }}
                 >
-                  <span className="karaoke-state-label">{state === 'active' ? `▶ ${t('currentLyric')}` : state === 'completed' ? `✓ ${t('completedLyric')}` : `○ ${t('pendingLyric')}`}</span>
+                  {task?.isCorrect === false ? <span className="karaoke-answer-status">{t('incorrect')}</span> : null}
                   <p className="karaoke-japanese" lang="ja">
                     <span className="sr-only">{line}</span>
                     <span className="karaoke-japanese-characters" aria-hidden="true">

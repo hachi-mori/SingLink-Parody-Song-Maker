@@ -8,6 +8,7 @@ import { WriteLyricsScreen } from './screens/WriteLyricsScreen';
 import { LoadingScreen } from './screens/LoadingScreen';
 import { ResultScreen } from './screens/ResultScreen';
 import { StaticImageScreen } from './screens/StaticImageScreen';
+import { HowToScreen } from './screens/HowToScreen';
 import { HistoryScreen } from './screens/HistoryScreen';
 import { assetUrl } from './lib/assets';
 import type { GeneratedResult } from './lib/generatedResult';
@@ -137,6 +138,9 @@ export function App() {
   }
 
   if (screen === 'howto') {
+    if (language === 'en') {
+      return <HowToScreen onBack={() => setScreen('title')} />;
+    }
     return <StaticImageScreen title={t('howToTitle')} description={t('howToBody')} imageSrc={language === 'ja' ? assetUrl('assets/texture/assets/howtoplay.png') : undefined} onBack={() => setScreen('title')} />;
   }
 

@@ -109,13 +109,21 @@ button:disabled {
   padding: clamp(14px, 3vw, 42px);
 }
 
-.voicevox-panel {
+.title-settings {
   position: absolute;
   top: clamp(12px, 2vw, 32px);
   left: clamp(12px, 2vw, 32px);
   display: grid;
-  gap: 7px;
+  gap: 10px;
   width: min(290px, 52vw);
+  z-index: 3;
+}
+
+.voicevox-panel,
+.language-panel {
+  display: grid;
+  gap: 7px;
+  width: 100%;
   padding: 10px 12px;
   border-radius: 8px;
   background: rgba(255, 250, 235, 0.94);
@@ -123,14 +131,15 @@ button:disabled {
   box-shadow: 0 10px 28px rgba(72, 40, 5, 0.16);
 }
 
-.voicevox-panel label {
+.voicevox-panel label,
+.language-panel {
   display: grid;
   gap: 4px;
   font-size: 13px;
 }
 
 .voicevox-panel input,
-.voicevox-panel select,
+.language-panel select,
 .song-picker select,
 .answer-form input {
   width: 100%;
@@ -639,21 +648,6 @@ button:disabled {
   text-underline-offset: 0.12em;
 }
 
-.karaoke-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 14px;
-  margin: 10px 0 14px;
-  color: var(--brown);
-  font-size: clamp(13px, 1.2vw, 17px);
-}
-
-.karaoke-legend span {
-  padding: 4px 9px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.68);
-}
-
 .karaoke-lyrics {
   display: grid;
   gap: clamp(10px, 1.4vw, 18px);
@@ -690,21 +684,17 @@ button:disabled {
   border-style: dashed;
 }
 
-.karaoke-line--incorrect::before {
-  content: "×";
-  position: absolute;
-  top: 7px;
-  right: 10px;
+.karaoke-answer-status {
+  justify-self: start;
+  padding: 3px 8px;
+  border: 1px solid rgba(167, 24, 24, 0.38);
+  border-radius: 999px;
   color: #a71818;
-  font-size: 22px;
-  font-weight: 800;
-}
-
-.karaoke-state-label {
-  color: #6d410a;
+  background: rgba(255, 239, 239, 0.86);
+  font-family: system-ui, sans-serif;
   font-size: clamp(12px, 1vw, 15px);
   font-weight: 800;
-  letter-spacing: 0.03em;
+  line-height: 1.2;
 }
 
 .karaoke-japanese {
@@ -828,6 +818,98 @@ button:disabled {
   background:
     radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.55), transparent 28%),
     linear-gradient(180deg, #edf8e4 0%, #dff1d2 100%);
+}
+
+.howto-screen {
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: clamp(18px, 3vw, 42px);
+  align-items: start;
+  padding: clamp(22px, 5vw, 70px);
+}
+
+.howto-header,
+.howto-steps {
+  width: min(1120px, 94vw);
+  margin-inline: auto;
+}
+
+.howto-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.howto-header p,
+.howto-header h1,
+.howto-steps h2,
+.howto-steps p {
+  margin: 0;
+}
+
+.howto-header p {
+  color: var(--brown);
+  font-family: system-ui, sans-serif;
+  font-size: clamp(16px, 1.6vw, 24px);
+  font-weight: 800;
+}
+
+.howto-header h1 {
+  color: var(--gold);
+  font-size: clamp(38px, 5vw, 76px);
+  line-height: 1.04;
+}
+
+.howto-steps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(14px, 2vw, 28px);
+  align-content: center;
+  padding: 0;
+  list-style: none;
+}
+
+.howto-steps li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: clamp(14px, 2vw, 26px);
+  align-items: center;
+  min-height: clamp(132px, 18vw, 210px);
+  padding: clamp(16px, 2.4vw, 30px);
+  border: 4px solid rgba(134, 79, 9, 0.68);
+  border-radius: 18px;
+  background: rgba(255, 250, 231, 0.92);
+  box-shadow: var(--shadow);
+}
+
+.howto-step-number {
+  display: grid;
+  place-items: center;
+  width: clamp(54px, 7vw, 92px);
+  aspect-ratio: 1;
+  border: 3px solid var(--brown);
+  border-radius: 50%;
+  color: var(--brown);
+  background: #ffe280;
+  font-size: clamp(30px, 4vw, 54px);
+  font-weight: 900;
+}
+
+.howto-steps h2 {
+  color: var(--brown);
+  font-size: clamp(28px, 3.1vw, 48px);
+  line-height: 1.05;
+}
+
+.howto-steps p {
+  margin-top: 8px;
+  color: #5d4b37;
+  font-family: system-ui, sans-serif;
+  font-size: clamp(16px, 1.55vw, 22px);
+  font-weight: 650;
+  line-height: 1.35;
 }
 
 .static-image-description {
@@ -995,10 +1077,14 @@ button:disabled {
     padding-top: 12px;
   }
 
-  .voicevox-panel {
+  .title-settings {
     position: static;
     width: min(440px, calc(100vw - 24px));
     justify-self: start;
+  }
+
+  .voicevox-panel {
+    width: 100%;
   }
 
   .credit-link {
@@ -1129,7 +1215,7 @@ button:disabled {
     grid-column: 2;
     justify-self: end;
     display: grid;
-    grid-template-rows: auto auto auto minmax(0, 1fr) auto auto;
+    grid-template-rows: auto auto minmax(0, 1fr) auto auto;
     width: min(980px, 57vw);
     max-width: 100%;
     height: calc(100svh - 80px);
@@ -1252,6 +1338,27 @@ button:disabled {
   .static-image-header {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .howto-screen {
+    padding: 18px 12px 28px;
+  }
+
+  .howto-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .howto-header .small-button {
+    align-self: start;
+  }
+
+  .howto-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .howto-steps li {
+    min-height: 0;
   }
 }
 
