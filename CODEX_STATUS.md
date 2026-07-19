@@ -11,7 +11,9 @@ OpenAI Build Week版を既存main版と共存させるGitHub Pages統合workflow
 - 作業開始時の `origin/openai-build-week`: `bc13839` と一致
 - 作業ツリー: 開始時クリーン
 - README、審査ガイド、Web画面機能、教材、依存関係: 変更なし
-- push / Pull Request / 実デプロイ: 未実施
+- push: `openai-build-week` と `main` へ実施済み
+- Pull Request: ユーザー指定により未作成
+- GitHub Actionsによる実デプロイ: push後のworkflowで実行
 
 ## 確認済み
 
@@ -57,8 +59,9 @@ OpenAI Build Week版を既存main版と共存させるGitHub Pages統合workflow
 
 ## 注意点
 
-- 恒久運用には同じworkflowをmainにも反映する必要がある。
-- Build Week側だけで先にデプロイ確認はできるが、その後mainの旧workflowが動くとサブパス版が消える。
+- `openai-build-week`: `e4b1c5c Build Week版をPagesの専用URLで公開可能にする` を反映済み。
+- `main`: `120d56b Build Week版のPages公開経路をmainへ反映` を反映済み。
+- 両ブランチの `.github/workflows/pages.yml` は同一内容である。
 - ユーザー確認前はREADMEと審査ガイドを変更しない。
 - GitHub Pages単体ではローカルVOICEVOX歌唱を保証しない。
 - 検証用一時成果物は実行ポリシーにより自動削除できず、`C:\Users\yaega\AppData\Local\Temp\singlink-pages-verify-f98678c2d16649329b4fd353fce4d5c8` に残っている。作業tree登録とローカルサーバーは削除・停止済み。
