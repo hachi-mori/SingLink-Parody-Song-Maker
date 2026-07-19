@@ -1089,14 +1089,27 @@ button:disabled {
   }
 
   .game-question-example {
-    font-size: clamp(42px, 4vw, 64px);
+    font-size: clamp(34px, 3.5vw, 60px);
     line-height: 1.12;
+    overflow-wrap: normal;
+    white-space: nowrap;
+  }
+
+  .choice-grid {
+    width: min(1320px, 94vw);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(12px, 2vw, 28px);
+  }
+
+  .choice-grid span {
+    font-size: clamp(22px, 2.7vw, 36px);
+    white-space: nowrap;
   }
 
   .result-layout {
     width: min(100%, 1760px);
     margin: 0 auto;
-    grid-template-columns: minmax(260px, 0.38fr) minmax(0, 1fr);
+    grid-template-columns: minmax(320px, 0.58fr) minmax(0, 1fr);
     gap: clamp(14px, 2vw, 34px);
     align-items: center;
     padding: clamp(24px, 3vw, 48px) clamp(20px, 2vw, 40px);
@@ -1114,11 +1127,11 @@ button:disabled {
 
   .result-card {
     grid-column: 2;
-    justify-self: stretch;
+    justify-self: end;
     display: grid;
     grid-template-rows: auto auto auto minmax(0, 1fr) auto auto;
-    width: 100%;
-    max-width: 1120px;
+    width: min(980px, 57vw);
+    max-width: 100%;
     height: calc(100svh - 80px);
     padding: clamp(22px, 2.4vw, 38px);
     overflow: hidden;
@@ -1130,7 +1143,7 @@ button:disabled {
   }
 
   .result-card h1 {
-    font-size: clamp(30px, 3vw, 50px);
+    font-size: clamp(28px, 2vw, 38px);
   }
 
   .karaoke-line {
@@ -1154,7 +1167,7 @@ button:disabled {
   }
 
   .karaoke-line--active .karaoke-japanese {
-    font-size: clamp(30px, 2.8vw, 44px);
+    font-size: clamp(30px, 2.4vw, 40px);
   }
 
   .karaoke-english {
