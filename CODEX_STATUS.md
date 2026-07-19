@@ -4,75 +4,61 @@
 
 ## 現在の状態
 
-OpenAI Build Week提出ドキュメント一式の作成、検証、独立レビューを完了し、日本語コミットで保存済み。
+OpenAI Build Week版を既存main版と共存させるGitHub Pages統合workflowを実装し、ローカル再現とブラウザ確認を完了した。
 
 - ブランチ: `codex/build-week-submission-docs`
-- 作業開始HEAD: `2ae471f 英語案内と歌詞状態表示を整理`
-- 提出資料コミット: `b36a6c2 OpenAI Build Week提出資料を整備`
-- 出典表現の追補コミット: `d74ab4a 教材の出典表現を明確化`
-- 基準: 作業開始時の最新 `origin/openai-build-week` と一致
-- 公式期間比較: `c1aab5f` の次のコミットから現行HEADまで
-- 最終体験差分の中間比較点: `f7da284`
-- コード、教材JSON、Score、伴奏、UIアセット、依存関係: 変更なし
-- 未追跡の `local-only/`: `.gitignore` 対象。変更なし
-- push / Pull Request / デプロイ / Devpostプロジェクト作成・提出: 未実施
+- 作業開始HEAD: `bc13839 提出資料の完了状態を記録`
+- 作業開始時の `origin/openai-build-week`: `bc13839` と一致
+- 作業ツリー: 開始時クリーン
+- README、審査ガイド、Web画面機能、教材、依存関係: 変更なし
+- push / Pull Request / 実デプロイ: 未実施
 
-## 完成した提出資料
+## 確認済み
 
-- 英語提出README: `README.md`
-- 日本語README: `README.ja.md`
-- 開発者・審査環境向けWeb手順: `web/README.md`
-- 審査員向け5分実行手順: `docs/judge-testing-guide.md`
-- Build Week前後の開発記録: `docs/build-week-development.md`
-- 第三者ソフトウェア・素材一覧: `THIRD_PARTY_NOTICES.md`
-- ファイル単位の素材台帳: `docs/asset-inventory.md`
-- 提出者本人の最終チェックリスト: `docs/submission-owner-checklist.md`
-- 提出用画面証跡4枚: `docs/images/build-week/`
+- 現行 `.github/workflows/pages.yml` はmainへのpushで `web/dist/client` だけをPagesへデプロイする。
+- 現在の公開URLは `https://hachi-mori.github.io/SingLink-Parody-Song-Maker/`。
+- GitHub Pagesはリポジトリ単位の単一サイトであり、別ブランチ版は同一artifactのサブパスへ統合する必要がある。
+- `web/client/vite.config.ts` は `base: './'`。
+- アプリの資産URLと静的API経路は `import.meta.env.BASE_URL` を使うため、サブパス配信に対応できる構造である。
+- GitHub公式ドキュメントでは、custom workflowでPages artifactをアップロードし、`pages: write` と `id-token: write` を持つdeploy jobから公開する。
+- mainの `copy-assets.mjs` はVite生成物を保持するが、Build Week版は公開許可リスト化時に `dist/client/assets` 全体を削除する実装となり、生成済みJS/CSSが消えることを成果物参照検査で再現した。
 
-既存の実装記録と権利監査も現行仕様へ整合させ、`BACKLOG.md` と `BLOCKERS.md` に提出者判断待ちを記録した。
+## 実装内容
+
+1. workflowをmainとopenai-build-weekのpush、および手動実行で起動する。
+2. 両refを別ディレクトリへcheckoutし、それぞれで `npm ci`、`npm test`、`npm run build` を実行する。
+3. main成果物をルート、Build Week成果物を `openai-build-week/` へ配置し、統合artifactを1回だけPagesへデプロイする。
+4. ActionsのSummaryへmain版とBuild Week版のURLを表示する。
+5. `copy-assets.mjs` は管理対象の静的素材ディレクトリだけを掃除し、Viteが生成したJS、CSS、フォントを保持する。
+
+想定公開URL:
+
+- main: `https://hachi-mori.github.io/SingLink-Parody-Song-Maker/`
+- OpenAI Build Week: `https://hachi-mori.github.io/SingLink-Parody-Song-Maker/openai-build-week/`
 
 ## 検証結果
 
-2026-07-19に次を実行した。
+2026-07-19に次を確認した。
 
-- `npm.cmd run test`: 7ファイル、33件成功
-- `npm.cmd run typecheck`: 成功
-- `npm.cmd run build`: 成功（Vite 8.0.16、1594 modules transformed）
-- `npm.cmd run audit:english-subtitles`: 335/335件。人手ニュアンス確認候補13件
-- Markdownローカルリンク検査: 19文書、欠落0件
+- `origin/main` (`c1aab5f`) の隔離ビルド: 2ファイル、9テスト成功、型検査・ビルド成功
+- `origin/openai-build-week` (`bc13839`) の隔離テスト: 7ファイル、33テスト成功
+- 修正後の作業ブランチ: `npm.cmd run test` 33件成功、`npm.cmd run typecheck` 成功、`npm.cmd run build` 成功
+- `npm.cmd run audit:english-subtitles`: 335/335件、人手確認候補13件
+- 統合成果物: ルート版と `openai-build-week/` 版の `index.html`、JS、CSS参照がすべて存在
+- 両版のJS bundleは別hashであり、mainとBuild Weekの内容を混同していない
+- ローカル静的サーバー: `/` と `/openai-build-week/` がHTTP 200
+- 実ブラウザ: ルートは日本語main画面、サブパスは英語Build Week画面を表示
+- Build Week版の画像、JS、CSS URLはすべてサブパス内の相対URLとして解決
+- ブラウザwarning/error: 0件
+- workflow構成検査: checkout 2回、test 2回、build 2回、Pages actionと両branch指定を確認
 - `git diff --check`: 成功
 - C++ / Siv3Dビルド: リポジトリ指示により未実施
+- 差分レビュー: 重大・中程度の指摘なし
 
-## 実ブラウザ確認
+## 注意点
 
-Windows、1280×720、ローカルVOICEVOX 0.25.1で、次を確認した。
-
-- 英語初期タイトル、5曲選択、VOICEVOX接続成功
-- 英語 `How to play` の4ステップ
-- ランダム4問を `1/4` から `4/4` まで完走
-- 4つの正解例文の歌声生成と結果表示
-- 日本語歌詞4行、英訳例文、英語意味、誤答時 `Not quite`
-- 再生、一時停止、再開と歌詞進行
-- 英語から日本語、日本語から英語への表示切替
-- ブラウザのwarning/errorログ0件
-
-証跡は `title-en.png`、`how-to-en.png`、`quiz-en.png`、`result-en.png` として保存した。既存記録にある820×1180、390×844のレスポンシブ確認結果も開発記録へ統合した。
-
-## レビュー結果
-
-- GPT-5.6 Terraによる実装事実監査: 現行コードとGit時系列を確認
-- GPT-5.6 Terraによる権利監査: 205 npm packagesと公開素材を台帳化
-- GPT-5.6 Terraによる最終読み取り専用レビュー: 重大指摘0件
-- 中程度5件を修正: 画面キャプチャの台帳追加、状態記録更新、計画範囲更新、公式Devpostリンク追加、335教材の出典表現限定
-- 軽微3件を修正: 曲名一致、未使用Story素材の説明、README内タイトル画像重複
-
-## 提出者本人の判断・作業が必要な項目
-
-- リポジトリ全体へ適用するコードライセンス
-- 画像・GIF・フォント・伴奏・Scoreの出典または許諾証拠
-- `VOICEVOX:ずんだもん` をアプリ、README、動画または説明へ適切に表示する最終確認
-- コア機能を実装したCodexタスクで `/feedback` を実行し、正式Session IDを取得
-- 3分未満の公開または限定公開YouTube動画と音声説明
-- Devpost本文、動画URL、リポジトリ公開範囲、審査アクセスの本人最終確認
-
-詳細は `BLOCKERS.md` と `docs/submission-owner-checklist.md` を参照する。
+- 恒久運用には同じworkflowをmainにも反映する必要がある。
+- Build Week側だけで先にデプロイ確認はできるが、その後mainの旧workflowが動くとサブパス版が消える。
+- ユーザー確認前はREADMEと審査ガイドを変更しない。
+- GitHub Pages単体ではローカルVOICEVOX歌唱を保証しない。
+- 検証用一時成果物は実行ポリシーにより自動削除できず、`C:\Users\yaega\AppData\Local\Temp\singlink-pages-verify-f98678c2d16649329b4fd353fce4d5c8` に残っている。作業tree登録とローカルサーバーは削除・停止済み。

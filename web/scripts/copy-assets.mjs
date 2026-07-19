@@ -22,8 +22,11 @@ const publicAssets = [
   'inst/幸せなら手をたたこう.wav',
   'inst/雪.wav'
 ];
+const managedAssetRoots = ['texture', 'dict', 'score', 'inst'];
 
-await rm(destinationRoot, { recursive: true, force: true });
+for (const directoryName of managedAssetRoots) {
+  await rm(resolve(destinationRoot, directoryName), { recursive: true, force: true });
+}
 for (const relativePath of publicAssets) {
   const source = resolve(assetsRoot, relativePath);
   const destination = resolve(destinationRoot, relativePath);
