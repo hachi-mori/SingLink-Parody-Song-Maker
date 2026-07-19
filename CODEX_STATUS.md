@@ -4,10 +4,12 @@
 
 ## 現在の状態
 
-OpenAI Build Week提出ドキュメント一式の作成、検証、独立レビューを完了し、日本語コミットで保存する段階。
+OpenAI Build Week提出ドキュメント一式の作成、検証、独立レビューを完了し、日本語コミットで保存済み。
 
 - ブランチ: `codex/build-week-submission-docs`
 - 作業開始HEAD: `2ae471f 英語案内と歌詞状態表示を整理`
+- 提出資料コミット: `b36a6c2 OpenAI Build Week提出資料を整備`
+- 出典表現の追補コミット: `d74ab4a 教材の出典表現を明確化`
 - 基準: 作業開始時の最新 `origin/openai-build-week` と一致
 - 公式期間比較: `c1aab5f` の次のコミットから現行HEADまで
 - 最終体験差分の中間比較点: `f7da284`
