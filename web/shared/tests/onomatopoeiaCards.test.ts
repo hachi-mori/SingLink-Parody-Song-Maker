@@ -23,7 +23,31 @@ const expectedWords = [
   'ぐちゃぐちゃ', 'くっきり', 'ぐつぐつ', 'ぐっすり', 'ぐったり', 'ぐっと', 'くよくよ', 'ぐらぐら', 'くりくり', 'くるくる',
   'ぐるぐる', 'くるり', 'ぐんぐん', 'ぐんと', 'げっそり', 'げらげら', 'けろっと', 'げんなり', 'ごくごく', 'ごしごし',
   'こそこそ', 'ごそごそ', 'ごたごた', 'ごちゃごちゃ', 'こつこつ', 'ごつごつ', 'こっそり', 'ごっちゃ', 'こってり', 'ことこと',
-  'ころころ', 'ごろごろ', 'ごわごわ', 'こんがり', 'こんこん', 'こんもり', 'さくさく', 'ざっくばらん', 'ざっくり', 'さっさと'
+  'ころころ', 'ごろごろ', 'ごわごわ', 'こんがり', 'こんこん', 'こんもり', 'さくさく', 'ざっくばらん', 'ざっくり', 'さっさと',
+  'さっと', 'ざっと', 'さっぱり', 'さらさら', 'ざらざら', 'ざわざわ', 'しくしく', 'しげしげ', 'しっかり', 'しっくり',
+  'じっくり', 'じっと', 'しっとり', 'しとしと', 'しばしば', 'じめじめ', 'しゃきしゃき', 'しゃっくり', 'しゃぶしゃぶ', 'じゃらじゃら',
+  'しょぼしょぼ', 'しょぼん', 'しょんぼり', 'じりじり', 'じろじろ', 'しわしわ', 'じわじわ', 'しんと', 'じんと', 'しんなり',
+  'しんみり', 'すかすか', 'すかっと', 'ずきずき', 'すくすく', 'ずけずけ', 'すごすご', 'すたすた', 'すっかり', 'すっきり',
+  'すっと', 'ずっと', 'すっぱり', 'すっぽり', 'ずばずば', 'ずばり', 'すやすや', 'ずらっと', 'すらり', 'ずらり',
+  'すらりと', 'ずらりと', 'ずるずる', 'すれすれ', 'ずんぐり', 'ずんずん', 'すんなり', 'せっせと', 'そっくり', 'そっと',
+  'ぞっと', 'そろそろ', 'たっぷり', 'たらたら', 'だらだら', 'だんだん', 'ちかちか', 'ちくちく', 'ちくり', 'ちびちび',
+  'ちやほや', 'ちゃんと', 'ちょいちょい', 'ちょくちょく', 'ちょこちょこ', 'ちょっと', 'ちょっぴり', 'ちょろちょろ', 'ちらちら', 'ちらっと',
+  'ちらほら', 'ちらり', 'ちりちり', 'ちんぷんかんぷん', 'つくづく', 'つやつや', 'つるつる', 'つんと', 'でかでか', 'てきぱき',
+  'てっきり', 'でんと', 'どうどう', 'どきどき', 'どぎまぎ', 'とことん', 'どさくさ', 'どしどし', 'どたばた', 'どっさり',
+  'どっと', 'とっとと', 'どっぷり', 'とぼとぼ', 'とろとろ', 'どろどろ', 'とんと', 'とんとん', 'どんどん', 'どんより',
+  'なみなみ', 'にこにこ', 'にこり', 'にっこり', 'にやにや', 'にやり', 'ぬくぬく', 'ぬるぬる', 'ねばねば', 'のうのう',
+  'のそのそ', 'のびのび', 'のろのろ', 'のんびり', 'ぱくぱく', 'ぱくり', 'ばさばさ', 'ぱさぱさ', 'ばたばた', 'ぱたぱた',
+  'ぱちくり', 'ぱちぱち', 'はっきり', 'ばっさり', 'ぱったり', 'ばっちり', 'はっと', 'ぱっと', 'はらはら', 'ばらばら',
+  'ぱらぱら', 'ぱりっと', 'ばりばり', 'ぱりぱり', 'ばんばん', 'ぱんぱん', 'ぴかぴか', 'びくびく', 'ぴくぴく', 'びしょびしょ',
+  'ぴたっと', 'ひたひた', 'ぴちぴち', 'びちゃびちゃ', 'びっくり', 'びっしょり', 'びっしり', 'ひっそり', 'ぴったり', 'ひょいと',
+  'ひょっこり', 'ひょっと', 'ひらひら', 'ふうふう', 'ふかふか', 'ぶくぶく', 'ふさふさ', 'ふっくら', 'ふっと', 'ぶつぶつ',
+  'ふと', 'ふらっと', 'ふらふら', 'ぶらぶら', 'ぶらりと', 'ぷりぷり', 'ぶるぶる', 'ふわふわ', 'ふわり', 'ぶんぶん',
+  'ぷんぷん', 'ふんわり', 'ぺこぺこ', 'べたべた', 'ぺたぺた', 'べったり', 'ぺったり', 'へとへと', 'べとべと', 'べらべら',
+  'ぺらぺら', 'ぼうっと', 'ぽうっと', 'ぽかぽか', 'ほくほく', 'ぼこぼこ', 'ぼさぼさ', 'ぽたり', 'ぼちぼち', 'ぽっかり',
+  'ほっそり', 'ぽっちゃり', 'ほっと', 'ぽつぽつ', 'ほとほと', 'ほのぼの', 'ぼやぼや', 'ぼろぼろ', 'ぽろぽろ', 'ほんのり',
+  'ぽんぽん', 'ぼんやり', 'まちまち', 'むかむか', 'むしゃくしゃ', 'むっつり', 'めちゃ', 'めちゃくちゃ', 'めちゃめちゃ', 'もくもく',
+  'もたもた', 'もりもり', 'もろもろ', 'やきもき', 'やんわり', 'ゆっくり', 'ゆったり', 'よたよた', 'よちよち', 'よぼよぼ',
+  'よれよれ', 'よろよろ', 'わいわい', 'わくわく', 'わんわん'
 ] as const;
 
 function getRecord(value: unknown): Record<string, unknown> {
@@ -43,22 +67,23 @@ function containsInOrder(text: string, expected: string): boolean {
   return expectedIndex === expected.length;
 }
 
-describe('100語のオノマトペカード', () => {
-  it('許可済みCSVの第3列先頭100件を順番どおり使い、自作教材の必須項目をそろえる', () => {
+describe('335語のオノマトペカード', () => {
+  it('許可済みCSVの第3列全335件を順番どおり使い、自作教材の必須項目をそろえる', () => {
     const cardsRoot = getRecord(cardsJson);
     const readingsRoot = getRecord(readingsJson);
     const records = cardsRoot.records;
     const readings = getRecord(readingsRoot.readings);
 
-    expect(cardsRoot.record_count).toBe(100);
+    expect(cardsRoot.record_count).toBe(335);
     expect(cardsRoot.provenance).toMatchObject({
       vocabulary: 'ユーザー提供CSVの第3列のみ',
-      selection: '先頭100件を元の順番で採用',
+      selection: '全335件を元の順番で採用',
       normalization: 'カタカナをひらがなへ機械変換'
     });
-    expect(readingsRoot.record_count).toBe(100);
+    expect(readingsRoot.record_count).toBe(335);
+    expect(readingsRoot.provenance).toBe('cards_text_data.json の提出用自作335例文から新規作成した歌唱用ひらがな読み');
     expect(Array.isArray(records)).toBe(true);
-    expect(records).toHaveLength(100);
+    expect(records).toHaveLength(335);
 
     const words = (records as unknown[]).map((rawRecord, index) => {
       const record = getRecord(rawRecord);
@@ -78,7 +103,7 @@ describe('100語のオノマトペカード', () => {
     });
 
     expect(words).toEqual(expectedWords);
-    expect(new Set(words).size).toBe(100);
+    expect(new Set(words).size).toBe(335);
     expect(Object.keys(readings)).toEqual(expectedWords);
     for (const word of expectedWords) {
       expect(readings[word]).toEqual(expect.stringMatching(/^[ぁ-ゖー]+$/u));
@@ -86,9 +111,9 @@ describe('100語のオノマトペカード', () => {
     }
   });
 
-  it('100語すべてに問題文・表示文・歌唱用読みを用意する', () => {
-    expect(entries).toHaveLength(100);
-    expect(new Set(entries.map((entry) => entry.word)).size).toBe(100);
+  it('335語すべてに問題文・表示文・歌唱用読みを用意する', () => {
+    expect(entries).toHaveLength(335);
+    expect(new Set(entries.map((entry) => entry.word)).size).toBe(335);
 
     for (const entry of entries) {
       expect(entry.questionText, entry.word).toContain('○○');
@@ -99,7 +124,7 @@ describe('100語のオノマトペカード', () => {
     }
   });
 
-  it('全100例文を5曲それぞれで1例文1フレーズへ割り当てる', () => {
+  it('全335例文を5曲それぞれで1例文1フレーズへ割り当てる', () => {
     for (const sourceSong of memorizationSourceSongs) {
       const baseScore = readJson(path.join('assets/score', sourceSong.scoreFileName)) as MemorizationScoreJson;
       for (const entry of entries) {
@@ -124,6 +149,18 @@ describe('100語のオノマトペカード', () => {
     expect(selected).toBeDefined();
     const tasks = buildOnomatopoeiaTasks(selected!, selected!.answer, true);
 
+    expect(buildOnomatopoeiaLyricsRows(tasks)).toEqual([
+      [selected!.answer, selected!.singingReading]
+    ]);
+  });
+
+  it('8モーラのちんぷんかんぷんは回答プレースホルダーも8モーラへ広げて歌唱に渡す', () => {
+    const selected = entries.find((entry) => entry.word === 'ちんぷんかんぷん');
+    expect(selected).toBeDefined();
+    const tasks = buildOnomatopoeiaTasks(selected!, selected!.answer, true);
+
+    expect(tasks[1]?.syllables).toHaveLength(8);
+    expect(tasks[1]?.userSyllables).toEqual(['ち', 'ん', 'ぷ', 'ん', 'か', 'ん', 'ぷ', 'ん']);
     expect(buildOnomatopoeiaLyricsRows(tasks)).toEqual([
       [selected!.answer, selected!.singingReading]
     ]);

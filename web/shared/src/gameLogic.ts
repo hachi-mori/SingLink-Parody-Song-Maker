@@ -160,7 +160,10 @@ export function buildOnomatopoeiaTasks(problem: OnomatopoeiaEntry, answer: strin
     },
     {
       phrase: problem.answer,
-      syllables: makePlaceholderSyllables('ル', 6),
+      syllables: makePlaceholderSyllables(
+        'ル',
+        Math.max(6, splitOnomatopoeiaMoras(replaceChoonWithVowel(problem.answer)).length)
+      ),
       userInput: answer,
       userSyllables: splitOnomatopoeiaMoras(replaceChoonWithVowel(problem.answer)),
       restPadding: true,

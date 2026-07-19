@@ -1,4 +1,3 @@
-import { replaceChoonWithVowel, splitOnomatopoeiaMoras } from './kana';
 import type { JsonObject, OnomatopoeiaEntry } from './types';
 
 function isRecord(value: unknown): value is JsonObject {
@@ -37,10 +36,9 @@ export function parseOnomatopoeiaCardEntries(cardsJson: unknown, singingReadings
     const answer = getString(record.onomatopoeia);
     const usageText = getTextItems(record.usages).find((text) => text.includes(answer)) ?? '';
     const explanation = getTextItems(record.meanings).join(' / ');
-    const answerMoraCount = splitOnomatopoeiaMoras(replaceChoonWithVowel(answer)).length;
     const singingReading = getString(singingReadings?.[answer]);
 
-    if (!answer || !usageText || answerMoraCount > 6) {
+    if (!answer || !usageText) {
       return [];
     }
 
