@@ -6,6 +6,7 @@ import {
   findVerbEntries,
   makeQuestionDisplayText,
   makeTimedOutTask,
+  onomatopoeiaQuestionsPerGame,
   parseQuestionVerbGroup,
   validateAndBuildSolvedTask
 } from '@shared/gameLogic';
@@ -26,7 +27,6 @@ type WriteLyricsScreenProps = {
 const timeLimit = 60;
 const countdownSeconds = 3;
 const onomatopoeiaTimeoutAnswer = 'ら'.repeat(6);
-const onomatopoeiaQuestionsPerGame = 3;
 
 function useTick(active: boolean) {
   const [, setTick] = useState(0);

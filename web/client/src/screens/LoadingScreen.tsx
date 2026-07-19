@@ -61,7 +61,7 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
           solvedTasks: tasks,
           fullLyrics,
           voicevoxBaseUrl
-        }, song), buildSongKaraokeTimings(song, tasks)]);
+        }, song), buildSongKaraokeTimings(song, tasks, fullLyrics)]);
 
         if (cancelled || doneRef.current) {
           return;

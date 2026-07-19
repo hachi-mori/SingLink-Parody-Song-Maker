@@ -6,7 +6,11 @@ import {
 } from '@shared/memorizationScore';
 import type { KaraokeLineTiming, SolvedTask, SongDetail } from '@shared/types';
 
-export async function buildSongKaraokeTimings(song: SongDetail, tasks: SolvedTask[]): Promise<KaraokeLineTiming[]> {
+export async function buildSongKaraokeTimings(
+  song: SongDetail,
+  tasks: SolvedTask[],
+  fullLyrics: string
+): Promise<KaraokeLineTiming[]> {
   if (song.mode !== 'onomatopoeiaQuiz') return [];
   const scoreUrl = song.sourceSong?.scoreUrl ?? song.baseScoreUrl;
   if (!scoreUrl) return [];
@@ -17,5 +21,6 @@ export async function buildSongKaraokeTimings(song: SongDetail, tasks: SolvedTas
     buildOnomatopoeiaLyricsRows(tasks),
     JSON.parse(text) as MemorizationScoreJson
   );
-  return buildKaraokeLineTimings(generated.score, generated.phraseRanges);
+  const displayLines = fullLyrics.replace(/[{}]/g, '').split('\n').filter(Boolean);
+  return buildKaraokeLineTimings(generated.score, generated.phraseRanges, undefined, displayLines);
 }

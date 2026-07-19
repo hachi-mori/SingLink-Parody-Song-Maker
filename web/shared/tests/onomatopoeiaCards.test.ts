@@ -164,9 +164,9 @@ describe('335語のオノマトペカード', () => {
     for (const sourceSong of memorizationSourceSongs) {
       const baseScore = readJson(path.join('assets/score', sourceSong.scoreFileName)) as MemorizationScoreJson;
       for (const entry of entries) {
-        const rows = Array.from({ length: 3 }, () => [entry.displayText ?? '', entry.singingReading ?? ''] as const);
+        const rows = Array.from({ length: 4 }, () => [entry.displayText ?? '', entry.singingReading ?? ''] as const);
         const result = createMemorizationScore(rows, baseScore);
-        expect(result.phraseRanges, `${sourceSong.title}: ${entry.word}`).toHaveLength(3);
+        expect(result.phraseRanges, `${sourceSong.title}: ${entry.word}`).toHaveLength(4);
         expect(result.phraseRanges.at(-1)?.[1], `${sourceSong.title}: ${entry.word}`)
           .toBe(result.score.notes.length);
         expect(result.phraseRanges.every(([start, end]) => end > start), `${sourceSong.title}: ${entry.word}`)

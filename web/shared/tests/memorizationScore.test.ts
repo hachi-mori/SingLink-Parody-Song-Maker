@@ -6,11 +6,16 @@ import {
   buildMemorizationSynthesisPlan,
   buildKaraokeLineTimings,
   createMemorizationScore,
+  getKaraokeLineProgress,
   type MemorizationScoreJson
 } from '../src/memorizationScore';
 import { memorizationSourceSongs } from '../src/memorizationSongs';
 import { parseOnomatopoeiaCardEntries } from '../src/onomatopoeiaCards';
-import { buildOnomatopoeiaTasks, buildOnomatopoeiaResultLyrics } from '../src/gameLogic';
+import {
+  buildOnomatopoeiaTasks,
+  buildOnomatopoeiaResultLyrics,
+  onomatopoeiaQuestionsPerGame
+} from '../src/gameLogic';
 
 function loadJson(fileName: string): unknown {
   const text = fs.readFileSync(path.resolve(fileName), 'utf8').replace(/^\uFEFF/, '');
@@ -28,7 +33,7 @@ function loadBaseScore(): MemorizationScoreJson {
 const originalEntries = parseOnomatopoeiaCardEntries(
   loadJson('assets/dict/cards_text_data.json'),
   loadJson('assets/dict/cards_singing_readings.json')
-).slice(0, 3);
+).slice(0, 4);
 
 function rowsFromOriginalEntries(): Array<[string, string]> {
   return originalEntries.map((entry) => [entry.displayText ?? '', entry.singingReading ?? '']);
@@ -69,15 +74,19 @@ function expandKeys(score: MemorizationScoreJson): Array<number | null> {
 }
 
 describe('memorization score', () => {
-  it('自作教材の3文を5曲すべてで3フレーズへ割り当てる', () => {
-    expect(originalEntries).toHaveLength(3);
+  it('オノマトペクイズを1プレイ4問にする', () => {
+    expect(onomatopoeiaQuestionsPerGame).toBe(4);
+  });
+
+  it('自作教材の4文を5曲すべてで4フレーズへ割り当てる', () => {
+    expect(originalEntries).toHaveLength(4);
     const rows = rowsFromOriginalEntries();
 
     for (const sourceSong of memorizationSourceSongs) {
       const base = loadScore(sourceSong.scoreFileName);
       const result = createMemorizationScore(rows, base);
       const totalFrames = result.score.notes.reduce((sum, note) => sum + note.frame_length, 0);
-      expect(result.phraseRanges, sourceSong.title).toHaveLength(3);
+      expect(result.phraseRanges, sourceSong.title).toHaveLength(4);
       expect(result.phraseRanges.at(-1)?.[1], sourceSong.title).toBe(result.score.notes.length);
       expect(result.phraseRanges.every(([start, end]) => end > start), sourceSong.title).toBe(true);
       expect(result.score.notes.at(-1)?.lyric, sourceSong.title).toMatch(/^[ぁ-ゖー]+$/u);
@@ -90,7 +99,7 @@ describe('memorization score', () => {
     const result = generate();
 
     expect(result.score.notes.length).toBeGreaterThan(0);
-    expect(result.phraseRanges).toHaveLength(3);
+    expect(result.phraseRanges).toHaveLength(4);
     expect(result.phraseRanges.at(-1)?.[1]).toBe(result.score.notes.length);
     expect(rowsFromOriginalEntries().map((row) => row[1])).toEqual(
       originalEntries.map((entry) => entry.singingReading)
@@ -123,15 +132,15 @@ describe('memorization score', () => {
 
   it('正誤順から各フレーズの話者を選び歌詞は変更しない', () => {
     const { score, phraseRanges } = generate();
-    const plan = buildMemorizationSynthesisPlan(score, phraseRanges, [true, false, true]);
+    const plan = buildMemorizationSynthesisPlan(score, phraseRanges, [true, false, true, false]);
 
-    expect(plan.map((segment) => segment.speakerId)).toEqual([3003, 3076, 3003]);
-    expect(plan.map((segment) => segment.leadingPaddingFrames)).toEqual([0, 2, 2]);
+    expect(plan.map((segment) => segment.speakerId)).toEqual([3003, 3076, 3003, 3076]);
+    expect(plan.map((segment) => segment.leadingPaddingFrames)).toEqual([0, 2, 2, 2]);
     expect(plan.map((segment) => segment.score.notes.slice(segment.leadingPaddingFrames > 0 ? 1 : 0))).toEqual(
       phraseRanges.map(([start, end]) => score.notes.slice(start, end))
     );
     expect(plan.slice(1).map((segment) => segment.score.notes[0]))
-      .toEqual(Array(2).fill({ frame_length: 2, key: null, lyric: '', notelen: 'R' }));
+      .toEqual(Array(3).fill({ frame_length: 2, key: null, lyric: '', notelen: 'R' }));
     expect(plan.map((segment) => segment.score.notes.reduce((sum, note) => sum + note.frame_length, 0)
       - segment.leadingPaddingFrames))
       .toEqual(phraseRanges.map(([start, end]) => score.notes.slice(start, end)
@@ -141,25 +150,45 @@ describe('memorization score', () => {
       .toEqual(score.notes.map((note) => note.lyric));
   });
 
-  it('5曲のphraseRangesから93.75fpsのカラオケ時刻を導出する', () => {
-    const expectedEndSeconds: Record<string, number[]> = {
-      'ちょうちょ': [4.032, 8.043, 12.053],
-      'むすんでひらいて': [4.011, 7.989, 11.979],
-      '大きな古時計': [3.989, 7.968, 11.936],
-      '幸せなら手をたたこう': [4.032, 8.032, 12.043],
-      '雪': [2.027, 4.032, 8.011]
-    };
+  it('5曲の4フレーズについて各音符のframe_lengthから93.75fpsのカラオケ時刻を導出する', () => {
     for (const sourceSong of memorizationSourceSongs) {
       const result = createMemorizationScore(rowsFromOriginalEntries(), loadScore(sourceSong.scoreFileName));
       const timings = buildKaraokeLineTimings(result.score, result.phraseRanges);
-      expect(timings, sourceSong.title).toHaveLength(3);
+      expect(timings, sourceSong.title).toHaveLength(4);
       expect(timings[0]?.startSeconds, sourceSong.title).toBe(0);
       timings.forEach((timing, index) => {
+        const expectedFrames = result.phraseRanges.slice(0, index + 1).reduce(
+          (total, [start, end]) => total + result.score.notes.slice(start, end)
+            .reduce((phraseTotal, note) => phraseTotal + Math.max(0, note.frame_length), 0),
+          0
+        );
         expect(timing.endSeconds, `${sourceSong.title} phrase ${index + 1}`)
-          .toBeCloseTo(expectedEndSeconds[sourceSong.title]?.[index] ?? 0, 3);
+          .toBeCloseTo(expectedFrames / 93.75, 8);
         if (index > 0) expect(timing.startSeconds).toBe(timings[index - 1]?.endSeconds);
+        const [start, end] = result.phraseRanges[index] ?? [0, 0];
+        const notes = result.score.notes.slice(start, end);
+        expect(timing.noteTimings, `${sourceSong.title} phrase ${index + 1} notes`).toHaveLength(notes.length);
+        timing.noteTimings.forEach((noteTiming, noteIndex) => {
+          expect(noteTiming.endSeconds - noteTiming.startSeconds)
+            .toBeCloseTo((notes[noteIndex]?.frame_length ?? 0) / 93.75, 8);
+        });
       });
     }
+  });
+
+  it('歌唱音符の間だけ着色を進め、休符中は位置を止める', () => {
+    const [timing] = buildKaraokeLineTimings({ notes: [
+      { frame_length: 94, key: 60, lyric: 'か', notelen: '4' },
+      { frame_length: 47, key: null, lyric: '', notelen: 'R' },
+      { frame_length: 188, key: 62, lyric: 'な', notelen: '2' }
+    ] }, [[0, 3]], 94, ['きゃく。']);
+
+    expect(timing).toBeDefined();
+    expect(timing?.noteTimings.map(({ startProgress, endProgress }) => [startProgress, endProgress]))
+      .toEqual([[0, 0.5], [0.5, 0.5], [0.5, 1]]);
+    expect(getKaraokeLineProgress(timing!, 0.5)).toBeCloseTo(0.25, 8);
+    expect(getKaraokeLineProgress(timing!, 1.25)).toBe(0.5);
+    expect(getKaraokeLineProgress(timing!, 2.5)).toBeCloseTo(0.75, 8);
   });
 
   it('自作教材の表示文と歌唱用読みを正誤に関係なく維持する', () => {

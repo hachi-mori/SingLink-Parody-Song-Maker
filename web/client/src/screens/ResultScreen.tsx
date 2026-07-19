@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Download, Pause, Play, RotateCcw } from 'lucide-react';
 import type { KaraokeLineTiming, SolvedTask, SongDetail } from '@shared/types';
+import { getKaraokeLineProgress } from '@shared/memorizationScore';
 import { AssetButton } from '../components/AssetButton';
 import { ScreenShell } from '../components/ScreenShell';
 import { downloadBlob } from '../lib/fileName';
@@ -31,11 +32,24 @@ function getLyricState(playbackState: PlaybackState, playbackTime: number, timin
 function getLineProgress(state: LyricState, playbackTime: number, timing?: KaraokeLineTiming): number {
   if (state === 'completed') return 1;
   if (state !== 'active' || !timing || timing.endSeconds <= timing.startSeconds) return 0;
-  return Math.min(1, Math.max(0, (playbackTime - timing.startSeconds) / (timing.endSeconds - timing.startSeconds)));
+  return getKaraokeLineProgress(timing, playbackTime);
+}
+
+function usePrefersReducedMotion(): boolean {
+  const [reduced, setReduced] = useState(() => typeof window !== 'undefined'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setReduced(media.matches);
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+  return reduced;
 }
 
 export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHistory }: ResultScreenProps) {
   const { t } = useLanguage();
+  const prefersReducedMotion = usePrefersReducedMotion();
   const audioContextRef = useRef<AudioContext | undefined>(undefined);
   const voiceBufferRef = useRef<AudioBuffer | undefined>(undefined);
   const instBufferRef = useRef<AudioBuffer | undefined>(undefined);
@@ -202,7 +216,9 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
 
   useEffect(() => () => {
     stopSources();
-    void audioContextRef.current?.close();
+    const context = audioContextRef.current;
+    audioContextRef.current = undefined;
+    if (context && context.state !== 'closed') void context.close().catch(() => undefined);
   }, [stopSources]);
 
   return (
@@ -223,6 +239,7 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
               const task = singingTasks[lineIndex];
               const state = getLyricState(playbackState, playbackTime, timing);
               const progress = getLineProgress(state, playbackTime, timing);
+              const characters = Array.from(line);
               return (
                 <article
                   className={`karaoke-line karaoke-line--${state}${task?.isCorrect === false ? ' karaoke-line--incorrect' : ''}`}
@@ -230,8 +247,29 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
                 >
                   <span className="karaoke-state-label">{state === 'active' ? `▶ ${t('currentLyric')}` : state === 'completed' ? `✓ ${t('completedLyric')}` : `○ ${t('pendingLyric')}`}</span>
                   <p className="karaoke-japanese" lang="ja">
-                    <span className="karaoke-japanese-base">{line}</span>
-                    <span className="karaoke-japanese-progress" aria-hidden="true" style={{ clipPath: `inset(0 ${100 - progress * 100}% 0 0)` }}>{line}</span>
+                    <span className="sr-only">{line}</span>
+                    <span className="karaoke-japanese-characters" aria-hidden="true">
+                      {characters.map((character, characterIndex) => {
+                        const characterStart = characterIndex / characters.length;
+                        const characterEnd = (characterIndex + 1) / characters.length;
+                        const characterProgress = Math.min(1, Math.max(
+                          0,
+                          (progress - characterStart) / (characterEnd - characterStart)
+                        ));
+                        const visibleCharacterProgress = prefersReducedMotion
+                          ? Number(characterProgress > 0)
+                          : characterProgress;
+                        return (
+                          <span className="karaoke-character" key={`${character}-${characterIndex}`}>
+                            <span className="karaoke-japanese-base">{character}</span>
+                            <span
+                              className="karaoke-japanese-progress"
+                              style={{ clipPath: `inset(0 ${100 - visibleCharacterProgress * 100}% 0 0)` }}
+                            >{character}</span>
+                          </span>
+                        );
+                      })}
+                    </span>
                   </p>
                   <p className="karaoke-english" lang="en">{task?.englishExample ?? t('translationUnavailable')}</p>
                   <p className="karaoke-meaning" lang="en">{task?.englishMeaning ?? t('translationUnavailable')}</p>

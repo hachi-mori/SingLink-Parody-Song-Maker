@@ -19,7 +19,7 @@
 ## 参照経路
 
 ```text
-cards_text_data.json ─┬─> parseOnomatopoeiaCardEntries ─> 3問ランダムクイズ
+cards_text_data.json ─┬─> parseOnomatopoeiaCardEntries ─> 4問ランダムクイズ
                       │                                  ├> 正解・意味表示
                       │                                  ├> 結果歌詞
 cards_singing_readings.json ┘                            └> 5曲のスコア生成・歌唱
@@ -36,7 +36,7 @@ cards_text_data.json ─> generate-onomatopoeia-readings.mjs ─> cards_singing_
 ## 既存構造として維持するもの
 
 - 335カード
-- 1プレイ3問のランダム抽出
+- 1プレイ4問のランダム抽出
 - クイズ、正解表示、結果歌詞、歌唱用読みの一貫したレコード参照
 - 5曲すべてに対する1例文1フレーズのスコア生成
 

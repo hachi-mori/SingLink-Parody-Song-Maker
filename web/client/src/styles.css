@@ -22,6 +22,18 @@
   box-sizing: border-box;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 html,
 body,
 #root {
@@ -244,6 +256,10 @@ button:disabled {
 .asset-button {
   position: relative;
   width: clamp(170px, 16vw, 250px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   background: transparent;
   padding: 0;
   transition: transform 0.16s ease, filter 0.16s ease;
@@ -354,10 +370,10 @@ button:disabled {
 }
 
 .asset-button-caption {
-  position: absolute;
-  inset: auto 8% 7%;
   display: block;
-  padding: 7px 10px;
+  width: max-content;
+  max-width: 100%;
+  padding: 7px 14px;
   border: 2px solid rgba(255, 255, 255, 0.82);
   border-radius: 999px;
   color: #fff;
@@ -692,7 +708,7 @@ button:disabled {
 }
 
 .karaoke-japanese {
-  display: grid;
+  display: block;
   width: fit-content;
   max-width: 100%;
   margin: 0;
@@ -706,8 +722,16 @@ button:disabled {
   font-size: clamp(30px, 3.6vw, 54px);
 }
 
-.karaoke-japanese-base,
-.karaoke-japanese-progress {
+.karaoke-japanese-characters {
+  display: inline;
+}
+
+.karaoke-character {
+  display: inline-grid;
+}
+
+.karaoke-character > .karaoke-japanese-base,
+.karaoke-character > .karaoke-japanese-progress {
   grid-area: 1 / 1;
 }
 
@@ -1166,7 +1190,4 @@ button:disabled {
     will-change: auto;
   }
 
-  .karaoke-line--active .karaoke-japanese-progress {
-    clip-path: inset(0 0 0 0) !important;
-  }
 }

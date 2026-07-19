@@ -1,4 +1,4 @@
-import type { SolvedTask } from './types';
+import type { KaraokeLineTiming, SolvedTask } from './types';
 import type { ScoreJson, ScoreNote } from './vvproj';
 
 const smallKana = 'ぁぃぅぇぉゃゅょァィゥェォャュョ';
@@ -347,15 +347,69 @@ export function buildMemorizationSynthesisPlan(
 export function buildKaraokeLineTimings(
   score: ScoreJson,
   phraseRanges: ReadonlyArray<PhraseRange>,
-  frameRate = voicevoxFrameRate
-): Array<{ startSeconds: number; endSeconds: number }> {
+  frameRate = voicevoxFrameRate,
+  displayLines: readonly string[] = []
+): KaraokeLineTiming[] {
   let elapsedFrames = 0;
-  return phraseRanges.map(([start, end]) => {
-    const phraseFrames = score.notes
-      .slice(start, end)
-      .reduce((total, note) => total + Math.max(0, note.frame_length), 0);
+  return phraseRanges.map(([start, end], lineIndex) => {
+    const phraseNotes = score.notes.slice(start, end);
+    const singingNoteCount = phraseNotes.filter(
+      (note) => note.key !== null && note.lyric.trim().length > 0
+    ).length;
+    const displayCharacters = Array.from(displayLines[lineIndex] ?? '');
+    const displayMoraStarts: number[] = [];
+    for (let characterIndex = 0; characterIndex < displayCharacters.length; characterIndex += 1) {
+      const character = displayCharacters[characterIndex] ?? '';
+      if (/^[。、！？・「」『』（）()\s]$/u.test(character)) continue;
+      if (smallKana.includes(character) && displayMoraStarts.length > 0) continue;
+      displayMoraStarts.push(characterIndex);
+    }
+    const progressAtSingingNoteBoundary = (completedNotes: number): number => {
+      if (singingNoteCount <= 0 || displayMoraStarts.length === 0 || displayCharacters.length === 0) {
+        return singingNoteCount > 0 ? completedNotes / singingNoteCount : 0;
+      }
+      if (completedNotes <= 0) return 0;
+      if (completedNotes >= singingNoteCount) return 1;
+      const moraPosition = completedNotes * displayMoraStarts.length / singingNoteCount;
+      const lowerMora = Math.floor(moraPosition);
+      const upperMora = Math.min(displayMoraStarts.length, lowerMora + 1);
+      const lowerProgress = lowerMora <= 0 ? 0 : (displayMoraStarts[lowerMora] ?? displayCharacters.length) / displayCharacters.length;
+      const upperProgress = upperMora >= displayMoraStarts.length
+        ? 1
+        : (displayMoraStarts[upperMora] ?? displayCharacters.length) / displayCharacters.length;
+      return lowerProgress + (upperProgress - lowerProgress) * (moraPosition - lowerMora);
+    };
     const startSeconds = elapsedFrames / frameRate;
-    elapsedFrames += phraseFrames;
-    return { startSeconds, endSeconds: elapsedFrames / frameRate };
+    let completedSingingNotes = 0;
+    const noteTimings = phraseNotes.map((note) => {
+      const noteStartSeconds = elapsedFrames / frameRate;
+      elapsedFrames += Math.max(0, note.frame_length);
+      const startProgress = progressAtSingingNoteBoundary(completedSingingNotes);
+      if (note.key !== null && note.lyric.trim().length > 0) completedSingingNotes += 1;
+      const endProgress = progressAtSingingNoteBoundary(completedSingingNotes);
+      return {
+        lyric: note.lyric,
+        startSeconds: noteStartSeconds,
+        endSeconds: elapsedFrames / frameRate,
+        startProgress,
+        endProgress
+      };
+    });
+    return { startSeconds, endSeconds: elapsedFrames / frameRate, noteTimings };
   });
+}
+
+export function getKaraokeLineProgress(timing: KaraokeLineTiming, playbackTime: number): number {
+  if (playbackTime <= timing.startSeconds) return 0;
+  if (playbackTime >= timing.endSeconds) return 1;
+  const note = timing.noteTimings.find((candidate) => playbackTime < candidate.endSeconds);
+  if (!note) return 1;
+  if (note.endProgress <= note.startProgress || note.endSeconds <= note.startSeconds) {
+    return note.startProgress;
+  }
+  const noteProgress = Math.min(1, Math.max(
+    0,
+    (playbackTime - note.startSeconds) / (note.endSeconds - note.startSeconds)
+  ));
+  return note.startProgress + (note.endProgress - note.startProgress) * noteProgress;
 }

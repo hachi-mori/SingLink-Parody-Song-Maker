@@ -49,9 +49,18 @@ export type OnomatopoeiaEntry = {
   translationReviewNote?: string;
 };
 
+export type KaraokeNoteTiming = {
+  lyric: string;
+  startSeconds: number;
+  endSeconds: number;
+  startProgress: number;
+  endProgress: number;
+};
+
 export type KaraokeLineTiming = {
   startSeconds: number;
   endSeconds: number;
+  noteTimings: KaraokeNoteTiming[];
 };
 
 export type SongMode = 'freeText' | 'verbQuiz' | 'onomatopoeiaQuiz';

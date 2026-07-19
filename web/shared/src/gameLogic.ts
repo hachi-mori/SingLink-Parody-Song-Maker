@@ -13,6 +13,8 @@ export type SubmitAnswerResult =
   | { ok: true; task: SolvedTask }
   | { ok: false; message: string };
 
+export const onomatopoeiaQuestionsPerGame = 4;
+
 export function makeQuestionDisplayText(index: number, questionText: string): string {
   const circledNumbers = [
     '①',
