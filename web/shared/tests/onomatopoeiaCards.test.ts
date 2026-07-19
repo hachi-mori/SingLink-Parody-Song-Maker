@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { buildOnomatopoeiaTasks } from '../src/gameLogic';
 import { buildOnomatopoeiaLyricsRows, createMemorizationScore, type MemorizationScoreJson } from '../src/memorizationScore';
 import { memorizationSourceSongs } from '../src/memorizationSongs';
-import { parseOnomatopoeiaCardEntries } from '../src/onomatopoeiaCards';
+import { attachEnglishCardData, parseEnglishCardRecords, parseOnomatopoeiaCardEntries } from '../src/onomatopoeiaCards';
 
 function readJson(filePath: string): unknown {
   return JSON.parse(fs.readFileSync(path.resolve(filePath), 'utf8').replace(/^\uFEFF/, '')) as unknown;
@@ -12,7 +12,8 @@ function readJson(filePath: string): unknown {
 
 const cardsJson = readJson('assets/dict/cards_text_data.json');
 const readingsJson = readJson('assets/dict/cards_singing_readings.json');
-const entries = parseOnomatopoeiaCardEntries(cardsJson, readingsJson);
+const englishJson = readJson('assets/dict/cards_english_data.json');
+const entries = attachEnglishCardData(parseOnomatopoeiaCardEntries(cardsJson, readingsJson), englishJson);
 const expectedWords = [
   'あたふた', 'あっさり', 'あやふや', 'いそいそ', 'いらいら', 'うきうき', 'うじゃうじゃ', 'うだうだ', 'うっかり', 'うっすら',
   'うっとり', 'うつらうつら', 'うとうと', 'うろうろ', 'うんざり', 'うんと', 'おいおい', 'おずおず', 'おそるおそる', 'おっとり',
@@ -121,7 +122,42 @@ describe('335語のオノマトペカード', () => {
       expect(entry.displayText, entry.word).toContain(entry.answer);
       expect(entry.singingReading, entry.word).toMatch(/^[ぁ-ゖー]+$/u);
       expect(entry.explanation.length, entry.word).toBeGreaterThan(0);
+      expect(entry.englishMeaning, entry.word).toEqual(expect.any(String));
+      expect(entry.englishExample, entry.word).toEqual(expect.any(String));
     }
+  });
+
+  it('英語字幕335件が重複・空欄・日本語例文との対応ずれなくそろう', () => {
+    const englishRoot = getRecord(englishJson);
+    const translations = parseEnglishCardRecords(englishJson);
+    expect(englishRoot.schemaVersion).toBe(1);
+    expect(englishRoot.recordCount).toBe(335);
+    expect(translations).toHaveLength(335);
+    expect(new Set(translations.map((record) => record.onomatopoeia)).size).toBe(335);
+    expect(translations.map((record) => record.onomatopoeia)).toEqual(expectedWords);
+
+    const sourceExamples = new Map(entries.map((entry) => [entry.word, entry.displayText]));
+    for (const translation of translations) {
+      expect(translation.meaning.trim().length, translation.onomatopoeia).toBeGreaterThan(0);
+      expect(translation.exampleEnglish.trim().length, translation.onomatopoeia).toBeGreaterThan(0);
+      expect(translation.exampleJapanese, translation.onomatopoeia).toBe(sourceExamples.get(translation.onomatopoeia));
+      expect(['reviewed', 'needsReview']).toContain(translation.reviewStatus);
+      if (translation.reviewStatus === 'needsReview') {
+        expect(translation.reviewNote?.trim().length, translation.onomatopoeia).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('英語字幕の未知のレビュー状態を有効なレコードとして扱わない', () => {
+    expect(parseEnglishCardRecords({
+      records: [{
+        onomatopoeia: 'わくわく',
+        meaning: 'Excited.',
+        exampleJapanese: 'えんそくまえでわくわくする。',
+        exampleEnglish: 'I feel excited.',
+        reviewStatus: 'unknown'
+      }]
+    })).toEqual([]);
   });
 
   it('全335例文を5曲それぞれで1例文1フレーズへ割り当てる', () => {

@@ -11,10 +11,12 @@ import { StaticImageScreen } from './screens/StaticImageScreen';
 import { HistoryScreen } from './screens/HistoryScreen';
 import { assetUrl } from './lib/assets';
 import type { GeneratedResult } from './lib/generatedResult';
+import { useLanguage } from './lib/i18n';
 
 type Screen = 'title' | 'write' | 'loading' | 'result' | 'story' | 'howto' | 'credit' | 'history';
 
 export function App() {
+  const { language, t } = useLanguage();
   const sourceSongs = getStaticMemorizationSourceSongs();
   const [screen, setScreen] = useState<Screen>('title');
   const [songs, setSongs] = useState<SongInfo[]>([]);
@@ -39,7 +41,7 @@ export function App() {
       try {
         setSongs(await fetchSongs());
       } catch (error) {
-        setTitleError(error instanceof Error ? error.message : String(error));
+        setTitleError(language === 'en' ? t('genericLoadError') : error instanceof Error ? error.message : String(error));
       }
     };
     void load();
@@ -51,7 +53,7 @@ export function App() {
 
   const startGame = async () => {
     if (!selectedSongId) {
-      setTitleError('←きょくをえらんでね！');
+      setTitleError(t('selectSongError'));
       return;
     }
 
@@ -63,7 +65,7 @@ export function App() {
       if (detail.mode === 'onomatopoeiaQuiz') {
         const sourceSong = sourceSongs.find((song) => song.id === selectedSourceSongId);
         if (!sourceSong) {
-          throw new Error('もとの曲が見つかりませんでした');
+          throw new Error(t('sourceSongMissing'));
         }
         selectedDetail = {
           ...detail,
@@ -82,7 +84,7 @@ export function App() {
       setGeneratedResult(undefined);
       setScreen('write');
     } catch (error) {
-      setTitleError(error instanceof Error ? error.message : String(error));
+      setTitleError(language === 'en' ? t('genericLoadError') : error instanceof Error ? error.message : String(error));
     } finally {
       setLoading(false);
     }
@@ -135,15 +137,15 @@ export function App() {
   }
 
   if (screen === 'story') {
-    return <StaticImageScreen title="ストーリー" imageSrc={assetUrl('assets/texture/assets/story.png')} onBack={() => setScreen('title')} />;
+    return <StaticImageScreen title={t('storyTitle')} description={t('storyBody')} imageSrc={assetUrl('assets/texture/assets/story.png')} onBack={() => setScreen('title')} />;
   }
 
   if (screen === 'howto') {
-    return <StaticImageScreen title="あそびかた" imageSrc={assetUrl('assets/texture/assets/howtoplay.png')} onBack={() => setScreen('title')} />;
+    return <StaticImageScreen title={t('howToTitle')} description={t('howToBody')} imageSrc={assetUrl('assets/texture/assets/howtoplay.png')} onBack={() => setScreen('title')} />;
   }
 
   if (screen === 'credit') {
-    return <StaticImageScreen title="クレジット" imageSrc={assetUrl('assets/texture/assets/credit.png')} onBack={() => setScreen('title')} />;
+    return <StaticImageScreen title={t('creditsTitle')} description={t('creditsBody')} imageSrc={assetUrl('assets/texture/assets/credit.png')} onBack={() => setScreen('title')} />;
   }
 
   if (screen === 'history') {

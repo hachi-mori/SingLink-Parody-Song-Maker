@@ -9,6 +9,7 @@ const publicAssets = [
   'texture',
   'dict/cards_text_data.json',
   'dict/cards_singing_readings.json',
+  'dict/cards_english_data.json',
   'score/オノマトペ.vvproj',
   'score/ちょうちょ.json',
   'score/むすんでひらいて.json',

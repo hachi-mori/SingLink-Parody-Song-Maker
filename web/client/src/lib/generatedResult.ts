@@ -1,9 +1,12 @@
+import type { KaraokeLineTiming } from '@shared/types';
+
 export type GeneratedResult =
   | {
       status: 'generated';
       blob: Blob;
       blobUrl: string;
       fileName: string;
+      karaokeTimings: KaraokeLineTiming[];
     }
   | {
       status: 'skipped';

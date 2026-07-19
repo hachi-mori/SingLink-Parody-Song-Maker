@@ -118,6 +118,7 @@ button:disabled {
 }
 
 .voicevox-panel input,
+.voicevox-panel select,
 .song-picker select,
 .answer-form input {
   width: 100%;
@@ -241,6 +242,7 @@ button:disabled {
 }
 
 .asset-button {
+  position: relative;
   width: clamp(170px, 16vw, 250px);
   background: transparent;
   padding: 0;
@@ -349,6 +351,22 @@ button:disabled {
   line-height: 1.16;
   white-space: pre-line;
   text-shadow: 0 3px 0 rgba(255, 247, 217, 0.75);
+}
+
+.asset-button-caption {
+  position: absolute;
+  inset: auto 8% 7%;
+  display: block;
+  padding: 7px 10px;
+  border: 2px solid rgba(255, 255, 255, 0.82);
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(82, 44, 5, 0.92);
+  box-shadow: 0 4px 12px rgba(39, 20, 2, 0.3);
+  font-size: clamp(14px, 1.4vw, 20px);
+  line-height: 1.05;
+  text-align: center;
+  pointer-events: none;
 }
 
 .game-question-card {
@@ -605,6 +623,128 @@ button:disabled {
   text-underline-offset: 0.12em;
 }
 
+.karaoke-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin: 10px 0 14px;
+  color: var(--brown);
+  font-size: clamp(13px, 1.2vw, 17px);
+}
+
+.karaoke-legend span {
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.karaoke-lyrics {
+  display: grid;
+  gap: clamp(10px, 1.4vw, 18px);
+  margin: 14px 0 20px;
+  font-size: inherit;
+}
+
+.karaoke-line {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  padding: clamp(10px, 1.6vw, 18px);
+  border: 2px solid rgba(134, 79, 9, 0.18);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.58);
+  transform-origin: center left;
+  transition: transform 180ms ease, opacity 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.karaoke-line--pending {
+  opacity: 0.64;
+}
+
+.karaoke-line--active {
+  z-index: 1;
+  border-color: #b55b00;
+  background: rgba(255, 246, 204, 0.98);
+  box-shadow: 0 10px 28px rgba(123, 63, 4, 0.2);
+  transform: scale(1.025);
+}
+
+.karaoke-line--completed {
+  opacity: 0.82;
+  border-style: dashed;
+}
+
+.karaoke-line--incorrect::before {
+  content: "×";
+  position: absolute;
+  top: 7px;
+  right: 10px;
+  color: #a71818;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.karaoke-state-label {
+  color: #6d410a;
+  font-size: clamp(12px, 1vw, 15px);
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.karaoke-japanese {
+  display: grid;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0;
+  font-size: clamp(24px, 3vw, 44px);
+  font-weight: 800;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.karaoke-line--active .karaoke-japanese {
+  font-size: clamp(30px, 3.6vw, 54px);
+}
+
+.karaoke-japanese-base,
+.karaoke-japanese-progress {
+  grid-area: 1 / 1;
+}
+
+.karaoke-japanese-base {
+  color: #6e6557;
+}
+
+.karaoke-line--completed .karaoke-japanese-base {
+  color: #5f411d;
+}
+
+.karaoke-japanese-progress {
+  color: #eb7200;
+  text-shadow: 0 1px 0 #fff, 0 0 12px rgba(255, 183, 0, 0.48);
+  will-change: clip-path;
+}
+
+.karaoke-english,
+.karaoke-meaning {
+  margin: 0 !important;
+}
+
+.karaoke-english {
+  color: #35291b;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: clamp(17px, 1.55vw, 24px);
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.karaoke-meaning {
+  color: #6f5b41;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: clamp(13px, 1.1vw, 17px);
+  line-height: 1.35;
+}
+
 .incorrect-lyric {
   color: #d51e1e;
 }
@@ -632,7 +772,7 @@ button:disabled {
 }
 
 .result-notice strong {
-  color: var(--pink);
+  color: #a84300;
   font-size: clamp(22px, 2.5vw, 34px);
 }
 
@@ -657,13 +797,31 @@ button:disabled {
 .static-image-screen {
   min-height: 100svh;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr);
   justify-items: center;
   gap: clamp(12px, 2svh, 20px);
   padding: clamp(14px, 2.6vw, 34px);
   background:
     radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.55), transparent 28%),
     linear-gradient(180deg, #edf8e4 0%, #dff1d2 100%);
+}
+
+.static-image-description {
+  width: min(960px, 94vw);
+  display: grid;
+  gap: 6px;
+  padding: clamp(14px, 2vw, 22px);
+  border: 2px solid var(--panel-border);
+  border-radius: 14px;
+  background: rgba(255, 250, 231, 0.94);
+  box-shadow: 0 10px 28px rgba(72, 40, 5, 0.14);
+  color: var(--brown);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.static-image-description p,
+.static-image-description small {
+  margin: 0;
 }
 
 .static-image-header {
@@ -948,6 +1106,32 @@ button:disabled {
     overflow: auto;
   }
 
+  .result-layout {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .result-character {
+    width: min(52vw, 220px);
+  }
+
+  .result-card {
+    padding: 14px;
+  }
+
+  .karaoke-line--active {
+    transform: none;
+  }
+
+  .karaoke-japanese,
+  .karaoke-line--active .karaoke-japanese {
+    font-size: clamp(25px, 8vw, 34px);
+  }
+
+  .player-actions button {
+    flex: 1 1 calc(50% - 8px);
+  }
+
   .history-screen header {
     align-items: stretch;
     flex-direction: column;
@@ -971,5 +1155,18 @@ button:disabled {
 @media (prefers-reduced-motion: reduce) {
   .title-logo {
     animation: none;
+  }
+
+  .karaoke-line,
+  .asset-button {
+    transition: none;
+  }
+
+  .karaoke-japanese-progress {
+    will-change: auto;
+  }
+
+  .karaoke-line--active .karaoke-japanese-progress {
+    clip-path: inset(0 0 0 0) !important;
   }
 }

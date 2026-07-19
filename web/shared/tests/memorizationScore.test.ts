@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildOnomatopoeiaLyricsRows,
   buildMemorizationSynthesisPlan,
+  buildKaraokeLineTimings,
   createMemorizationScore,
   type MemorizationScoreJson
 } from '../src/memorizationScore';
@@ -138,6 +139,27 @@ describe('memorization score', () => {
     expect(plan.flatMap((segment) => segment.score.notes.slice(segment.leadingPaddingFrames > 0 ? 1 : 0))
       .map((note) => note.lyric))
       .toEqual(score.notes.map((note) => note.lyric));
+  });
+
+  it('5曲のphraseRangesから93.75fpsのカラオケ時刻を導出する', () => {
+    const expectedEndSeconds: Record<string, number[]> = {
+      'ちょうちょ': [4.032, 8.043, 12.053],
+      'むすんでひらいて': [4.011, 7.989, 11.979],
+      '大きな古時計': [3.989, 7.968, 11.936],
+      '幸せなら手をたたこう': [4.032, 8.032, 12.043],
+      '雪': [2.027, 4.032, 8.011]
+    };
+    for (const sourceSong of memorizationSourceSongs) {
+      const result = createMemorizationScore(rowsFromOriginalEntries(), loadScore(sourceSong.scoreFileName));
+      const timings = buildKaraokeLineTimings(result.score, result.phraseRanges);
+      expect(timings, sourceSong.title).toHaveLength(3);
+      expect(timings[0]?.startSeconds, sourceSong.title).toBe(0);
+      timings.forEach((timing, index) => {
+        expect(timing.endSeconds, `${sourceSong.title} phrase ${index + 1}`)
+          .toBeCloseTo(expectedEndSeconds[sourceSong.title]?.[index] ?? 0, 3);
+        if (index > 0) expect(timing.startSeconds).toBe(timings[index - 1]?.endSeconds);
+      });
+    }
   });
 
   it('自作教材の表示文と歌唱用読みを正誤に関係なく維持する', () => {

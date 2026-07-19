@@ -6,6 +6,8 @@ import { saveGeneratedTrack } from '../lib/historyDb';
 import { ScreenShell } from '../components/ScreenShell';
 import { assetUrl } from '../lib/assets';
 import type { GeneratedResult } from '../lib/generatedResult';
+import { buildSongKaraokeTimings } from '../lib/karaoke';
+import { useLanguage } from '../lib/i18n';
 
 type LoadingScreenProps = {
   song: SongDetail;
@@ -19,7 +21,8 @@ type LoadingScreenProps = {
 };
 
 export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, voicevoxConnected, onDone, onBack }: LoadingScreenProps) {
-  const [message, setMessage] = useState('ずんだもん が おうた を れんしゅう しているよ');
+  const { language, t } = useLanguage();
+  const [message, setMessage] = useState(() => t('preparingVoice'));
   const [error, setError] = useState('');
   const startedRef = useRef(false);
   const doneRef = useRef(false);
@@ -41,24 +44,24 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
       });
     };
     const skipTimer = window.setTimeout(() => {
-      skipWithMessage('歌声生成に時間がかかっているため、音声なしでリザルトを表示しました。VOICEVOXに接続できない場合でもクイズ結果は確認できます。');
+      skipWithMessage(t('generationTimeout'));
     }, 180_000);
 
     const run = async () => {
       try {
         if (!voicevoxConnected) {
-          skipWithMessage('VOICEVOXに接続されていないため、音声生成をスキップしました。クイズ結果は音声なしで確認できます。');
+          skipWithMessage(t('generationOffline'));
           return;
         }
 
-        setMessage('VOICEVOXに歌声をお願いしています...');
-        const blob = await synthesizeSong({
+        setMessage(t('requestingVoice'));
+        const [blob, karaokeTimings] = await Promise.all([synthesizeSong({
           songId: song.id,
           sourceSongId: song.sourceSong?.id,
           solvedTasks: tasks,
           fullLyrics,
           voicevoxBaseUrl
-        }, song);
+        }, song), buildSongKaraokeTimings(song, tasks)]);
 
         if (cancelled || doneRef.current) {
           return;
@@ -85,10 +88,13 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
           status: 'generated',
           blob,
           blobUrl: URL.createObjectURL(blob),
-          fileName
+          fileName,
+          karaokeTimings
         });
       } catch (synthesisError) {
-        skipWithMessage(synthesisError instanceof Error ? synthesisError.message : String(synthesisError));
+        skipWithMessage(language === 'en'
+          ? t('generationSkippedFallback')
+          : synthesisError instanceof Error ? synthesisError.message : String(synthesisError));
       }
     };
 
@@ -97,7 +103,7 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
       cancelled = true;
       window.clearTimeout(skipTimer);
     };
-  }, [song, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, voicevoxConnected, onDone]);
+  }, [song, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, voicevoxConnected, onDone, language, t]);
 
   const skipVoice = () => {
     if (doneRef.current) {
@@ -106,7 +112,7 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
     doneRef.current = true;
     onDone({
       status: 'skipped',
-      message: error || 'VOICEVOXに接続できなかったため、音声生成をスキップしました。'
+      message: error || t('generationSkippedFallback')
     });
   };
 
@@ -118,8 +124,8 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
         {error ? (
           <>
             <p className="error-text">{error}</p>
-            <button onClick={skipVoice}>音声なしでリザルトを見る</button>
-            <button onClick={onBack}>入力画面へ戻る</button>
+            <button onClick={skipVoice}>{t('skipVoice')}</button>
+            <button onClick={onBack}>{t('backToQuiz')}</button>
           </>
         ) : null}
       </section>

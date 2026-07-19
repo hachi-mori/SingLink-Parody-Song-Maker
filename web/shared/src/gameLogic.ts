@@ -171,7 +171,9 @@ export function buildOnomatopoeiaTasks(problem: OnomatopoeiaEntry, answer: strin
       rhymeMatchPercent: 0,
       matchesCount: 0,
       isCorrect,
-      singingReading: problem.singingReading
+      singingReading: problem.singingReading,
+      englishMeaning: problem.englishMeaning,
+      englishExample: problem.englishExample
     }
   ];
 }

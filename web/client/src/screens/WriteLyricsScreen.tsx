@@ -15,6 +15,7 @@ import { ScreenShell } from '../components/ScreenShell';
 import { previewLyrics } from '../lib/api';
 import { assetUrl } from '../lib/assets';
 import { shuffle, takeShuffled } from '../lib/random';
+import { useLanguage } from '../lib/i18n';
 
 type WriteLyricsScreenProps = {
   song: SongDetail;
@@ -69,6 +70,7 @@ function prepareOnomatopoeiaOptions(entries: OnomatopoeiaEntry[], correctAnswer:
 }
 
 export function WriteLyricsScreen({ song, onComplete, onCancel }: WriteLyricsScreenProps) {
+  const { language, t } = useLanguage();
   const [countdownStartedAt] = useState(() => Date.now());
   const [started, setStarted] = useState(false);
   const [problemStartedAt, setProblemStartedAt] = useState(() => Date.now());
@@ -166,9 +168,11 @@ export function WriteLyricsScreen({ song, onComplete, onCancel }: WriteLyricsScr
         correct: false,
         timeUp: true,
         question: currentOnomatopoeia.questionText ?? currentOnomatopoeia.word,
-        selected: 'みかいとう',
+        selected: t('unanswered'),
         correctAnswer: currentOnomatopoeia.answer,
-        explanation: currentOnomatopoeia.explanation || `「${currentOnomatopoeia.word}」には「${currentOnomatopoeia.answer}」がぴったりだよ。`,
+        explanation: language === 'en'
+          ? currentOnomatopoeia.englishMeaning ?? t('translationUnavailable')
+          : currentOnomatopoeia.explanation,
         answerForRecord: onomatopoeiaTimeoutAnswer
       });
       return;
@@ -176,7 +180,7 @@ export function WriteLyricsScreen({ song, onComplete, onCancel }: WriteLyricsScr
     if (currentProblem) {
       advance(makeTimedOutTask(currentProblem), 'タイムアップ');
     }
-  }, [started, feedback, remainingSeconds, problemCount, song.mode, currentOnomatopoeia, currentProblem]);
+  }, [started, feedback, remainingSeconds, problemCount, song.mode, currentOnomatopoeia, currentProblem, language, t]);
 
   const submitFreeText = () => {
     if (!currentProblem) {
@@ -218,7 +222,9 @@ export function WriteLyricsScreen({ song, onComplete, onCancel }: WriteLyricsScr
       question: currentOnomatopoeia.questionText ?? currentOnomatopoeia.word,
       selected: answer,
       correctAnswer: currentOnomatopoeia.answer,
-      explanation: currentOnomatopoeia.explanation || `「${currentOnomatopoeia.word}」には「${currentOnomatopoeia.answer}」がぴったりだよ。`,
+      explanation: language === 'en'
+        ? currentOnomatopoeia.englishMeaning ?? t('translationUnavailable')
+        : currentOnomatopoeia.explanation,
       answerForRecord: answer
     });
   };
@@ -259,9 +265,9 @@ export function WriteLyricsScreen({ song, onComplete, onCancel }: WriteLyricsScr
     return (
       <ScreenShell background={assetUrl('assets/texture/assets/game_background2.gif')} fit="cover" dim>
         <section className="game-panel">
-          <h1>お題がありません</h1>
-          <p>曲データか辞書CSVを確認してください。</p>
-          <AssetButton imageSrc={assetUrl('assets/texture/assets/button/title.png')} label="タイトルへ" onClick={onCancel} />
+          <h1>{t('noQuestions')}</h1>
+          <p>{t('noQuestionsHelp')}</p>
+          <AssetButton imageSrc={assetUrl('assets/texture/assets/button/title.png')} label={t('backToTitle')} onClick={onCancel} />
         </section>
       </ScreenShell>
     );
@@ -281,7 +287,7 @@ export function WriteLyricsScreen({ song, onComplete, onCancel }: WriteLyricsScr
       <section className="game-card">
         {isCardOnomatopoeiaProblem && currentOnomatopoeia?.questionText ? (
           <section className="game-question-card">
-            <p className="game-question-prompt">{makeQuestionDisplayText(currentIndex, '○○に入るオノマトペは？')}</p>
+            <p className="game-question-prompt">{makeQuestionDisplayText(currentIndex, t('fillBlank'))}</p>
             <p className="game-question-example">{currentOnomatopoeia.questionText}</p>
           </section>
         ) : (
@@ -296,8 +302,8 @@ export function WriteLyricsScreen({ song, onComplete, onCancel }: WriteLyricsScr
               submitFreeText();
             }}
           >
-            <input value={input} onChange={(event) => setInput(event.target.value)} autoFocus placeholder="ひらがなで入力" />
-            <button type="submit">決定</button>
+            <input value={input} onChange={(event) => setInput(event.target.value)} autoFocus placeholder={t('answerPlaceholder')} />
+            <button type="submit">{t('submit')}</button>
           </form>
         ) : null}
 
@@ -329,12 +335,12 @@ export function WriteLyricsScreen({ song, onComplete, onCancel }: WriteLyricsScr
         <section className="feedback-overlay" onClick={advanceFeedback}>
           <div className="feedback-panel">
             <div className="judge-mark">{feedback.correct ? '○' : '×'}</div>
-            <h2>{feedback.timeUp ? 'タイムアップ！' : feedback.correct ? 'せいかい！' : 'ふせいかい'}</h2>
-            <p>おだい: {feedback.question}</p>
-            <p>あなたのこたえ: {feedback.selected}</p>
-            <p>せいかい: {feedback.correctAnswer}</p>
+            <h2>{feedback.timeUp ? t('timeUp') : feedback.correct ? t('correct') : t('incorrect')}</h2>
+            <p><span className="feedback-label">{t('prompt')}:</span> {feedback.question}</p>
+            <p><span className="feedback-label">{t('yourAnswer')}:</span> {feedback.selected}</p>
+            <p><span className="feedback-label">{t('correctAnswer')}:</span> {feedback.correctAnswer}</p>
             <small>{feedback.explanation}</small>
-            <button>つぎへ</button>
+            <button>{t('next')}</button>
           </div>
         </section>
       ) : null}

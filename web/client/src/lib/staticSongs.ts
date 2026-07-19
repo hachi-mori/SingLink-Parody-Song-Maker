@@ -1,5 +1,5 @@
 import { buildResultDisplayLyrics, buildTalkProblems, extractTalkUtterances, getVvprojTrackName } from '@shared/vvproj';
-import { parseOnomatopoeiaCardEntries } from '@shared/onomatopoeiaCards';
+import { attachEnglishCardData, parseOnomatopoeiaCardEntries } from '@shared/onomatopoeiaCards';
 import { memorizationSourceSongs } from '@shared/memorizationSongs';
 import type {
   OnomatopoeiaEntry,
@@ -55,11 +55,12 @@ async function fetchJson(path: string): Promise<unknown> {
 }
 
 async function loadOnomatopoeiaEntries(): Promise<OnomatopoeiaEntry[]> {
-  const [cards, singingReadings] = await Promise.all([
+  const [cards, singingReadings, englishCards] = await Promise.all([
     fetchJson('assets/dict/cards_text_data.json'),
-    fetchJson('assets/dict/cards_singing_readings.json')
+    fetchJson('assets/dict/cards_singing_readings.json'),
+    fetchJson('assets/dict/cards_english_data.json')
   ]);
-  return parseOnomatopoeiaCardEntries(cards, singingReadings);
+  return attachEnglishCardData(parseOnomatopoeiaCardEntries(cards, singingReadings), englishCards);
 }
 
 export function getStaticMemorizationSourceSongs(): SourceSongInfo[] {

@@ -25,6 +25,8 @@ export type SolvedTask = {
   matchesCount?: number;
   isCorrect?: boolean;
   singingReading?: string;
+  englishMeaning?: string;
+  englishExample?: string;
 };
 
 export type VerbEntry = {
@@ -41,6 +43,15 @@ export type OnomatopoeiaEntry = {
   questionText?: string;
   displayText?: string;
   singingReading?: string;
+  englishMeaning?: string;
+  englishExample?: string;
+  translationReviewStatus?: 'reviewed' | 'needsReview';
+  translationReviewNote?: string;
+};
+
+export type KaraokeLineTiming = {
+  startSeconds: number;
+  endSeconds: number;
 };
 
 export type SongMode = 'freeText' | 'verbQuiz' | 'onomatopoeiaQuiz';

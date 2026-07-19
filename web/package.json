@@ -9,6 +9,7 @@
     "dev:server": "tsx watch server/src/index.ts",
     "start:server": "tsx server/src/index.ts",
     "generate:onomatopoeia-readings": "node scripts/generate-onomatopoeia-readings.mjs",
+    "audit:english-subtitles": "node scripts/audit-english-subtitles.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run --config vitest.config.ts",
     "build": "npm run typecheck && vite build --config client/vite.config.ts && node scripts/copy-assets.mjs"

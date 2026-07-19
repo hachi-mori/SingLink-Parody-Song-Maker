@@ -53,3 +53,54 @@ export function parseOnomatopoeiaCardEntries(cardsJson: unknown, singingReadings
     }];
   });
 }
+
+export type EnglishCardRecord = {
+  onomatopoeia: string;
+  meaning: string;
+  exampleJapanese: string;
+  exampleEnglish: string;
+  reviewStatus: 'reviewed' | 'needsReview';
+  reviewNote?: string;
+};
+
+export function parseEnglishCardRecords(value: unknown): EnglishCardRecord[] {
+  const root = isRecord(value) ? value : undefined;
+  const records = Array.isArray(root?.records) ? root.records : [];
+  return records.flatMap((raw): EnglishCardRecord[] => {
+    if (!isRecord(raw)) return [];
+    const onomatopoeia = getString(raw.onomatopoeia);
+    const meaning = getString(raw.meaning);
+    const exampleJapanese = getString(raw.exampleJapanese);
+    const exampleEnglish = getString(raw.exampleEnglish);
+    const reviewStatus = raw.reviewStatus === 'reviewed' || raw.reviewStatus === 'needsReview'
+      ? raw.reviewStatus
+      : undefined;
+    const reviewNote = getString(raw.reviewNote);
+    if (!onomatopoeia || !reviewStatus) return [];
+    return [{
+      onomatopoeia,
+      meaning,
+      exampleJapanese,
+      exampleEnglish,
+      reviewStatus,
+      reviewNote: reviewNote || undefined
+    }];
+  });
+}
+
+export function attachEnglishCardData(entries: OnomatopoeiaEntry[], englishJson: unknown): OnomatopoeiaEntry[] {
+  const translations = new Map(parseEnglishCardRecords(englishJson).map((record) => [record.onomatopoeia, record]));
+  return entries.map((entry) => {
+    const translation = translations.get(entry.word);
+    if (!translation || translation.exampleJapanese !== entry.displayText) {
+      return entry;
+    }
+    return {
+      ...entry,
+      englishMeaning: translation.meaning || undefined,
+      englishExample: translation.exampleEnglish || undefined,
+      translationReviewStatus: translation.reviewStatus,
+      translationReviewNote: translation.reviewNote
+    };
+  });
+}

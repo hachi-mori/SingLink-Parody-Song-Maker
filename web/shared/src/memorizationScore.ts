@@ -4,6 +4,7 @@ import type { ScoreJson, ScoreNote } from './vvproj';
 const smallKana = 'ぁぃぅぇぉゃゅょァィゥェォャュョ';
 const normalSpeakerId = 3003;
 const incorrectSpeakerId = 3076;
+export const voicevoxFrameRate = 93.75;
 
 const vowelMap: Record<string, string> = {
   あ: 'あ', い: 'い', う: 'う', え: 'え', お: 'お',
@@ -340,5 +341,21 @@ export function buildMemorizationSynthesisPlan(
       speakerId: lineCorrects[index] === false ? incorrectSpeakerId : normalSpeakerId,
       leadingPaddingFrames
     }];
+  });
+}
+
+export function buildKaraokeLineTimings(
+  score: ScoreJson,
+  phraseRanges: ReadonlyArray<PhraseRange>,
+  frameRate = voicevoxFrameRate
+): Array<{ startSeconds: number; endSeconds: number }> {
+  let elapsedFrames = 0;
+  return phraseRanges.map(([start, end]) => {
+    const phraseFrames = score.notes
+      .slice(start, end)
+      .reduce((total, note) => total + Math.max(0, note.frame_length), 0);
+    const startSeconds = elapsedFrames / frameRate;
+    elapsedFrames += phraseFrames;
+    return { startSeconds, endSeconds: elapsedFrames / frameRate };
   });
 }
