@@ -7,6 +7,7 @@ export type GeneratedResult =
       blobUrl: string;
       fileName: string;
       karaokeTimings: KaraokeLineTiming[];
+      source: 'live' | 'demo';
     }
   | {
       status: 'skipped';

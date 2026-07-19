@@ -161,6 +161,7 @@ button:disabled {
 
 .small-button,
 .history-button,
+.demo-button,
 .credit-link,
 .answer-form button,
 .player-actions button,
@@ -260,6 +261,30 @@ button:disabled {
   border-radius: 18px;
   background: rgba(255, 250, 231, 0.94);
   box-shadow: 0 18px 42px rgba(72, 40, 5, 0.18);
+}
+
+.demo-button {
+  min-width: min(300px, 80vw);
+  min-height: 92px;
+  display: grid;
+  gap: 2px;
+  padding: 14px 22px;
+  border: 3px solid #fff7c4;
+  border-radius: 16px;
+  color: #fff;
+  background: linear-gradient(135deg, #e46d00, #b94700);
+  box-shadow: 0 12px 26px rgba(100, 42, 0, 0.3);
+  text-align: center;
+}
+
+.demo-button strong {
+  font-size: clamp(22px, 2vw, 30px);
+  line-height: 1.15;
+}
+
+.demo-button span {
+  font-family: system-ui, sans-serif;
+  font-size: clamp(13px, 1vw, 16px);
 }
 
 .asset-button {
@@ -618,6 +643,37 @@ button:disabled {
 .result-card p,
 .result-card h1 {
   margin: 0 0 10px;
+}
+
+.demo-disclosure {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 14px;
+  padding: 12px 16px;
+  border: 3px solid #e46d00;
+  border-radius: 14px;
+  color: #643100;
+  background: #fff2c9;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.demo-disclosure strong {
+  color: #b94700;
+  font-size: clamp(18px, 1.8vw, 25px);
+}
+
+.demo-disclosure p {
+  margin: 0;
+  font-size: clamp(14px, 1.2vw, 18px);
+  line-height: 1.45;
+}
+
+.demo-credits {
+  margin: 10px 0 0 !important;
+  color: #6f5b41;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: clamp(12px, 1vw, 15px);
+  line-height: 1.4;
 }
 
 .result-song-source {

@@ -16,6 +16,8 @@ type ResultScreenProps = {
   tasks: SolvedTask[];
   fullLyrics: string;
   result: GeneratedResult;
+  demoDisclosure?: string;
+  demoCredits?: string[];
   onTitle: () => void;
   onHistory: () => void;
 };
@@ -48,7 +50,7 @@ function usePrefersReducedMotion(): boolean {
   return reduced;
 }
 
-export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHistory }: ResultScreenProps) {
+export function ResultScreen({ song, tasks, fullLyrics, result, demoDisclosure, demoCredits, onTitle, onHistory }: ResultScreenProps) {
   const { language, t } = useLanguage();
   const showEnglishLearningSupport = showsEnglishLearningSupport(language);
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -65,6 +67,7 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
   const [playbackTime, setPlaybackTime] = useState(0);
   const [playError, setPlayError] = useState('');
   const generatedAudio = hasGeneratedAudio(result);
+  const isDemo = generatedAudio && result.source === 'demo';
 
   const lines = useMemo(() => fullLyrics.replace(/[{}]/g, '').split('\n').filter(Boolean), [fullLyrics]);
   const singingTasks = useMemo(
@@ -240,8 +243,14 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
       <section className="result-layout">
         <img className="result-character" src={assetUrl('assets/texture/assets/zunda_singing.gif')} alt="" aria-hidden="true" />
         <div className="result-card">
-          <p className="result-song-source">{t('songSourceEyebrow')}</p>
-          <h1>{t('songMadeWith', { song: song.sourceSong?.title ?? song.trackName ?? song.title })}</h1>
+          {isDemo ? (
+            <aside className="demo-disclosure" aria-label={t('demoLabel')}>
+              <strong>{t('demoLabel')}</strong>
+              <p>{demoDisclosure ?? t('demoDisclosure')}</p>
+            </aside>
+          ) : null}
+          <p className="result-song-source">{isDemo ? t('demoEyebrow') : t('songSourceEyebrow')}</p>
+          <h1>{isDemo ? t('demoSongTitle') : t('songMadeWith', { song: song.sourceSong?.title ?? song.trackName ?? song.title })}</h1>
           <div className="lyrics-box karaoke-lyrics" aria-live="polite">
             {lines.map((line, lineIndex) => {
               const timing = timings[lineIndex];
@@ -297,7 +306,7 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
               </button>
               <button onClick={() => void restart()}><RotateCcw />{t('restart')}</button>
               <button onClick={() => downloadBlob(result.blob, result.fileName)}><Download />{t('download')}</button>
-              <button onClick={onHistory}>{t('history')}</button>
+              {!isDemo ? <button onClick={onHistory}>{t('history')}</button> : null}
             </div>
           ) : (
             <div className="result-notice">
@@ -307,6 +316,9 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
             </div>
           )}
           {playError ? <p className="error-text">{playError}</p> : null}
+          {isDemo && demoCredits?.length ? (
+            <p className="demo-credits">{demoCredits.join(' / ')}</p>
+          ) : null}
         </div>
         <AssetButton imageSrc={assetUrl('assets/texture/assets/button/title.png')} label={t('backToTitle')} onClick={onTitle} className="result-title-button" />
       </section>

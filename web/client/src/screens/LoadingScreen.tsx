@@ -86,6 +86,7 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
         doneRef.current = true;
         onDone({
           status: 'generated',
+          source: 'live',
           blob,
           blobUrl: URL.createObjectURL(blob),
           fileName,

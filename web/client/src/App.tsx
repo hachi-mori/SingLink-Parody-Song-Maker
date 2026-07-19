@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { defaultMemorizationSourceSongId } from '@shared/memorizationSongs';
 import type { SolvedTask, SongDetail, SongInfo, SourceSongInfo, VoicevoxVersionResponse } from '@shared/types';
 import { fetchSongDetail, fetchSongs, checkVoicevox } from './lib/api';
@@ -13,6 +13,7 @@ import { HistoryScreen } from './screens/HistoryScreen';
 import { assetUrl } from './lib/assets';
 import type { GeneratedResult } from './lib/generatedResult';
 import { useLanguage } from './lib/i18n';
+import { loadDemoBundle, type DemoBundle } from './lib/demo';
 
 type Screen = 'title' | 'write' | 'loading' | 'result' | 'howto' | 'credit' | 'history';
 
@@ -32,10 +33,34 @@ export function App() {
   const [fullLyrics, setFullLyrics] = useState('');
   const [inputTexts, setInputTexts] = useState<string[]>([]);
   const [generatedResult, setGeneratedResult] = useState<GeneratedResult>();
+  const [demoInfo, setDemoInfo] = useState<Pick<DemoBundle, 'disclosure' | 'credits'>>();
+  const demoRequestedRef = useRef(false);
 
   const refreshVoicevox = useCallback(async () => {
     setVoicevoxStatus(await checkVoicevox(voicevoxBaseUrl));
   }, [voicevoxBaseUrl]);
+
+  const startDemo = useCallback(async () => {
+    setLoading(true);
+    setTitleError('');
+    try {
+      const demo = await loadDemoBundle();
+      setSongDetail(demo.song);
+      setSolvedTasks(demo.tasks);
+      setFullLyrics(demo.fullLyrics);
+      setInputTexts([]);
+      setGeneratedResult(demo.result);
+      setDemoInfo({ disclosure: demo.disclosure, credits: demo.credits });
+      setScreen('result');
+    } catch (error) {
+      setTitleError(language === 'en'
+        ? t('demoLoadError')
+        : error instanceof Error ? error.message : String(error));
+      setScreen('title');
+    } finally {
+      setLoading(false);
+    }
+  }, [language, t]);
 
   useEffect(() => {
     const load = async () => {
@@ -49,8 +74,10 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    void refreshVoicevox();
-  }, [refreshVoicevox]);
+    if (demoRequestedRef.current || new URLSearchParams(window.location.search).get('demo') !== '1') return;
+    demoRequestedRef.current = true;
+    void startDemo();
+  }, [startDemo]);
 
   const startGame = async () => {
     if (!selectedSongId) {
@@ -83,6 +110,7 @@ export function App() {
       setFullLyrics('');
       setInputTexts([]);
       setGeneratedResult(undefined);
+      setDemoInfo(undefined);
       setScreen('write');
     } catch (error) {
       setTitleError(language === 'en' ? t('genericLoadError') : error instanceof Error ? error.message : String(error));
@@ -131,6 +159,8 @@ export function App() {
         tasks={solvedTasks}
         fullLyrics={fullLyrics}
         result={generatedResult}
+        demoDisclosure={demoInfo?.disclosure[language]}
+        demoCredits={demoInfo?.credits}
         onHistory={() => setScreen('history')}
         onTitle={() => setScreen('title')}
       />
@@ -168,6 +198,7 @@ export function App() {
       onBaseUrlChange={setVoicevoxBaseUrl}
       onCheckVoicevox={refreshVoicevox}
       onStart={startGame}
+      onStartDemo={() => void startDemo()}
       onOpenHowTo={() => setScreen('howto')}
       onOpenCredit={() => setScreen('credit')}
       onOpenHistory={() => setScreen('history')}

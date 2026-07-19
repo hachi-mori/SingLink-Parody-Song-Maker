@@ -44,6 +44,7 @@ The included dataset contains 335 onomatopoeia learning records with newly writt
 - Voice result history stored in the browser with IndexedDB
 - Responsive layouts checked at 1280×720, 820×1180, and 390×844
 - Reduced-motion support while preserving lyric timing
+- Instant pre-generated demo using four original example sentences, an original melody and accompaniment, pre-generated `VOICEVOX:ずんだもん` singing, and the real karaoke result UI
 
 ## What was built during OpenAI Build Week
 
@@ -124,7 +125,7 @@ npm.cmd run dev
 
 Open [http://127.0.0.1:5173/](http://127.0.0.1:5173/). The client runs on port 5173, the local API server on port 5174, and the default VOICEVOX endpoint is `http://localhost:50021`.
 
-The repository already includes the 335-record sample dataset and the five local song assets; no demo account or environment file is needed. See the [judge testing guide](docs/judge-testing-guide.md) for the shortest test path and expected states.
+The repository already includes the 335-record sample dataset and the five local song assets; no demo account or environment file is needed. Choose `Try instant demo` (or open `http://127.0.0.1:5173/?demo=1`) to inspect singing, subtitles, and karaoke timing without running VOICEVOX. The screen clearly identifies this as pre-generated; normal mode still generates singing in real time from quiz answers. See the [judge testing guide](docs/judge-testing-guide.md) for the shortest test path and expected states.
 
 ## VOICEVOX setup
 
@@ -164,18 +165,19 @@ npm.cmd run audit:english-subtitles
 
 Verified on July 19, 2026:
 
-- Vitest: 7 files, 33 tests passed
+- Vitest: 8 files, 34 tests passed
 - TypeScript type-check: passed
 - Production Web build: passed
 - English subtitle audit: 335/335 present
 - VOICEVOX 0.25.1: four-sentence singing synthesis checked on the local path
 - Browser: main flow checked at 1280×720, 820×1180, and 390×844
+- Browser: instant demo checked at 1440×900, 768×1024, and 375×812; playback and one active karaoke line confirmed
 
 These commands are run again for the submission-document commit; see the final result in [CODEX_STATUS.md](CODEX_STATUS.md).
 
 ## Known limitations
 
-- GitHub Pages can serve the static UI but cannot run the Fastify server or complete local VOICEVOX singing by itself. The supported judging path is the local Windows setup above.
+- GitHub Pages can serve the static UI and the pre-generated instant demo, but cannot run the Fastify server or real-time local VOICEVOX synthesis by itself. The supported real-time generation path is the local Windows setup above.
 - Local VOICEVOX from a phone is not a supported synthesis path.
 - There is no user account, cloud synchronization, or server-side history database.
 - English learning records are structurally audited, but educational wording should continue to receive human language review.

@@ -14,6 +14,8 @@
 
 VOICEVOX 0.25.1で実音声確認済みです。アプリ実行にOpenAI APIキー、デモアカウント、`.env` は不要です。
 
+タイトルの「すぐにデモを見る」は、事前生成したずんだもん歌唱、自作メロディ・伴奏、自作例文4件を既存結果画面で再生します。実行時のVOICEVOX接続は不要です。`http://127.0.0.1:5173/?demo=1` で結果へ直接移動できます。画面には、通常モードがクイズ回答からリアルタイム生成することとの違いを明記しています。
+
 ## インストールと起動
 
 リポジトリルートから:
@@ -56,6 +58,7 @@ web/
 ├─ shared/                 教材、かな・モーラ、Score、WAV、型
 ├─ scripts/                アセットコピー、読み生成、英語字幕監査
 ├─ assets/
+│  ├─ demo/                事前生成歌唱、自作伴奏、字幕・同期manifest
 │  ├─ dict/                335件の日本語・読み・英語教材
 │  ├─ inst/                5曲の伴奏WAV
 │  ├─ score/               5曲の基礎Scoreとvvproj
@@ -71,7 +74,13 @@ web/
 Browser :5173 -> /api proxy -> Fastify :5174 -> VOICEVOX :50021
 ```
 
-静的配置向けにブラウザからVOICEVOXへ直接接続するコードもあります。両経路は `createMemorizationScore` と `buildMemorizationSynthesisPlan` を共有します。ただしGitHub PagesだけではローカルVOICEVOX接続を保証できず、正式な審査経路はFastifyを含むローカル起動です。
+事前生成デモ経路:
+
+```text
+Browser :5173 -> /assets/demo（VOICEVOXへの実行時通信なし）
+```
+
+静的配置向けにブラウザからVOICEVOXへ直接接続するコードもあります。両経路は `createMemorizationScore` と `buildMemorizationSynthesisPlan` を共有します。GitHub Pagesだけではリアルタイム生成を保証できませんが、事前生成デモはVOICEVOXなしで再生できます。リアルタイム生成の正式な審査経路はFastifyとVOICEVOXを含むローカル起動です。
 
 ## 教材
 
@@ -133,9 +142,10 @@ node scripts/audit-english-subtitles.mjs --all
 | `npm.cmd run typecheck` | TypeScript型チェック |
 | `npm.cmd run build` | 型チェック、Vite build、公開許可リストのアセットコピー |
 | `npm.cmd run audit:english-subtitles` | 335件の英語字幕監査 |
+| `npm.cmd run generate:demo-assets` | ローカルVOICEVOXからデモ歌唱WAV、自作伴奏、同期manifestを再生成 |
 | `npm.cmd run generate:onomatopoeia-readings` | ローカルVOICEVOXを使う読みデータ再生成 |
 
-`generate:onomatopoeia-readings` は成果物の通常起動には不要です。実行すると追跡対象JSONへ影響するため、変更目的がある場合だけ使います。
+`generate:onomatopoeia-readings` と `generate:demo-assets` は成果物の通常起動には不要です。実行すると追跡対象アセットへ影響するため、変更目的がありVOICEVOX 0.25.1を起動している場合だけ使います。
 
 ## 検証
 
@@ -155,6 +165,7 @@ Build Week提出版の確認範囲:
 - WAV休符除去
 - 保存値なしの英語開始と保存済み `en` / `ja`
 - 1280×720、820×1180、390×844の実ブラウザ表示
+- 事前生成デモは1440×900、768×1024、375×812でも横スクロールなし
 - VOICEVOX 0.25.1の4文実音声
 
 審査用の具体的な操作は [judge-testing-guide.md](../docs/judge-testing-guide.md) を参照してください。
@@ -167,7 +178,7 @@ Build Week提出版の確認範囲:
 
 ## GitHub Pages
 
-静的UI、教材、曲選択、クイズ、音声なし結果は配信できます。Fastifyは動かず、ブラウザからローカルVOICEVOXへの接続も環境依存のため、Pages単体をフル機能デモと表現しません。`web/dist/client/` が静的配置対象です。
+静的UI、教材、曲選択、クイズ、音声なし結果、事前生成デモを配信できます。Fastifyは動かず、ブラウザからローカルVOICEVOXへの接続も環境依存のため、Pages単体ではリアルタイム生成を提供しません。`web/dist/client/` が静的配置対象です。
 
 ## クレジット
 

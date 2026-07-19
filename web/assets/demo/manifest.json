@@ -1,0 +1,450 @@
+{
+  "version": 1,
+  "id": "singlink-original-demo-v1",
+  "title": {
+    "ja": "シングリンク オリジナル・デモメロディ",
+    "en": "SingLink Original Demo Melody"
+  },
+  "disclosure": {
+    "ja": "これは事前生成したデモサンプルです。通常モードでは、クイズの回答から歌声をリアルタイム生成します。",
+    "en": "This is a pre-generated demo sample. In normal mode, the singing voice is generated in real time from your quiz answers."
+  },
+  "voice": {
+    "path": "assets/demo/zundamon-voice.wav",
+    "credit": "VOICEVOX:ずんだもん",
+    "engineVersion": "0.25.1",
+    "speakerId": 3003,
+    "style": "ノーマル"
+  },
+  "accompaniment": {
+    "path": "assets/demo/original-accompaniment.wav",
+    "credit": "Original melody, accompaniment, and example sentences created by the SingLink project author for this demo."
+  },
+  "lines": [
+    {
+      "japanese": "朝日がきらきら光ります",
+      "singingReading": "あさひがきらきらひかります",
+      "keyword": "きらきら",
+      "englishExample": "The morning sun sparkles brightly.",
+      "englishMeaning": "きらきら: sparkling or glittering"
+    },
+    {
+      "japanese": "雨がしとしと降っています",
+      "singingReading": "あめがしとしとふっています",
+      "keyword": "しとしと",
+      "englishExample": "The rain is falling softly and steadily.",
+      "englishMeaning": "しとしと: gently and continuously, as with light rain"
+    },
+    {
+      "japanese": "猫がすやすや眠っています",
+      "singingReading": "ねこがすやすやねむっています",
+      "keyword": "すやすや",
+      "englishExample": "The cat is sleeping peacefully.",
+      "englishMeaning": "すやすや: sleeping peacefully and comfortably"
+    },
+    {
+      "japanese": "鐘がりんりん鳴っています",
+      "singingReading": "かねがりんりんなっています",
+      "keyword": "りんりん",
+      "englishExample": "The bell is ringing brightly.",
+      "englishMeaning": "りんりん: a clear, repeated ringing sound"
+    }
+  ],
+  "karaokeTimings": [
+    {
+      "startSeconds": 0.192,
+      "endSeconds": 3.52,
+      "noteTimings": [
+        {
+          "lyric": "あ",
+          "startSeconds": 0.192,
+          "endSeconds": 0.448,
+          "startProgress": 0,
+          "endProgress": 0.07692307692307693
+        },
+        {
+          "lyric": "さ",
+          "startSeconds": 0.448,
+          "endSeconds": 0.704,
+          "startProgress": 0.07692307692307693,
+          "endProgress": 0.15384615384615385
+        },
+        {
+          "lyric": "ひ",
+          "startSeconds": 0.704,
+          "endSeconds": 0.96,
+          "startProgress": 0.15384615384615385,
+          "endProgress": 0.23076923076923078
+        },
+        {
+          "lyric": "が",
+          "startSeconds": 0.96,
+          "endSeconds": 1.216,
+          "startProgress": 0.23076923076923078,
+          "endProgress": 0.3076923076923077
+        },
+        {
+          "lyric": "き",
+          "startSeconds": 1.216,
+          "endSeconds": 1.472,
+          "startProgress": 0.3076923076923077,
+          "endProgress": 0.38461538461538464
+        },
+        {
+          "lyric": "ら",
+          "startSeconds": 1.472,
+          "endSeconds": 1.728,
+          "startProgress": 0.38461538461538464,
+          "endProgress": 0.46153846153846156
+        },
+        {
+          "lyric": "き",
+          "startSeconds": 1.728,
+          "endSeconds": 1.984,
+          "startProgress": 0.46153846153846156,
+          "endProgress": 0.5384615384615384
+        },
+        {
+          "lyric": "ら",
+          "startSeconds": 1.984,
+          "endSeconds": 2.24,
+          "startProgress": 0.5384615384615384,
+          "endProgress": 0.6153846153846154
+        },
+        {
+          "lyric": "ひ",
+          "startSeconds": 2.24,
+          "endSeconds": 2.496,
+          "startProgress": 0.6153846153846154,
+          "endProgress": 0.6923076923076923
+        },
+        {
+          "lyric": "か",
+          "startSeconds": 2.496,
+          "endSeconds": 2.752,
+          "startProgress": 0.6923076923076923,
+          "endProgress": 0.7692307692307693
+        },
+        {
+          "lyric": "り",
+          "startSeconds": 2.752,
+          "endSeconds": 3.008,
+          "startProgress": 0.7692307692307693,
+          "endProgress": 0.8461538461538461
+        },
+        {
+          "lyric": "ま",
+          "startSeconds": 3.008,
+          "endSeconds": 3.264,
+          "startProgress": 0.8461538461538461,
+          "endProgress": 0.9230769230769231
+        },
+        {
+          "lyric": "す",
+          "startSeconds": 3.264,
+          "endSeconds": 3.52,
+          "startProgress": 0.9230769230769231,
+          "endProgress": 1
+        }
+      ]
+    },
+    {
+      "startSeconds": 3.84,
+      "endSeconds": 7.168,
+      "noteTimings": [
+        {
+          "lyric": "あ",
+          "startSeconds": 3.84,
+          "endSeconds": 4.096,
+          "startProgress": 0,
+          "endProgress": 0.07692307692307693
+        },
+        {
+          "lyric": "め",
+          "startSeconds": 4.096,
+          "endSeconds": 4.352,
+          "startProgress": 0.07692307692307693,
+          "endProgress": 0.15384615384615385
+        },
+        {
+          "lyric": "が",
+          "startSeconds": 4.352,
+          "endSeconds": 4.608,
+          "startProgress": 0.15384615384615385,
+          "endProgress": 0.23076923076923078
+        },
+        {
+          "lyric": "し",
+          "startSeconds": 4.608,
+          "endSeconds": 4.864,
+          "startProgress": 0.23076923076923078,
+          "endProgress": 0.3076923076923077
+        },
+        {
+          "lyric": "と",
+          "startSeconds": 4.864,
+          "endSeconds": 5.12,
+          "startProgress": 0.3076923076923077,
+          "endProgress": 0.38461538461538464
+        },
+        {
+          "lyric": "し",
+          "startSeconds": 5.12,
+          "endSeconds": 5.376,
+          "startProgress": 0.38461538461538464,
+          "endProgress": 0.46153846153846156
+        },
+        {
+          "lyric": "と",
+          "startSeconds": 5.376,
+          "endSeconds": 5.632,
+          "startProgress": 0.46153846153846156,
+          "endProgress": 0.5384615384615384
+        },
+        {
+          "lyric": "ふ",
+          "startSeconds": 5.632,
+          "endSeconds": 5.888,
+          "startProgress": 0.5384615384615384,
+          "endProgress": 0.6153846153846154
+        },
+        {
+          "lyric": "っ",
+          "startSeconds": 5.888,
+          "endSeconds": 6.144,
+          "startProgress": 0.6153846153846154,
+          "endProgress": 0.6923076923076923
+        },
+        {
+          "lyric": "て",
+          "startSeconds": 6.144,
+          "endSeconds": 6.4,
+          "startProgress": 0.6923076923076923,
+          "endProgress": 0.7692307692307693
+        },
+        {
+          "lyric": "い",
+          "startSeconds": 6.4,
+          "endSeconds": 6.656,
+          "startProgress": 0.7692307692307693,
+          "endProgress": 0.8461538461538461
+        },
+        {
+          "lyric": "ま",
+          "startSeconds": 6.656,
+          "endSeconds": 6.912,
+          "startProgress": 0.8461538461538461,
+          "endProgress": 0.9230769230769231
+        },
+        {
+          "lyric": "す",
+          "startSeconds": 6.912,
+          "endSeconds": 7.168,
+          "startProgress": 0.9230769230769231,
+          "endProgress": 1
+        }
+      ]
+    },
+    {
+      "startSeconds": 7.488,
+      "endSeconds": 11.072,
+      "noteTimings": [
+        {
+          "lyric": "ね",
+          "startSeconds": 7.488,
+          "endSeconds": 7.744,
+          "startProgress": 0,
+          "endProgress": 0.07142857142857142
+        },
+        {
+          "lyric": "こ",
+          "startSeconds": 7.744,
+          "endSeconds": 8,
+          "startProgress": 0.07142857142857142,
+          "endProgress": 0.14285714285714285
+        },
+        {
+          "lyric": "が",
+          "startSeconds": 8,
+          "endSeconds": 8.256,
+          "startProgress": 0.14285714285714285,
+          "endProgress": 0.21428571428571427
+        },
+        {
+          "lyric": "す",
+          "startSeconds": 8.256,
+          "endSeconds": 8.512,
+          "startProgress": 0.21428571428571427,
+          "endProgress": 0.2857142857142857
+        },
+        {
+          "lyric": "や",
+          "startSeconds": 8.512,
+          "endSeconds": 8.768,
+          "startProgress": 0.2857142857142857,
+          "endProgress": 0.35714285714285715
+        },
+        {
+          "lyric": "す",
+          "startSeconds": 8.768,
+          "endSeconds": 9.024,
+          "startProgress": 0.35714285714285715,
+          "endProgress": 0.42857142857142855
+        },
+        {
+          "lyric": "や",
+          "startSeconds": 9.024,
+          "endSeconds": 9.28,
+          "startProgress": 0.42857142857142855,
+          "endProgress": 0.5
+        },
+        {
+          "lyric": "ね",
+          "startSeconds": 9.28,
+          "endSeconds": 9.536,
+          "startProgress": 0.5,
+          "endProgress": 0.5714285714285714
+        },
+        {
+          "lyric": "む",
+          "startSeconds": 9.536,
+          "endSeconds": 9.792,
+          "startProgress": 0.5714285714285714,
+          "endProgress": 0.6428571428571429
+        },
+        {
+          "lyric": "っ",
+          "startSeconds": 9.792,
+          "endSeconds": 10.048,
+          "startProgress": 0.6428571428571429,
+          "endProgress": 0.7142857142857143
+        },
+        {
+          "lyric": "て",
+          "startSeconds": 10.048,
+          "endSeconds": 10.304,
+          "startProgress": 0.7142857142857143,
+          "endProgress": 0.7857142857142857
+        },
+        {
+          "lyric": "い",
+          "startSeconds": 10.304,
+          "endSeconds": 10.56,
+          "startProgress": 0.7857142857142857,
+          "endProgress": 0.8571428571428571
+        },
+        {
+          "lyric": "ま",
+          "startSeconds": 10.56,
+          "endSeconds": 10.816,
+          "startProgress": 0.8571428571428571,
+          "endProgress": 0.9285714285714286
+        },
+        {
+          "lyric": "す",
+          "startSeconds": 10.816,
+          "endSeconds": 11.072,
+          "startProgress": 0.9285714285714286,
+          "endProgress": 1
+        }
+      ]
+    },
+    {
+      "startSeconds": 11.392,
+      "endSeconds": 14.72,
+      "noteTimings": [
+        {
+          "lyric": "か",
+          "startSeconds": 11.392,
+          "endSeconds": 11.648,
+          "startProgress": 0,
+          "endProgress": 0.07692307692307693
+        },
+        {
+          "lyric": "ね",
+          "startSeconds": 11.648,
+          "endSeconds": 11.904,
+          "startProgress": 0.07692307692307693,
+          "endProgress": 0.15384615384615385
+        },
+        {
+          "lyric": "が",
+          "startSeconds": 11.904,
+          "endSeconds": 12.16,
+          "startProgress": 0.15384615384615385,
+          "endProgress": 0.23076923076923078
+        },
+        {
+          "lyric": "り",
+          "startSeconds": 12.16,
+          "endSeconds": 12.416,
+          "startProgress": 0.23076923076923078,
+          "endProgress": 0.3076923076923077
+        },
+        {
+          "lyric": "ん",
+          "startSeconds": 12.416,
+          "endSeconds": 12.672,
+          "startProgress": 0.3076923076923077,
+          "endProgress": 0.38461538461538464
+        },
+        {
+          "lyric": "り",
+          "startSeconds": 12.672,
+          "endSeconds": 12.928,
+          "startProgress": 0.38461538461538464,
+          "endProgress": 0.46153846153846156
+        },
+        {
+          "lyric": "ん",
+          "startSeconds": 12.928,
+          "endSeconds": 13.184,
+          "startProgress": 0.46153846153846156,
+          "endProgress": 0.5384615384615384
+        },
+        {
+          "lyric": "な",
+          "startSeconds": 13.184,
+          "endSeconds": 13.44,
+          "startProgress": 0.5384615384615384,
+          "endProgress": 0.6153846153846154
+        },
+        {
+          "lyric": "っ",
+          "startSeconds": 13.44,
+          "endSeconds": 13.696,
+          "startProgress": 0.6153846153846154,
+          "endProgress": 0.6923076923076923
+        },
+        {
+          "lyric": "て",
+          "startSeconds": 13.696,
+          "endSeconds": 13.952,
+          "startProgress": 0.6923076923076923,
+          "endProgress": 0.7692307692307693
+        },
+        {
+          "lyric": "い",
+          "startSeconds": 13.952,
+          "endSeconds": 14.208,
+          "startProgress": 0.7692307692307693,
+          "endProgress": 0.8461538461538461
+        },
+        {
+          "lyric": "ま",
+          "startSeconds": 14.208,
+          "endSeconds": 14.464,
+          "startProgress": 0.8461538461538461,
+          "endProgress": 0.9230769230769231
+        },
+        {
+          "lyric": "す",
+          "startSeconds": 14.464,
+          "endSeconds": 14.72,
+          "startProgress": 0.9230769230769231,
+          "endProgress": 1
+        }
+      ]
+    }
+  ]
+}
