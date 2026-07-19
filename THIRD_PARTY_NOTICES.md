@@ -74,7 +74,7 @@ Status: **Needs evidence**. Obtain the official distribution package and license
 
 | Files | Recorded origin | Status |
 | --- | --- | --- |
-| `cards_text_data.json` | Original 335-record Japanese learning content created for the Build Week submission; vocabulary order came from the third column of an owner-provided CSV | First-party content recorded; permission for the source vocabulary column still needs owner evidence |
+| `cards_text_data.json` | Newly written examples and meanings for 335 vocabulary records; vocabulary order came from the third column of an owner-provided CSV | New submission text recorded; permission for the source vocabulary column still needs owner evidence |
 | `cards_singing_readings.json` | Singing readings newly created for the 335 submission examples | First-party/derived submission data recorded |
 | `cards_english_data.json` | English meanings and examples created for the 335 Japanese records, with structural review status and automated cross-checks | First-party submission data recorded; ongoing human language review recommended |
 

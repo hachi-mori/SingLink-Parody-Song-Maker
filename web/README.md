@@ -75,7 +75,7 @@ Browser :5173 -> /api proxy -> Fastify :5174 -> VOICEVOX :50021
 
 ## 教材
 
-- `assets/dict/cards_text_data.json`: 自作335件の問題・例文・意味
+- `assets/dict/cards_text_data.json`: 所有者提供の語彙順と、新規作成した335件の問題・例文・意味
 - `assets/dict/cards_singing_readings.json`: 335件の歌唱用ひらがな読み
 - `assets/dict/cards_english_data.json`: 335件の英訳例文・英語意味
 

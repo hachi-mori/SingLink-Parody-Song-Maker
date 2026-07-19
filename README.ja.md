@@ -63,8 +63,8 @@ C++ / Siv3D版は履歴・参照用に残していますが、Build Week提出�
 - [`2916f58`](https://github.com/hachi-mori/Tohoku-procon2025/commit/2916f58): 動的オノマトペScore生成をWeb版へ移植
 - [`416fe42`](https://github.com/hachi-mori/Tohoku-procon2025/commit/416fe42): 5曲選択を追加
 - [`f7da284`](https://github.com/hachi-mori/Tohoku-procon2025/commit/f7da284): 100語を出題と歌唱へ接続
-- [`759273d`](https://github.com/hachi-mori/Tohoku-procon2025/commit/759273d): 出版社教材由来の提出データを除去し、自作教材へ置換
-- [`67e63f8`](https://github.com/hachi-mori/Tohoku-procon2025/commit/67e63f8): 自作教材を335件へ拡張
+- [`759273d`](https://github.com/hachi-mori/Tohoku-procon2025/commit/759273d): 出版社教材由来の提出本文を除去し、例文・意味・歌唱用読みを新規作成
+- [`67e63f8`](https://github.com/hachi-mori/Tohoku-procon2025/commit/67e63f8): 新規作成した学習内容を335語分へ拡張
 - [`2391294`](https://github.com/hachi-mori/Tohoku-procon2025/commit/2391294): 英語データ、i18n、字幕監査、Score由来カラオケ時刻を追加
 - [`a654981`](https://github.com/hachi-mori/Tohoku-procon2025/commit/a654981): 4問化と音符単位の文字進行を追加
 - [`44d87fc`](https://github.com/hachi-mori/Tohoku-procon2025/commit/44d87fc)〜[`2ae471f`](https://github.com/hachi-mori/Tohoku-procon2025/commit/2ae471f): 横長・縦長・モバイル・英語初期表示・言語別表示を調整
@@ -82,7 +82,7 @@ CodexとGPT-5.6を、旧C++実装の追跡、Score変換の移植、335教材の
 - 日本のカラオケ文化を学習体験に使うこと
 - 学習者ではなく、ずんだもんが歌うこと
 - 日本語を学習対象、英語を補助情報にすること
-- 出版社教材由来の内容を自作教材へ置き換えること
+- 出版社教材由来の本文を除去し、例文・意味・歌唱用読みを新規作成すること
 - 提出版を英語初期表示にすること
 - 固定タイマーではなく実Scoreを同期の正本にすること
 - 横長・縦長・モバイルの具体的なレイアウト

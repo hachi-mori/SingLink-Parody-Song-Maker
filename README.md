@@ -63,8 +63,8 @@ The C++ / Siv3D application remains in the repository for history and reference;
 - [`2916f58`](https://github.com/hachi-mori/Tohoku-procon2025/commit/2916f58): ported dynamic onomatopoeia Score generation to the Web app
 - [`416fe42`](https://github.com/hachi-mori/Tohoku-procon2025/commit/416fe42): added five selectable source melodies
 - [`f7da284`](https://github.com/hachi-mori/Tohoku-procon2025/commit/f7da284): connected 100 onomatopoeia records to both questions and singing
-- [`759273d`](https://github.com/hachi-mori/Tohoku-procon2025/commit/759273d): removed publisher-derived submission data and replaced it with original learning content
-- [`67e63f8`](https://github.com/hachi-mori/Tohoku-procon2025/commit/67e63f8): expanded the original dataset to 335 records
+- [`759273d`](https://github.com/hachi-mori/Tohoku-procon2025/commit/759273d): removed publisher-derived submission text and replaced it with newly written examples, meanings, and singing readings
+- [`67e63f8`](https://github.com/hachi-mori/Tohoku-procon2025/commit/67e63f8): expanded that newly written learning content to 335 vocabulary records
 - [`2391294`](https://github.com/hachi-mori/Tohoku-procon2025/commit/2391294): added English learning data, i18n, subtitle auditing, and Score-derived karaoke timing
 - [`a654981`](https://github.com/hachi-mori/Tohoku-procon2025/commit/a654981): changed a play session to four questions and added note-level lyric progress
 - [`44d87fc`](https://github.com/hachi-mori/Tohoku-procon2025/commit/44d87fc) through [`2ae471f`](https://github.com/hachi-mori/Tohoku-procon2025/commit/2ae471f): refined wide, portrait, mobile, English-first, and language-specific presentation
@@ -84,7 +84,7 @@ The project owner decided:
 - to use Japanese karaoke culture as the learning metaphor;
 - that the learner answers but Zundamon sings;
 - that Japanese remains the learning target and English remains support;
-- to replace publisher-derived content with original records;
+- to remove publisher-derived text and write new examples, meanings, and singing readings;
 - to start the submission branch in English;
 - to use real Score frames, rather than a fixed timer, for highlighting; and
 - how the layout should respond on wide, portrait, and mobile screens.

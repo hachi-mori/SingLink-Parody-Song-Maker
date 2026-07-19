@@ -23,9 +23,9 @@
 
 | File/path | Type | Creator/source | License or permission | Modification | Redistribution status | Required credit | Evidence | Submission status | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `web/assets/dict/cards_text_data.json` | Japanese learning JSON, 335 records | Build Week提出用に作成。語彙順は所有者提供CSV第3列 | 本文は自作記録。入力列の利用根拠は要確認 | 旧100教材を置換し335件へ拡張 | ビルドへコピー | 未設定 | provenance、`759273d`、`67e63f8`、テスト | 要確認 | 旧出版社本文との完全一致0件という監査記録あり |
-| `web/assets/dict/cards_singing_readings.json` | Singing-reading JSON, 335 records | 上記335例文から新規作成 | 自作派生データ記録 | VOICEVOX用ひらがな読みに変換 | ビルドへコピー | VOICEVOX音声を使う成果物は別途クレジット | provenance、`67e63f8`、テスト | 提出データ | 読み再生成時はVOICEVOX条件も確認 |
-| `web/assets/dict/cards_english_data.json` | English examples/meanings JSON, 335 records | Build Week提出用に作成 | 自作記録 | 日本語例文へ完全一致で関連付け | ビルドへコピー | 未設定 | `2391294`、`reviewStatus`、字幕監査 | 提出データ | 構造監査済み。人間の言語レビュー継続推奨 |
+| `web/assets/dict/cards_text_data.json` | Japanese learning JSON, 335 records | Build Week提出用に例文・意味を新規作成。語彙順は所有者提供CSV第3列 | 新規作成本文の記録あり。入力列の利用根拠は要確認 | 旧100教材を置換し335件へ拡張 | ビルドへコピー | 未設定 | provenance、`759273d`、`67e63f8`、テスト | 要確認 | 旧出版社本文との完全一致0件という監査記録あり |
+| `web/assets/dict/cards_singing_readings.json` | Singing-reading JSON, 335 records | 上記335例文から新規作成 | 新規作成例文からの派生データ記録 | VOICEVOX用ひらがな読みに変換 | ビルドへコピー | VOICEVOX音声を使う成果物は別途クレジット | provenance、`67e63f8`、テスト | 提出データ | 読み再生成時はVOICEVOX条件も確認 |
+| `web/assets/dict/cards_english_data.json` | English examples/meanings JSON, 335 records | Build Week提出用に作成 | 新規作成記録 | 日本語例文へ完全一致で関連付け | ビルドへコピー | 未設定 | `2391294`、`reviewStatus`、字幕監査 | 提出データ | 構造監査済み。人間の言語レビュー継続推奨 |
 
 ## 伴奏WAV
 
