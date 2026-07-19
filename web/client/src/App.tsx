@@ -13,7 +13,7 @@ import { assetUrl } from './lib/assets';
 import type { GeneratedResult } from './lib/generatedResult';
 import { useLanguage } from './lib/i18n';
 
-type Screen = 'title' | 'write' | 'loading' | 'result' | 'story' | 'howto' | 'credit' | 'history';
+type Screen = 'title' | 'write' | 'loading' | 'result' | 'howto' | 'credit' | 'history';
 
 export function App() {
   const { language, t } = useLanguage();
@@ -136,12 +136,8 @@ export function App() {
     );
   }
 
-  if (screen === 'story') {
-    return <StaticImageScreen title={t('storyTitle')} description={t('storyBody')} imageSrc={assetUrl('assets/texture/assets/story.png')} onBack={() => setScreen('title')} />;
-  }
-
   if (screen === 'howto') {
-    return <StaticImageScreen title={t('howToTitle')} description={t('howToBody')} imageSrc={assetUrl('assets/texture/assets/howtoplay.png')} onBack={() => setScreen('title')} />;
+    return <StaticImageScreen title={t('howToTitle')} description={t('howToBody')} imageSrc={language === 'ja' ? assetUrl('assets/texture/assets/howtoplay.png') : undefined} onBack={() => setScreen('title')} />;
   }
 
   if (screen === 'credit') {
@@ -168,7 +164,6 @@ export function App() {
       onBaseUrlChange={setVoicevoxBaseUrl}
       onCheckVoicevox={refreshVoicevox}
       onStart={startGame}
-      onOpenStory={() => setScreen('story')}
       onOpenHowTo={() => setScreen('howto')}
       onOpenCredit={() => setScreen('credit')}
       onOpenHistory={() => setScreen('history')}

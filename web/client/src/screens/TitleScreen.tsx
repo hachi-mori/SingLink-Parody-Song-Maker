@@ -29,7 +29,6 @@ type TitleScreenProps = {
   onBaseUrlChange: (baseUrl: string) => void;
   onCheckVoicevox: () => void;
   onStart: () => void;
-  onOpenStory: () => void;
   onOpenHowTo: () => void;
   onOpenCredit: () => void;
   onOpenHistory: () => void;
@@ -112,7 +111,6 @@ export function TitleScreen(props: TitleScreenProps) {
           </div>
 
           <nav className="title-actions" aria-label={t('titleMenu')}>
-            <AssetButton imageSrc={assetUrl('assets/texture/assets/button/story.png')} label={t('story')} onClick={props.onOpenStory} />
             <AssetButton imageSrc={assetUrl('assets/texture/assets/button/start.png')} label={t('start')} onClick={props.onStart} disabled={props.loading} />
             <AssetButton imageSrc={assetUrl('assets/texture/assets/button/howtoplay.png')} label={t('howTo')} onClick={props.onOpenHowTo} />
             <button className="history-button" onClick={props.onOpenHistory}>{t('savedSongs')}</button>

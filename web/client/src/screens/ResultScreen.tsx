@@ -9,6 +9,7 @@ import { assetUrl } from '../lib/assets';
 import type { GeneratedResult } from '../lib/generatedResult';
 import { hasGeneratedAudio } from '../lib/generatedResult';
 import { useLanguage } from '../lib/i18n';
+import { showsEnglishLearningSupport } from '@shared/languageMode';
 
 type ResultScreenProps = {
   song: SongDetail;
@@ -48,7 +49,8 @@ function usePrefersReducedMotion(): boolean {
 }
 
 export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHistory }: ResultScreenProps) {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
+  const showEnglishLearningSupport = showsEnglishLearningSupport(language);
   const prefersReducedMotion = usePrefersReducedMotion();
   const audioContextRef = useRef<AudioContext | undefined>(undefined);
   const voiceBufferRef = useRef<AudioBuffer | undefined>(undefined);
@@ -284,8 +286,10 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
                       })}
                     </span>
                   </p>
-                  <p className="karaoke-english" lang="en">{task?.englishExample ?? t('translationUnavailable')}</p>
-                  <p className="karaoke-meaning" lang="en">{task?.englishMeaning ?? t('translationUnavailable')}</p>
+                  {showEnglishLearningSupport ? <>
+                    <p className="karaoke-english" lang="en">{task?.englishExample ?? t('translationUnavailable')}</p>
+                    <p className="karaoke-meaning" lang="en">{task?.englishMeaning ?? t('translationUnavailable')}</p>
+                  </> : null}
                 </article>
               );
             })}

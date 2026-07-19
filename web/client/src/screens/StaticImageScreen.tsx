@@ -3,7 +3,7 @@ import { useLanguage } from '../lib/i18n';
 
 type StaticImageScreenProps = {
   title: string;
-  imageSrc: string;
+  imageSrc?: string;
   description?: string;
   onBack: () => void;
 };
@@ -17,10 +17,10 @@ export function StaticImageScreen({ title, description, imageSrc, onBack }: Stat
           <h1>{title}</h1>
           <button className="small-button" onClick={onBack}>{t('backToTitle')}</button>
         </header>
-        {description ? <section className="static-image-description"><p>{description}</p><small>{t('japaneseReference')}</small></section> : null}
-        <div className="static-image-frame">
+        {description ? <section className="static-image-description"><p>{description}</p>{imageSrc ? <small>{t('japaneseReference')}</small> : null}</section> : null}
+        {imageSrc ? <div className="static-image-frame">
           <img src={imageSrc} alt={title} />
-        </div>
+        </div> : null}
       </section>
     </ScreenShell>
   );

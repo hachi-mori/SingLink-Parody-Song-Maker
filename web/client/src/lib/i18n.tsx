@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { languageStorageKey, resolveInitialLanguage, type AppLanguage } from '@shared/languageMode';
 
-export type Language = 'en' | 'ja';
+export type Language = AppLanguage;
 
 const messages = {
   en: {
@@ -71,7 +72,7 @@ const messages = {
     storyTitle: 'Why karaoke?',
     storyBody: 'Answer four Japanese onomatopoeia questions. Zundamon then sings the correct example sentences while Japanese lyrics light up and English subtitles explain their meaning.',
     howToTitle: 'How to play',
-    howToBody: '1. Choose one of five melodies. 2. Answer four Japanese questions. 3. Listen and follow the highlighted Japanese lyrics with English subtitles.',
+    howToBody: '1. Choose one of five melodies. 2. Answer four Japanese onomatopoeia questions. 3. Zundamon sings the correct Japanese sentences. 4. Follow the Japanese lyrics as they light up, with English subtitles below.',
     creditsTitle: 'Credits',
     creditsBody: 'This Build Week edition uses an original 335-card onomatopoeia dataset. The Japanese artwork below contains the original project credits.',
     japaneseReference: 'Original Japanese reference artwork',
@@ -88,10 +89,7 @@ export type MessageKey = keyof typeof messages.en;
 
 function detectLanguage(): Language {
   try {
-    const saved = window.localStorage.getItem('singlink.language');
-    if (saved === 'en' || saved === 'ja') return saved;
-    const primaryLanguage = navigator.languages[0] ?? navigator.language;
-    return primaryLanguage.toLowerCase().startsWith('ja') ? 'ja' : 'en';
+    return resolveInitialLanguage(window.localStorage.getItem(languageStorageKey));
   } catch {
     return 'en';
   }
@@ -109,7 +107,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(detectLanguage);
   const setLanguage = (next: Language) => {
     setLanguageState(next);
-    try { window.localStorage.setItem('singlink.language', next); } catch { /* Storage can be unavailable. */ }
+    try { window.localStorage.setItem(languageStorageKey, next); } catch { /* Storage can be unavailable. */ }
   };
   const value = useMemo<LanguageContextValue>(() => ({
     language,
