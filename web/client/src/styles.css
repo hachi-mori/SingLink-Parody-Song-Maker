@@ -1069,13 +1069,37 @@ button:disabled {
     max-height: 44svh;
   }
 
+  .game-card {
+    padding-inline: clamp(24px, 3vw, 56px);
+  }
+
+  .game-question-card {
+    width: min(1540px, 95vw);
+    padding: clamp(18px, 2.4vw, 32px) clamp(24px, 3vw, 48px);
+  }
+
+  .game-question-prompt,
+  .game-question-example {
+    width: 100%;
+    max-width: none;
+  }
+
+  .game-question-prompt {
+    font-size: clamp(22px, 2.2vw, 34px);
+  }
+
+  .game-question-example {
+    font-size: clamp(42px, 4vw, 64px);
+    line-height: 1.12;
+  }
+
   .result-layout {
     width: min(100%, 1760px);
     margin: 0 auto;
-    grid-template-columns: minmax(440px, 0.92fr) minmax(620px, 1fr);
+    grid-template-columns: minmax(260px, 0.38fr) minmax(0, 1fr);
     gap: clamp(14px, 2vw, 34px);
     align-items: center;
-    padding: clamp(28px, 4vw, 64px) clamp(28px, 3vw, 56px);
+    padding: clamp(24px, 3vw, 48px) clamp(20px, 2vw, 40px);
   }
 
   .result-character {
@@ -1090,9 +1114,51 @@ button:disabled {
 
   .result-card {
     grid-column: 2;
-    justify-self: center;
-    width: min(900px, 50vw);
-    transform: translateX(clamp(8px, 1vw, 24px));
+    justify-self: stretch;
+    display: grid;
+    grid-template-rows: auto auto auto minmax(0, 1fr) auto auto;
+    width: 100%;
+    max-width: 1120px;
+    height: calc(100svh - 80px);
+    padding: clamp(22px, 2.4vw, 38px);
+    overflow: hidden;
+    transform: none;
+  }
+
+  .result-song-source {
+    font-size: clamp(20px, 2vw, 30px);
+  }
+
+  .result-card h1 {
+    font-size: clamp(30px, 3vw, 50px);
+  }
+
+  .karaoke-line {
+    padding: clamp(10px, 1.2vw, 16px);
+    scroll-margin-block: 6px;
+  }
+
+  .karaoke-line--active {
+    transform: none;
+  }
+
+  .karaoke-lyrics {
+    min-height: 0;
+    padding: 6px 6px 6px 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .karaoke-japanese {
+    font-size: clamp(26px, 2.4vw, 38px);
+  }
+
+  .karaoke-line--active .karaoke-japanese {
+    font-size: clamp(30px, 2.8vw, 44px);
+  }
+
+  .karaoke-english {
+    font-size: clamp(16px, 1.25vw, 21px);
   }
 }
 

@@ -55,6 +55,7 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
   const instBufferRef = useRef<AudioBuffer | undefined>(undefined);
   const voiceSourceRef = useRef<AudioBufferSourceNode | undefined>(undefined);
   const instSourceRef = useRef<AudioBufferSourceNode | undefined>(undefined);
+  const lyricLineRefs = useRef<Array<HTMLElement | null>>([]);
   const playbackGenerationRef = useRef(0);
   const playbackOffsetRef = useRef(0);
   const scheduledStartRef = useRef(0);
@@ -69,6 +70,9 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
     [tasks]
   );
   const timings = generatedAudio ? result.karaokeTimings : [];
+  const activeLineIndex = timings.findIndex(
+    (timing) => getLyricState(playbackState, playbackTime, timing) === 'active'
+  );
 
   const stopSources = useCallback(() => {
     playbackGenerationRef.current += 1;
@@ -214,6 +218,14 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
     return () => window.cancelAnimationFrame(frame);
   }, [playbackState]);
 
+  useEffect(() => {
+    if (activeLineIndex < 0) return;
+    lyricLineRefs.current[activeLineIndex]?.scrollIntoView({
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+      block: 'nearest'
+    });
+  }, [activeLineIndex, prefersReducedMotion]);
+
   useEffect(() => () => {
     stopSources();
     const context = audioContextRef.current;
@@ -244,6 +256,7 @@ export function ResultScreen({ song, tasks, fullLyrics, result, onTitle, onHisto
                 <article
                   className={`karaoke-line karaoke-line--${state}${task?.isCorrect === false ? ' karaoke-line--incorrect' : ''}`}
                   key={`${line}-${lineIndex}`}
+                  ref={(element) => { lyricLineRefs.current[lineIndex] = element; }}
                 >
                   <span className="karaoke-state-label">{state === 'active' ? `▶ ${t('currentLyric')}` : state === 'completed' ? `✓ ${t('completedLyric')}` : `○ ${t('pendingLyric')}`}</span>
                   <p className="karaoke-japanese" lang="ja">
