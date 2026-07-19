@@ -1,78 +1,76 @@
-# Codex作業状況
+# Codex 作業状況
 
 最終更新: 2026-07-19
 
 ## 現在の状態
 
-英語の遊び方、タイトル設定、結果歌詞の補助表示を再調整し、検証まで完了。コミット作成前の最終状態確認中。
+OpenAI Build Week提出ドキュメント一式の作成、検証、独立レビューを完了し、日本語コミットで保存する段階。
 
-## Git状態
+- ブランチ: `codex/build-week-submission-docs`
+- 作業開始HEAD: `2ae471f 英語案内と歌詞状態表示を整理`
+- 基準: 作業開始時の最新 `origin/openai-build-week` と一致
+- 公式期間比較: `c1aab5f` の次のコミットから現行HEADまで
+- 最終体験差分の中間比較点: `f7da284`
+- コード、教材JSON、Score、伴奏、UIアセット、依存関係: 変更なし
+- 未追跡の `local-only/`: `.gitignore` 対象。変更なし
+- push / Pull Request / デプロイ / Devpostプロジェクト作成・提出: 未実施
 
-- ブランチ: `codex/build-week-karaoke-ui`
-- 基点: `67e63f8 自作オノマトペ教材を全335語へ拡張`
-- `origin/openai-build-week` が基準コミットを含むことを確認済み。
-- 開始時の未追跡 `local-only/` は保持。内容へアクセス・変更しない。
-- push、PR、デプロイ: 未実施。
+## 完成した提出資料
 
-## 確認済み
+- 英語提出README: `README.md`
+- 日本語README: `README.ja.md`
+- 開発者・審査環境向けWeb手順: `web/README.md`
+- 審査員向け5分実行手順: `docs/judge-testing-guide.md`
+- Build Week前後の開発記録: `docs/build-week-development.md`
+- 第三者ソフトウェア・素材一覧: `THIRD_PARTY_NOTICES.md`
+- ファイル単位の素材台帳: `docs/asset-inventory.md`
+- 提出者本人の最終チェックリスト: `docs/submission-owner-checklist.md`
+- 提出用画面証跡4枚: `docs/images/build-week/`
 
-- 日本語教材: 335件。
-- 5曲: `memorizationSourceSongs` とテストで維持。
-- ランダム4問: `onomatopoeiaQuestionsPerGame = 4` へ変更済み。
-- 動的Score: `createMemorizationScore` が `phraseRanges` を返す。
-- VOICEVOXフレームレート: 93.75 fps。
-- server/direct両経路が同じ `buildMemorizationSynthesisPlan` を使う。
-- 結果再生は伴奏と歌声を同じ `AudioContext` 時刻で開始する。
-
-## 設計判断
-
-- 英語教材は別JSONで335件を管理し、語と日本語例文の双方を照合する。
-- UI言語はReact Context、ブラウザ言語初期値、localStorage保存で切り替える。
-- 同期は `phraseRanges` とScoreの `frame_length` から導出し、固定タイマーは使わない。
-- フレーズ時刻を正確にし、現在行のみ左から右へ進捗表示する。
+既存の実装記録と権利監査も現行仕様へ整合させ、`BACKLOG.md` と `BLOCKERS.md` に提出者判断待ちを記録した。
 
 ## 検証結果
 
-- `npm.cmd run test`: 6ファイル、29テスト成功。4問定数、4文×5曲、335教材×4文×5曲、音符・休符タイミングを確認。
-- `npm.cmd run typecheck`: 成功。
-- `npm.cmd run build`: 成功（Vite 1592 modules）。
-- `npm.cmd run audit:english-subtitles`: 335/335、監査候補13件。
-- `git diff --check`: 成功。
-- 1280x720、820x1180、390x844: 横はみ出しなし。英語タイトル、クイズ、正誤、結果、遊び方、履歴を確認。
-- VOICEVOX 0.25.1 server経路: 4問へ回答し、4文の実音声生成に成功。
-- カラオケ: Score音符の `frame_length / 93.75` で各文字の着色区間を生成。実音声再生で文字が順に着色し、一時停止中400msは値不変、再開後に進行することを確認。
-- 1280x720、820x1180、390x844: 4行・4字幕、横はみ出しなし。日本語歌詞と英語字幕、画像内日本語と画像下英語ラベルの重なり0件。
-- ブラウザログで検出した開発時ホットリロードの `AudioContext` 二重closeを修正。終了済みContextを再closeせず、失敗も安全に処理する。
-- 再生状態: 再実行で0秒復帰、一時停止中はclip値不変、再開後はclip値進行を確認。
-- ブラウザコンソール: warning/error 0件。
-- C++ / Siv3D、5曲Score/伴奏、`package-lock.json`: 差分なし。
-- 読み取り専用レビュー: 重大・中程度の指摘なし。軽微2件を `BACKLOG.md` のBL-008、BL-009へ記録。
-- 横長UI再確認: 1280x720の問題文は実効幅1133px・最大22文字相当、1600x900は1418px・最大22文字相当。実生成した4歌詞は両サイズですべて1行表示。
-- 縦長回帰: 820x1180と390x844で横スクロールなし。820px幅は4歌詞とも1行、390px幅は従来どおり大きな文字を維持して2行表示。
-- 歌唱行追従: 1280x720で先頭行と4行目が再生中に結果カード内へ自動スクロールされ、全体が表示されることを確認。
-- 横長UI変更後の `npm.cmd run test`: 6ファイル・29テスト成功。`npm.cmd run typecheck`、`npm.cmd run build`、英語字幕335/335監査、`git diff --check` 成功。
-- 横長UIの読み取り専用レビュー: 歌唱行追従と操作バー常時表示の中程度指摘を修正。再レビューで重大・中程度の指摘なし。
-- 添付画像対応: 1200x356で問題文と3選択肢が1行、選択肢幅360px、横スクロールなし。教材内最長8文字も収容可能。
-- 添付画像対応: 1895x892で歌詞カード左端802px、幅980pxへ右寄せ。1280x720では左端525px、幅730pxでキャラクター本体と分離し、歌唱中行も1行表示。
-- 縦長回帰: 820x1180と390x844で横スクロールなし。横長専用ルールの影響なし。
-- 最終検証: `npm.cmd run test` 6ファイル・29件成功、`npm.cmd run typecheck` 成功、`npm.cmd run build` 成功、`git diff --check` 成功。
-- 読み取り専用レビュー: 重大・中程度の指摘なし。
-- 言語モード実装: 保存値なしは英語、保存済み `en` / `ja` を維持する純粋ヘルパーと4テストをGPT-5.6 Terraが追加。
-- 英語タイトル: Storyボタンなし。英語How toは4ステップの英文のみで画像0件・日本語参考ラベル0件。
-- 日本語How to: 既存 `howtoplay.png` 1件を維持。
-- 言語別結果: 日本語は英訳例文0件・英語意味0件・日本語歌詞4件、英語は英訳例文4件・英語意味4件・日本語歌詞4件。
-- 最終検証: `npm.cmd run test` 7ファイル・33件成功、`npm.cmd run typecheck` 成功、`npm.cmd run build` 成功、英語字幕335/335、`git diff --check` 成功。
-- 最終読み取り専用レビュー: 重大・中程度の指摘なし。CSS、C++、アセット、依存関係に差分なし。
-- 英語How to: 大きな番号・見出し・補足文を持つ4ステップ専用画面へ変更。1280px幅の実ブラウザで4カード表示を確認。
-- タイトル設定: VOICEVOX接続と`Language`を別々の外枠付きブロックに分離し、実ブラウザで確認。
-- 結果歌詞: 状態凡例と行内の歌唱状態文字ラベルを削除。誤答は右上の×ではなく、行内の`Not quite`／`ふせいかい`バッジで表示する。
-- 今回の最終検証: `npm.cmd run test` 7ファイル・33件成功、`npm.cmd run typecheck` 成功、`npm.cmd run build` 成功、`git diff --check` 成功。
+2026-07-19に次を実行した。
 
-## 次の作業
+- `npm.cmd run test`: 7ファイル、33件成功
+- `npm.cmd run typecheck`: 成功
+- `npm.cmd run build`: 成功（Vite 8.0.16、1594 modules transformed）
+- `npm.cmd run audit:english-subtitles`: 335/335件。人手ニュアンス確認候補13件
+- Markdownローカルリンク検査: 19文書、欠落0件
+- `git diff --check`: 成功
+- C++ / Siv3Dビルド: リポジトリ指示により未実施
 
-1. Git差分・状態を最終確認する。
-2. 日本語コミットを作成する。
+## 実ブラウザ確認
 
-## ブロッカー
+Windows、1280×720、ローカルVOICEVOX 0.25.1で、次を確認した。
 
-なし。
+- 英語初期タイトル、5曲選択、VOICEVOX接続成功
+- 英語 `How to play` の4ステップ
+- ランダム4問を `1/4` から `4/4` まで完走
+- 4つの正解例文の歌声生成と結果表示
+- 日本語歌詞4行、英訳例文、英語意味、誤答時 `Not quite`
+- 再生、一時停止、再開と歌詞進行
+- 英語から日本語、日本語から英語への表示切替
+- ブラウザのwarning/errorログ0件
+
+証跡は `title-en.png`、`how-to-en.png`、`quiz-en.png`、`result-en.png` として保存した。既存記録にある820×1180、390×844のレスポンシブ確認結果も開発記録へ統合した。
+
+## レビュー結果
+
+- GPT-5.6 Terraによる実装事実監査: 現行コードとGit時系列を確認
+- GPT-5.6 Terraによる権利監査: 205 npm packagesと公開素材を台帳化
+- GPT-5.6 Terraによる最終読み取り専用レビュー: 重大指摘0件
+- 中程度5件を修正: 画面キャプチャの台帳追加、状態記録更新、計画範囲更新、公式Devpostリンク追加、335教材の出典表現限定
+- 軽微3件を修正: 曲名一致、未使用Story素材の説明、README内タイトル画像重複
+
+## 提出者本人の判断・作業が必要な項目
+
+- リポジトリ全体へ適用するコードライセンス
+- 画像・GIF・フォント・伴奏・Scoreの出典または許諾証拠
+- `VOICEVOX:ずんだもん` をアプリ、README、動画または説明へ適切に表示する最終確認
+- コア機能を実装したCodexタスクで `/feedback` を実行し、正式Session IDを取得
+- 3分未満の公開または限定公開YouTube動画と音声説明
+- Devpost本文、動画URL、リポジトリ公開範囲、審査アクセスの本人最終確認
+
+詳細は `BLOCKERS.md` と `docs/submission-owner-checklist.md` を参照する。

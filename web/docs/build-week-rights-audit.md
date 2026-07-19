@@ -107,6 +107,8 @@ cards_text_data.json ─> generate-onomatopoeia-readings.mjs ─> cards_singing_
 
 - 画像・GIF・フォント・VOICEVOXの提出利用条件。
 
+提出時点の素材別判定は [`docs/asset-inventory.md`](../../docs/asset-inventory.md)、配布物に含める表示は [`THIRD_PARTY_NOTICES.md`](../../THIRD_PARTY_NOTICES.md)、提出者が行う最終判断は [`docs/submission-owner-checklist.md`](../../docs/submission-owner-checklist.md) を正本とする。
+
 ## 実施結果
 
 - 第3列全335件から新規例文・意味・歌唱用読みを作成した。先に動作確認済みだった先頭100件は内容を維持し、残り235件を追加した。
