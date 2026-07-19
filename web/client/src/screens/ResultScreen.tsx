@@ -250,7 +250,7 @@ export function ResultScreen({ song, tasks, fullLyrics, result, demoDisclosure, 
             </aside>
           ) : null}
           <p className="result-song-source">{isDemo ? t('demoEyebrow') : t('songSourceEyebrow')}</p>
-          <h1>{isDemo ? t('demoSongTitle') : t('songMadeWith', { song: song.sourceSong?.title ?? song.trackName ?? song.title })}</h1>
+          <h1>{t('songMadeWith', { song: song.sourceSong?.title ?? song.trackName ?? song.title })}</h1>
           <div className="lyrics-box karaoke-lyrics" aria-live="polite">
             {lines.map((line, lineIndex) => {
               const timing = timings[lineIndex];

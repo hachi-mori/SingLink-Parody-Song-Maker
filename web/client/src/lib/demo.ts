@@ -15,6 +15,12 @@ type DemoManifest = {
   id: string;
   title: { ja: string; en: string };
   disclosure: { ja: string; en: string };
+  sourceSong: {
+    id: string;
+    title: string;
+    scorePath: string;
+    accompanimentPath: string;
+  };
   voice: {
     path: string;
     credit: string;
@@ -50,6 +56,13 @@ function assertDemoManifest(value: unknown): asserts value is DemoManifest {
   }
   if (!isRecord(value.disclosure) || typeof value.disclosure.ja !== 'string' || typeof value.disclosure.en !== 'string') {
     throw new Error('Demo disclosure is missing.');
+  }
+  if (!isRecord(value.sourceSong)
+    || typeof value.sourceSong.id !== 'string'
+    || typeof value.sourceSong.title !== 'string'
+    || typeof value.sourceSong.scorePath !== 'string'
+    || typeof value.sourceSong.accompanimentPath !== 'string') {
+    throw new Error('Demo source song metadata is invalid.');
   }
   if (!isRecord(value.voice) || typeof value.voice.path !== 'string' || typeof value.voice.credit !== 'string') {
     throw new Error('Demo voice metadata is invalid.');
@@ -133,11 +146,11 @@ export async function loadDemoBundle(): Promise<DemoBundle> {
     problems: [],
     onomatopoeiaEntries: questions,
     sourceSong: {
-      id: `${manifest.id}-source`,
-      title: manifest.title.ja,
-      scoreFileName: 'manifest.json',
-      scoreUrl: manifestUrl,
-      instFileName: manifest.accompaniment.path.split('/').at(-1) ?? 'original-accompaniment.wav',
+      id: manifest.sourceSong.id,
+      title: manifest.sourceSong.title,
+      scoreFileName: manifest.sourceSong.scorePath.split('/').at(-1) ?? 'score.json',
+      scoreUrl: assetUrl(manifest.sourceSong.scorePath),
+      instFileName: manifest.accompaniment.path.split('/').at(-1) ?? 'accompaniment.wav',
       instUrl: accompanimentUrl
     }
   };
@@ -152,7 +165,7 @@ export async function loadDemoBundle(): Promise<DemoBundle> {
       source: 'demo',
       blob: voiceBlob,
       blobUrl: voiceUrl,
-      fileName: 'singlink-original-demo.wav',
+      fileName: manifest.voice.path.split('/').at(-1) ?? 'singlink-demo.wav',
       karaokeTimings: manifest.karaokeTimings
     },
     disclosure: manifest.disclosure,

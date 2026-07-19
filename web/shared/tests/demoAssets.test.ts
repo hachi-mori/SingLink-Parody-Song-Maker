@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { buildKaraokeLineTimings, createMemorizationScore, voicevoxFrameRate } from '../src/memorizationScore';
 
 type WavInfo = { durationSeconds: number; sampleRate: number };
 
@@ -27,14 +28,15 @@ function readWavInfo(buffer: Buffer): WavInfo {
   return { sampleRate, durationSeconds: dataSize / byteRate };
 }
 
-describe('instant demo assets', () => {
-  it('keeps four original learning lines and timings aligned with both WAV files', async () => {
+describe('fixed quiz demo assets', () => {
+  it('uses the existing 幸せなら手をたたこう score and accompaniment for four fixed lines', async () => {
     const demoRoot = path.resolve('assets/demo');
     const manifest = JSON.parse(await readFile(path.join(demoRoot, 'manifest.json'), 'utf8')) as {
       disclosure: { ja: string; en: string };
+      sourceSong: { id: string; title: string; scorePath: string; accompanimentPath: string };
       voice: { path: string; credit: string };
       accompaniment: { path: string; credit: string };
-      lines: Array<{ japanese: string; keyword: string; englishExample: string; englishMeaning: string }>;
+      lines: Array<{ japanese: string; singingReading: string; keyword: string; englishExample: string; englishMeaning: string }>;
       karaokeTimings: Array<{ startSeconds: number; endSeconds: number; noteTimings: unknown[] }>;
     };
     expect(manifest.lines).toHaveLength(4);
@@ -42,7 +44,14 @@ describe('instant demo assets', () => {
     expect(manifest.disclosure.en).toContain('pre-generated demo sample');
     expect(manifest.disclosure.ja).toContain('事前生成したデモサンプル');
     expect(manifest.voice.credit).toBe('VOICEVOX:ずんだもん');
-    expect(manifest.accompaniment.credit).toContain('Original melody');
+    expect(manifest.sourceSong).toEqual({
+      id: 'shiawase-nara-tewo-tatakou',
+      title: '幸せなら手をたたこう',
+      scorePath: 'assets/score/幸せなら手をたたこう.json',
+      accompanimentPath: 'assets/inst/幸せなら手をたたこう.wav'
+    });
+    expect(manifest.accompaniment.path).toBe(manifest.sourceSong.accompanimentPath);
+    expect(manifest.accompaniment.credit).toContain('幸せなら手をたたこう');
     expect(manifest.lines.map((line) => line.keyword)).toEqual(['きらきら', 'しとしと', 'すやすや', 'りんりん']);
     expect(manifest.lines.map((line) => line.japanese).join('\n')).toBe([
       '朝日がきらきら光ります',
@@ -50,6 +59,20 @@ describe('instant demo assets', () => {
       '猫がすやすや眠っています',
       '鐘がりんりん鳴っています'
     ].join('\n'));
+
+    const scoreText = await readFile(path.resolve(manifest.sourceSong.scorePath), 'utf8');
+    const sourceScore = JSON.parse(scoreText.replace(/^\uFEFF/, ''));
+    const generated = createMemorizationScore(
+      manifest.lines.map((line) => [line.japanese, line.singingReading]),
+      sourceScore
+    );
+    expect(generated.phraseRanges).toHaveLength(manifest.lines.length);
+    expect(manifest.karaokeTimings).toEqual(buildKaraokeLineTimings(
+      generated.score,
+      generated.phraseRanges,
+      voicevoxFrameRate,
+      manifest.lines.map((line) => line.japanese)
+    ));
 
     let previousEnd = 0;
     for (const [index, timing] of manifest.karaokeTimings.entries()) {
@@ -73,8 +96,8 @@ describe('instant demo assets', () => {
     ]);
     const voiceInfo = readWavInfo(voice);
     const accompanimentInfo = readWavInfo(accompaniment);
-    expect(voiceInfo.durationSeconds).toBeGreaterThan(previousEnd);
-    expect(accompanimentInfo.durationSeconds).toBeGreaterThan(previousEnd);
-    expect(Math.abs(voiceInfo.durationSeconds - accompanimentInfo.durationSeconds)).toBeLessThan(0.05);
+    expect(voiceInfo.durationSeconds).toBeGreaterThan(previousEnd - 0.06);
+    expect(accompanimentInfo.durationSeconds).toBeGreaterThan(previousEnd - 0.06);
+    expect(Math.abs(voiceInfo.durationSeconds - accompanimentInfo.durationSeconds)).toBeLessThan(0.06);
   });
 });

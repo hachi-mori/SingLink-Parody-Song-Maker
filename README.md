@@ -44,7 +44,7 @@ The included dataset contains 335 onomatopoeia learning records with newly writt
 - Voice result history stored in the browser with IndexedDB
 - Responsive layouts checked at 1280×720, 820×1180, and 390×844
 - Reduced-motion support while preserving lyric timing
-- Fixed-question demo with four original examples, an original melody and accompaniment, pre-generated `VOICEVOX:ずんだもん` singing, and the real karaoke result UI
+- Fixed-question demo with four original examples sung to the in-project `幸せなら手をたたこう` score and accompaniment, pre-generated with `VOICEVOX:ずんだもん`
 
 ## What was built during OpenAI Build Week
 
