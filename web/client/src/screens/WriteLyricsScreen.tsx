@@ -20,6 +20,7 @@ import { useLanguage } from '../lib/i18n';
 
 type WriteLyricsScreenProps = {
   song: SongDetail;
+  fixedOnomatopoeiaEntries?: OnomatopoeiaEntry[];
   onComplete: (tasks: SolvedTask[], fullLyrics: string, inputTexts: string[]) => void;
   onCancel: () => void;
 };
@@ -69,7 +70,7 @@ function prepareOnomatopoeiaOptions(entries: OnomatopoeiaEntry[], correctAnswer:
   };
 }
 
-export function WriteLyricsScreen({ song, onComplete, onCancel }: WriteLyricsScreenProps) {
+export function WriteLyricsScreen({ song, fixedOnomatopoeiaEntries, onComplete, onCancel }: WriteLyricsScreenProps) {
   const { language, t } = useLanguage();
   const [countdownStartedAt] = useState(() => Date.now());
   const [started, setStarted] = useState(false);
@@ -91,10 +92,11 @@ export function WriteLyricsScreen({ song, onComplete, onCancel }: WriteLyricsScr
   }>();
 
   const onomatopoeiaProblems = useMemo(() => {
-    return song.mode === 'onomatopoeiaQuiz'
-      ? takeShuffled(song.onomatopoeiaEntries ?? [], onomatopoeiaQuestionsPerGame)
-      : [];
-  }, [song]);
+    if (song.mode !== 'onomatopoeiaQuiz') {
+      return [];
+    }
+    return fixedOnomatopoeiaEntries ?? takeShuffled(song.onomatopoeiaEntries ?? [], onomatopoeiaQuestionsPerGame);
+  }, [song, fixedOnomatopoeiaEntries]);
 
   const problemCount = song.mode === 'onomatopoeiaQuiz' ? onomatopoeiaProblems.length : song.problems.length;
   const currentProblem = song.problems[currentIndex];

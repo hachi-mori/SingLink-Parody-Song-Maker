@@ -1,4 +1,4 @@
-import type { KaraokeLineTiming, SolvedTask, SongDetail } from '@shared/types';
+import type { KaraokeLineTiming, OnomatopoeiaEntry, SolvedTask, SongDetail } from '@shared/types';
 import type { GeneratedResult } from './generatedResult';
 import { assetUrl } from './assets';
 
@@ -29,6 +29,7 @@ type DemoManifest = {
 
 export type DemoBundle = {
   song: SongDetail;
+  questions: OnomatopoeiaEntry[];
   tasks: SolvedTask[];
   fullLyrics: string;
   result: GeneratedResult;
@@ -71,6 +72,9 @@ function assertDemoManifest(value: unknown): asserts value is DemoManifest {
       || typeof line.englishMeaning !== 'string') {
       throw new Error('A demo lyric line is invalid.');
     }
+    if (!line.japanese.includes(line.keyword)) {
+      throw new Error('A demo question is missing its answer.');
+    }
   }
 }
 
@@ -104,6 +108,18 @@ export async function loadDemoBundle(): Promise<DemoBundle> {
     englishExample: line.englishExample,
     englishMeaning: line.englishMeaning
   }));
+  const questions: OnomatopoeiaEntry[] = manifest.lines.map((line) => ({
+    word: line.keyword,
+    reading: line.keyword,
+    answer: line.keyword,
+    explanation: line.englishMeaning,
+    questionText: line.japanese.replace(line.keyword, '○○'),
+    displayText: line.japanese,
+    singingReading: line.singingReading,
+    englishExample: line.englishExample,
+    englishMeaning: line.englishMeaning,
+    translationReviewStatus: 'reviewed'
+  }));
   const accompanimentUrl = assetUrl(manifest.accompaniment.path);
   const song: SongDetail = {
     id: manifest.id,
@@ -115,6 +131,7 @@ export async function loadDemoBundle(): Promise<DemoBundle> {
     mode: 'onomatopoeiaQuiz',
     trackName: manifest.title.ja,
     problems: [],
+    onomatopoeiaEntries: questions,
     sourceSong: {
       id: `${manifest.id}-source`,
       title: manifest.title.ja,
@@ -127,6 +144,7 @@ export async function loadDemoBundle(): Promise<DemoBundle> {
 
   return {
     song,
+    questions,
     tasks,
     fullLyrics: manifest.lines.map((line) => line.japanese).join('\n'),
     result: {

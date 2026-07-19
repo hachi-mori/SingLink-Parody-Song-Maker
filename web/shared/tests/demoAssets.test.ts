@@ -34,7 +34,7 @@ describe('instant demo assets', () => {
       disclosure: { ja: string; en: string };
       voice: { path: string; credit: string };
       accompaniment: { path: string; credit: string };
-      lines: Array<{ japanese: string; englishExample: string; englishMeaning: string }>;
+      lines: Array<{ japanese: string; keyword: string; englishExample: string; englishMeaning: string }>;
       karaokeTimings: Array<{ startSeconds: number; endSeconds: number; noteTimings: unknown[] }>;
     };
     expect(manifest.lines).toHaveLength(4);
@@ -43,12 +43,24 @@ describe('instant demo assets', () => {
     expect(manifest.disclosure.ja).toContain('事前生成したデモサンプル');
     expect(manifest.voice.credit).toBe('VOICEVOX:ずんだもん');
     expect(manifest.accompaniment.credit).toContain('Original melody');
+    expect(manifest.lines.map((line) => line.keyword)).toEqual(['きらきら', 'しとしと', 'すやすや', 'りんりん']);
+    expect(manifest.lines.map((line) => line.japanese).join('\n')).toBe([
+      '朝日がきらきら光ります',
+      '雨がしとしと降っています',
+      '猫がすやすや眠っています',
+      '鐘がりんりん鳴っています'
+    ].join('\n'));
 
     let previousEnd = 0;
     for (const [index, timing] of manifest.karaokeTimings.entries()) {
-      expect(manifest.lines[index]?.japanese.length).toBeGreaterThan(0);
-      expect(manifest.lines[index]?.englishExample.length).toBeGreaterThan(0);
-      expect(manifest.lines[index]?.englishMeaning.length).toBeGreaterThan(0);
+      const line = manifest.lines[index];
+      expect(line).toBeDefined();
+      if (!line) throw new Error(`Missing demo line ${index}`);
+      expect(line.japanese.length).toBeGreaterThan(0);
+      expect(line.englishExample.length).toBeGreaterThan(0);
+      expect(line.englishMeaning.length).toBeGreaterThan(0);
+      expect(line.japanese).toContain(line.keyword);
+      expect(line.japanese.replace(line.keyword, '○○')).toContain('○○');
       expect(timing.startSeconds).toBeGreaterThanOrEqual(previousEnd);
       expect(timing.endSeconds).toBeGreaterThan(timing.startSeconds);
       expect(timing.noteTimings.length).toBeGreaterThan(0);

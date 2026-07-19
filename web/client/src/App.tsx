@@ -14,6 +14,7 @@ import { assetUrl } from './lib/assets';
 import type { GeneratedResult } from './lib/generatedResult';
 import { useLanguage } from './lib/i18n';
 import { loadDemoBundle, type DemoBundle } from './lib/demo';
+import { completeFixedDemo, getFixedDemoQuestions, shouldCheckVoicevoxOnInitialLoad } from './lib/demoFlow';
 
 type Screen = 'title' | 'write' | 'loading' | 'result' | 'howto' | 'credit' | 'history';
 
@@ -34,6 +35,7 @@ export function App() {
   const [inputTexts, setInputTexts] = useState<string[]>([]);
   const [generatedResult, setGeneratedResult] = useState<GeneratedResult>();
   const [demoInfo, setDemoInfo] = useState<Pick<DemoBundle, 'disclosure' | 'credits'>>();
+  const [demoBundle, setDemoBundle] = useState<DemoBundle>();
   const demoRequestedRef = useRef(false);
 
   const refreshVoicevox = useCallback(async () => {
@@ -46,12 +48,13 @@ export function App() {
     try {
       const demo = await loadDemoBundle();
       setSongDetail(demo.song);
-      setSolvedTasks(demo.tasks);
-      setFullLyrics(demo.fullLyrics);
+      setSolvedTasks([]);
+      setFullLyrics('');
       setInputTexts([]);
-      setGeneratedResult(demo.result);
+      setGeneratedResult(undefined);
       setDemoInfo({ disclosure: demo.disclosure, credits: demo.credits });
-      setScreen('result');
+      setDemoBundle(demo);
+      setScreen('write');
     } catch (error) {
       setTitleError(language === 'en'
         ? t('demoLoadError')
@@ -72,6 +75,11 @@ export function App() {
     };
     void load();
   }, []);
+
+  useEffect(() => {
+    if (!shouldCheckVoicevoxOnInitialLoad(window.location.search)) return;
+    void refreshVoicevox();
+  }, [refreshVoicevox]);
 
   useEffect(() => {
     if (demoRequestedRef.current || new URLSearchParams(window.location.search).get('demo') !== '1') return;
@@ -111,6 +119,7 @@ export function App() {
       setInputTexts([]);
       setGeneratedResult(undefined);
       setDemoInfo(undefined);
+      setDemoBundle(undefined);
       setScreen('write');
     } catch (error) {
       setTitleError(language === 'en' ? t('genericLoadError') : error instanceof Error ? error.message : String(error));
@@ -123,8 +132,18 @@ export function App() {
     return (
       <WriteLyricsScreen
         song={songDetail}
+        fixedOnomatopoeiaEntries={demoBundle ? getFixedDemoQuestions(demoBundle) : undefined}
         onCancel={() => setScreen('title')}
         onComplete={(tasks, lyrics, inputs) => {
+          if (demoBundle) {
+            const completion = completeFixedDemo(demoBundle, inputs);
+            setSolvedTasks(completion.tasks);
+            setFullLyrics(completion.fullLyrics);
+            setInputTexts(completion.inputTexts);
+            setGeneratedResult(completion.result);
+            setScreen(completion.nextScreen);
+            return;
+          }
           setSolvedTasks(tasks);
           setFullLyrics(lyrics);
           setInputTexts(inputs);
