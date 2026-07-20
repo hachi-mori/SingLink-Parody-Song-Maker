@@ -10,7 +10,7 @@
 | BL-004 | 2026-07-16 | 他の曲・C++版への展開 | Web全般、Siv3D版 | 低 | Web版の3例文完成後に別タスクで扱う | 未着手 |
 | BL-005 | 2026-07-16 | GitHub Pages実環境でdirect経路の聴感・CORS確認 | ブラウザ直接VOICEVOX経路 | 低 | `.github.io` 条件を満たす公開環境で伴奏同期、話者切替、CORSを人間が確認する | 未着手 |
 | BL-006 | 2026-07-16 | WAVのJUNK/LISTチャンクと破損境界の追加テスト | 共有WAV処理 | 低 | 現行のfmt/data・PCMトリムテストに、補助チャンクと不正サイズ境界を追加する | 未着手 |
-| BL-007 | 2026-07-19 | 画像・GIF・フォント・VOICEVOXの提出条件確認 | Web公開資産、クレジット | 中 | `docs/asset-inventory.md` と `THIRD_PARTY_NOTICES.md` へ調査結果を記録。出典・許諾証拠と最終採否は提出者が確認する | 調査済・提出者確認待ち |
+| BL-007 | 2026-07-19 | 画像・GIF・フォント・VOICEVOXの提出条件確認 | Web公開資産、クレジット | 中 | MIT適用範囲、Ryotsu許諾要約、hachi-mori制作音源・Score、OFL、VOICEVOX条件を台帳化 | 完了 |
 | BL-008 | 2026-07-19 | カラオケ凡例のaria-labelを日本語UIでも翻訳する | `ResultScreen.tsx`、i18n | 低 | 独立レビューで、可視文言は翻訳済みだが凡例のaria-labelのみ英語固定と確認 | 未着手 |
 | BL-009 | 2026-07-19 | 英語字幕監査スクリプト単体でもスキーマ・件数・reviewStatusを検査する | `audit-english-subtitles.mjs` | 低 | Vitestでは検査済みだが、監査コマンド単体の検査範囲をさらに自己完結させられる | 未着手 |
 

@@ -78,13 +78,13 @@ cards_text_data.json ─> generate-onomatopoeia-readings.mjs ─> cards_singing_
 - `assets/texture/assets/button/` の6件
 - `assets/texture/assets/` 直下の19件
 
-今回は変更せず、出典・利用条件は確認待ちとして残す。
+2026-07-20追補: 全25件をRyotsu制作と確認した。所有者はSingLink公開・Build Week提出用途の許諾根拠を非公開保管し、公開要約を `docs/permissions/ryotsu-assets.md` に記録した。画像はMIT対象外とする。
 
 ### フォント 1件
 
 - `assets/texture/Futehodo-MaruGothic.ttf`
 
-今回は変更せず、ライセンスと再配布条件は確認待ちとして残す。
+2026-07-20追補: 公式配布元を確認し、SIL Open Font License 1.1全文を `assets/texture/OFL.txt` に配置した。追跡TTFはVersion 1.000のまま維持し、ローカル保管のVersion 1.03とは別hashであることを台帳化した。
 
 ### VOICEVOX関係
 
@@ -93,7 +93,7 @@ cards_text_data.json ─> generate-onomatopoeia-readings.mjs ─> cards_singing_
 - クライアント直接接続とサーバー接続の音声合成処理
 - 話者IDとクレジット表示
 
-今回は教材本文の置換に必要な読みデータ以外を主要実装対象にしない。提出前にVOICEVOX利用規約、話者ごとの利用条件、必要なクレジット表記を別途確認する。
+今回は教材本文の置換に必要な読みデータ以外を主要実装対象にしない。2026-07-20にVOICEVOXとずんだもん音源の公式条件を再確認し、必要表記を **`VOICEVOX:ずんだもん`** へ統一した。
 
 ## 自作教材の生成規則
 
@@ -103,9 +103,11 @@ cards_text_data.json ─> generate-onomatopoeia-readings.mjs ─> cards_singing_
 4. 第1・第2列と旧カード本文は生成材料として使わない。
 5. 旧本文との完全一致、語の欠落、重複、読みの文字種をテスト・監査する。
 
-## 残る確認待ち
+## 2026-07-19時点の確認待ち（2026-07-20解消）
 
-- 画像・GIF・フォント・VOICEVOXの提出利用条件。
+- 画像・GIF・フォント・VOICEVOXの提出利用条件は、2026-07-20の所有者確認と公式条件確認で解消した。
+- 公開対象の5曲のScore・伴奏はhachi-mori本人が制作し、演奏/打ち込み・書き出しを行ったと確認した。
+- コードはMIT License、Copyright © 2025–2026 hachi-moriとし、個別素材を `LICENSE_SCOPE.md` で分離した。
 
 提出時点の素材別判定は [`docs/asset-inventory.md`](../../docs/asset-inventory.md)、配布物に含める表示は [`THIRD_PARTY_NOTICES.md`](../../THIRD_PARTY_NOTICES.md)、提出者が行う最終判断は [`docs/submission-owner-checklist.md`](../../docs/submission-owner-checklist.md) を正本とする。
 

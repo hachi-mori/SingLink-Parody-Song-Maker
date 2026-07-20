@@ -9,6 +9,7 @@ import { LoadingScreen } from './screens/LoadingScreen';
 import { ResultScreen } from './screens/ResultScreen';
 import { StaticImageScreen } from './screens/StaticImageScreen';
 import { HowToScreen } from './screens/HowToScreen';
+import { CreditsScreen } from './screens/CreditsScreen';
 import { HistoryScreen } from './screens/HistoryScreen';
 import { assetUrl } from './lib/assets';
 import type { GeneratedResult } from './lib/generatedResult';
@@ -194,6 +195,9 @@ export function App() {
   }
 
   if (screen === 'credit') {
+    if (language === 'en') {
+      return <CreditsScreen onBack={() => setScreen('title')} />;
+    }
     return <StaticImageScreen title={t('creditsTitle')} description={t('creditsBody')} imageSrc={assetUrl('assets/texture/assets/credit.png')} onBack={() => setScreen('title')} />;
   }
 

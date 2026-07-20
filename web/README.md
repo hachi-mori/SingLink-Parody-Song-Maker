@@ -176,7 +176,7 @@ Build Week提出版の確認範囲:
 
 `scripts/copy-assets.mjs` は `web/assets/` 全体ではなく、コードに列挙した公開許可リストだけを `dist/client/assets/` へコピーします。ただし `texture/` はディレクトリ単位なので、画像・GIF・フォントをすべて含みます。
 
-第三者素材の出典・許諾証拠には未解決項目があります。公開・再配布前に [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md)、[asset-inventory.md](../docs/asset-inventory.md)、[submission-owner-checklist.md](../docs/submission-owner-checklist.md) を確認してください。
+コードはルートのMIT Licenseで公開しますが、画像、フォント、音声、Score、生成歌声には個別条件があります。[LICENSE_SCOPE.md](../LICENSE_SCOPE.md)、[THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md)、[asset-inventory.md](../docs/asset-inventory.md) を確認してください。素材の近くにも [`assets/README.md`](assets/README.md)、フォントの [`assets/texture/OFL.txt`](assets/texture/OFL.txt)、デモ音声の [`assets/demo/NOTICE.md`](assets/demo/NOTICE.md) を配置しています。
 
 ## GitHub Pages
 
@@ -184,8 +184,9 @@ Build Week提出版の確認範囲:
 
 ## クレジット
 
-- プログラム: はちもり
-- デザイン: りょつ
+- プログラム: hachi-mori
+- デザイン・画像/GIF: Ryotsu（許諾を得て使用）
 - 歌声: **VOICEVOX:ずんだもん**
+- コード: [MIT License](../LICENSE)
 
 VOICEVOX本体はリポジトリへ同梱していません。

@@ -905,6 +905,122 @@ button:disabled {
   margin: 0;
 }
 
+.credits-screen {
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: clamp(16px, 2.4vw, 30px);
+  align-items: start;
+  padding: clamp(22px, 4vw, 56px);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.credits-header,
+.credits-grid,
+.credit-footer {
+  width: min(1120px, 94vw);
+  margin-inline: auto;
+}
+
+.credits-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.credits-header p,
+.credits-header h1,
+.credit-card h2,
+.credit-card p,
+.credit-footer p {
+  margin: 0;
+}
+
+.credits-header p {
+  color: var(--brown);
+  font-size: clamp(15px, 1.45vw, 21px);
+  font-weight: 800;
+}
+
+.credits-header h1 {
+  color: var(--gold);
+  font-family: "FutehodoMaru", "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;
+  font-size: clamp(38px, 5vw, 72px);
+  line-height: 1.04;
+}
+
+.credits-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(12px, 1.8vw, 22px);
+  align-content: center;
+}
+
+.credit-card {
+  min-height: clamp(155px, 17vw, 205px);
+  padding: clamp(18px, 2.2vw, 28px);
+  border: 4px solid rgba(134, 79, 9, 0.68);
+  border-radius: 18px;
+  background: rgba(255, 250, 231, 0.94);
+  box-shadow: var(--shadow);
+}
+
+.credit-label {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  color: #5b3b08;
+  background: #ffe280;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.credit-card h2 {
+  color: var(--brown);
+  font-size: clamp(24px, 2.5vw, 38px);
+  line-height: 1.12;
+}
+
+.credit-card p {
+  margin-top: 9px;
+  color: #5d4b37;
+  font-size: clamp(15px, 1.35vw, 19px);
+  font-weight: 620;
+  line-height: 1.45;
+}
+
+.credit-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border: 2px solid var(--panel-border);
+  border-radius: 14px;
+  color: #5d4b37;
+  background: rgba(255, 250, 231, 0.9);
+  box-shadow: 0 10px 28px rgba(72, 40, 5, 0.14);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.credit-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px 14px;
+}
+
+.credit-footer a {
+  color: #6c4609;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
 .howto-header p {
   color: var(--brown);
   font-family: system-ui, sans-serif;
@@ -1415,6 +1531,32 @@ button:disabled {
 
   .howto-steps li {
     min-height: 0;
+  }
+
+  .credits-screen {
+    padding: 18px 12px 28px;
+  }
+
+  .credits-header,
+  .credit-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .credits-header .small-button {
+    align-self: start;
+  }
+
+  .credits-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .credit-card {
+    min-height: 0;
+  }
+
+  .credit-footer nav {
+    justify-content: flex-start;
   }
 }
 

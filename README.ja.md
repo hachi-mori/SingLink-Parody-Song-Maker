@@ -187,7 +187,7 @@ npm.cmd run audit:english-subtitles
 - スマートフォンからのローカルVOICEVOX合成は対応経路ではありません。
 - ユーザーアカウント、クラウド同期、サーバー側履歴DBはありません。
 - 英語教材は構造監査済みですが、教育用の自然さは今後も人間の言語レビュー対象です。
-- 素材の出典証拠がリポジトリ内で完結していません。提出者が [最終チェックリスト](docs/submission-owner-checklist.md) を完了するまで、再配布可能と判断しないでください。
+- MIT Licenseの対象はプロジェクトのコードであり、同梱素材すべてではありません。画像、フォント、音声、Score、生成歌声、第三者パッケージには [適用範囲](LICENSE_SCOPE.md) と [第三者素材一覧](THIRD_PARTY_NOTICES.md) に記載した個別条件が適用されます。
 
 ## プライバシーと保存
 
@@ -195,10 +195,12 @@ npm.cmd run audit:english-subtitles
 
 ## ライセンスとクレジット
 
-- プログラム: はちもり
-- デザイン: りょつ
+- プログラム: hachi-mori
+- デザイン・画像/GIF: Ryotsu（許諾を得て使用）
 - 歌声: **VOICEVOX:ずんだもん**
+- コードライセンス: [MIT](LICENSE)、Copyright © 2025–2026 hachi-mori
+- ライセンス適用範囲: [LICENSE_SCOPE.md](LICENSE_SCOPE.md)
 - Web依存関係: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
 - 素材ごとの証拠状態: [docs/asset-inventory.md](docs/asset-inventory.md)
 
-リポジトリ全体へ適用するコードライセンスは未決定です。第三者素材はこのREADMEによってライセンスされません。**要証拠**の項目は、Devpost公開提出・デモ動画公開・再配布の前に提出者本人が確認する必要があります。
+MIT Licenseは、Ryotsuの画像、ふてほど丸ゴシック、VOICEVOX・ずんだもん素材、生成歌声、曲素材、第三者依存関係を再ライセンスしません。再配布時は各リンク先の条件に従ってください。

@@ -1,6 +1,6 @@
 # OpenAI Build Week 提出者本人チェックリスト
 
-更新日: 2026-07-19
+更新日: 2026-07-20
 
 この文書はAI生成文をそのままDevpost本文へ提出するためのものではありません。提出者本人が事実を確認し、自分の言葉へ直し、外部公開・権利・本人情報を確定するためのチェックリストです。公式入口は [OpenAI Build Week on Devpost](https://openai.devpost.com/) です。
 
@@ -31,29 +31,30 @@ Session IDはGit SHA、CodexタスクID、会話URLから推測しないでく�
 
 - [ ] 提出するブランチ/コミットに、このドキュメントコミットが含まれる
 - [ ] `README.md` の `git switch openai-build-week` が実際の提出ブランチと一致する
-- [ ] Publicにする場合、リポジトリ全体のコードライセンスを決定し、関連するLICENSEを追加する
+- [x] コードをMIT License、Copyright © 2025–2026 hachi-moriとしてルート `LICENSE` へ追加する
 - [ ] Privateにする場合、`testing@devpost.com` と `build-week-event@openai.com` へアクセスを付与する
-- [ ] 第三者素材をコードのライセンス対象へ含めない
+- [x] `LICENSE_SCOPE.md` で画像、フォント、音声、Score、生成歌声、第三者依存をMIT対象外とする
 - [ ] GitHub上の全相対リンクと画像を確認する
 - [ ] `local-only/` と秘密情報が追跡されていないことを確認する
 
 ## 素材・権利
 
-- [ ] [asset-inventory.md](asset-inventory.md) の **要証拠** をすべて確認する
-- [ ] 25件の画像/GIFについて、作者、配布元、許諾、改変、GitHub公開、Devpost提出、動画利用、再配布の可否を記録する
-- [ ] ずんだもん画像について、画像制作者の許諾とキャラクター利用ガイドラインの両方を確認する
-- [ ] `Futehodo-MaruGothic.ttf` の公式配布元、ライセンス本文、Web配信・再配布条件、必要表記を確認する
-- [ ] 5つの伴奏WAVについて、原曲、編曲、演奏/音源制作者、録音、改変、再配布、動画利用の根拠を記録する
-- [ ] 5つのScore JSONと `オノマトペ.vvproj` の作成者・由来・改変/配布条件を記録する
-- [ ] 335語の入力元CSV第3列を利用できる根拠を保存する
-- [ ] VOICEVOXとずんだもん音源の最新規約を本人が確認する
-- [ ] README、アプリ紹介画面、動画内または概要欄へ **`VOICEVOX:ずんだもん`** を記載する
-- [ ] `web/assets/demo/zundamon-shiawase-demo.wav` のGitHub Pages配信、動画利用、ユーザーダウンロード、再配布条件を確認する
-- [ ] デモWAVが参照する「幸せなら手をたたこう」のScore・伴奏について、公開Pagesと動画で使える証拠を確認する
+- [x] [asset-inventory.md](asset-inventory.md) に現行Web公開素材の作者・条件・クレジットを記録する
+- [x] 25件の画像/GIFをRyotsu制作として、SingLink公開・Build Week提出用途の許諾要約を保存する
+- [x] ずんだもん画像について、Ryotsuの許諾根拠とキャラクター利用ガイドラインの両方を記録する
+- [x] `Futehodo-MaruGothic.ttf` の公式配布元とSIL OFL 1.1を確認し、`web/assets/texture/OFL.txt` を配置する
+- [x] 5つの伴奏WAVをhachi-mori本人の制作・演奏/打ち込み・書き出しとして記録する
+- [x] 5つのScore JSONをhachi-mori本人の制作として記録し、`オノマトペ.vvproj` を個別条件の所有者管理資産として分離する
+- [x] 335語の入力元CSV第3列を利用できるという所有者確認を記録する
+- [x] VOICEVOXとずんだもん音源の公式規約、商用・非商用利用、必要クレジットを確認する
+- [x] READMEとアプリの英語クレジット画面へ **`VOICEVOX:ずんだもん`** を記載する
+- [ ] 動画内または概要欄へ **`VOICEVOX:ずんだもん`** とRyotsuのクレジットを記載する
+- [x] `web/assets/demo/zundamon-shiawase-demo.wav` の生成条件と公開時のVOICEVOX/ずんだもん条件を `web/assets/demo/NOTICE.md` に記録する
+- [x] デモWAVが参照する「幸せなら手をたたこう」のScore・伴奏をhachi-mori制作として記録する
 - [ ] デモ音源を再生成した場合はVOICEVOX版、speaker/style、manifest、WAV hash、台帳を更新する
 - [ ] 動画内の歌声・伴奏・キャラクター画像も各条件を満たすことを確認する
 
-権利の最終判断はこのドキュメントやCodexではなく、提出者本人が根拠資料を読んで行います。
+現行Web公開素材について、公開を妨げる未解決項目は台帳に残っていません。動画では **`VOICEVOX:ずんだもん`** とRyotsuのクレジットを確認し、素材を変更した場合は公式条件と許諾範囲を再確認します。
 
 ## デモ動画の推奨確認順
 

@@ -1,14 +1,14 @@
-# OpenAI Build Week デモ対応提出資料更新計画
+# OpenAI Build Week ライセンス・クレジット実装計画
 
-最終更新: 2026-07-19
+最終更新: 2026-07-20
 
 ## 目標
 
-`openai-build-week` の最新実装 `2bc0f00` に追加された、固定4問と事前生成歌唱によるVOICEVOX不要デモを、英語・日本語README、審査員向け手順、開発記録、第三者素材台帳へ正確に反映する。公開GitHub Pagesで最短評価できる経路と、ローカルVOICEVOXによる通常モードの正式検証経路を明確に分ける。
+コードをMIT License（Copyright © 2025–2026 hachi-mori）で公開し、画像/GIF、フォント、Score・伴奏、VOICEVOX生成音声を再ライセンスしない適用範囲を明示する。Ryotsuの許諾要約、hachi-mori制作資産、SIL OFL 1.1、VOICEVOX/ずんだもん条件を素材の近くと提出資料へ整合して記録する。英語クレジット画面は英語「あそびかた」画面と同様に読みやすい構造へ改善する。
 
 ## 作業基準
 
-- 開始元: 最新 `origin/openai-build-week` (`2bc0f00`)
+- 開始元: `0451a47 公開デモに合わせてBuild Week提出資料を更新`
 - 作業ブランチ: `codex/build-week-demo-docs`
 - 公開デモ: `https://hachi-mori.github.io/SingLink-Parody-Song-Maker/openai-build-week/`
 - 実装事実の正本: コード、Git履歴、テスト、公開Pagesとローカル実ブラウザ確認
@@ -28,13 +28,25 @@
 - `CODEX_PLAN.md`
 - `CODEX_STATUS.md`
 - 必要な場合の `BACKLOG.md` / `BLOCKERS.md`
+- `LICENSE` / `LICENSE_SCOPE.md`
+- `docs/permissions/`
+- `web/assets/README.md` / `web/assets/texture/OFL.txt` / `web/assets/demo/NOTICE.md`
+- 英語クレジット画面に必要なWeb UIとテスト
 
 ## 変更しない範囲
 
-- Webアプリ、教材JSON、音源、Score、画像、フォント
+- 教材JSON、音源、Score、画像、追跡中のTTF本体
 - C++ / Siv3D版
 - 依存関係と公開workflow
-- LICENSEの最終決定
+
+## 確定した権利事実
+
+- コード: MIT License、Copyright © 2025–2026 hachi-mori
+- 画像/GIF: 全件Ryotsu制作。SingLink公開・Build Week提出用途の許諾根拠を所有者が保管
+- 5曲のScore・伴奏: hachi-mori本人が制作し、演奏/打ち込み・書き出し
+- フォント: ふてほど丸ゴシック、isMe、SIL Open Font License 1.1。追跡TTF Version 1.000は維持
+- 歌声: 公式条件に従い **`VOICEVOX:ずんだもん`** を表示
+- 上記素材は、別途明記しない限りルートMITの対象外
 
 ## デモについて文書化する事実
 
@@ -48,9 +60,9 @@
 
 ## 分担
 
-- 親 GPT-5.6 Sol: 方針、事実確認、文章統合、残りの文書編集、検証、コミット
-- Terra 構造担当: README、Web README、審査ガイドの限定実装
-- Luna監査担当: デモアセット、権利表示、テスト候補の読み取り専用監査（利用可能モデル制約によりTerraで実行）
+- 親 GPT-5.6 Sol: 方針、UI統合、検証、コミット
+- Terra 構造・分離実装担当: ライセンス配置、権利文書、README・提出資料の整合（UIコードは変更しない）
+- Luna監査担当: アセット事実、許諾表現、フォント版差分、テスト候補の読み取り専用監査
 - Terra 最終レビュー担当: 初稿後の英語・技術・日英整合レビュー（読み取り専用）
 
 ## 検証
@@ -64,6 +76,8 @@
 - 記載コマンドと `web/package.json` を照合
 - `git diff --check`
 - コード・教材・アセット・依存関係に意図しない差分がないことを確認
+- MIT/OFL本文、ライセンス適用範囲、素材別クレジットのリンクを確認
+- クレジット画面の英語表示とレスポンシブ表示を確認
 
 ## 完了条件
 
@@ -74,6 +88,8 @@
 - Build Week開発記録へデモ3コミットと担当分担が追加される。
 - 実ブラウザ、テスト、型検査、ビルド、字幕監査、リンク検査、最終レビューが完了する。
 - 日本語コミットで保存する。
+- MITと個別素材の境界がREADME、NOTICE、素材台帳、画面で矛盾しない。
+- 現行Web公開素材に「要証拠」「未決定」の古い記述が残らない。
 
 ## 作業手順
 
@@ -83,4 +99,8 @@
 - [x] 開発記録、素材台帳、第三者表記、所有者チェックを更新する。
 - [x] 公開Pagesとローカル手順を実ブラウザ・テストで検証する。
 - [x] Terra最終レビューを反映する。
-- [x] 最終状態を記録し、日本語コミットで保存する。
+- [x] MIT、適用範囲、OFL、Ryotsu許諾要約、デモ音声NOTICEを配置する。
+- [x] 英日README、Web README、第三者素材一覧、素材台帳、提出チェックを整合させる。
+- [x] 英語クレジット画面を実装し、自動テストとブラウザで確認する。
+- [x] 最終レビューと検証を行う。
+- [x] 日本語コミットで保存する。

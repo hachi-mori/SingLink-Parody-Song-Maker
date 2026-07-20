@@ -51,7 +51,7 @@ describe('fixed quiz demo assets', () => {
       accompanimentPath: 'assets/inst/幸せなら手をたたこう.wav'
     });
     expect(manifest.accompaniment.path).toBe(manifest.sourceSong.accompanimentPath);
-    expect(manifest.accompaniment.credit).toContain('幸せなら手をたたこう');
+    expect(manifest.accompaniment.credit).toBe('Score and accompaniment: hachi-mori');
     expect(manifest.lines.map((line) => line.keyword)).toEqual(['きらきら', 'しとしと', 'すやすや', 'りんりん']);
     expect(manifest.lines.map((line) => line.japanese).join('\n')).toBe([
       '朝日がきらきら光ります',

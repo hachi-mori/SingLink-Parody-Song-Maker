@@ -169,4 +169,4 @@ npm.cmd run audit:english-subtitles
 - 主対象は `web/` 以下のWeb版です。
 - C++ / Siv3D版は既存プロジェクトであり、Build Week期間中の主要実装ではありません。
 - 実行時にOpenAI APIは使用しません。Codex / GPT-5.6は開発工程で使用しました。
-- 素材の権利証拠状況は [第三者素材一覧](../THIRD_PARTY_NOTICES.md) と [素材台帳](asset-inventory.md) に明示しています。
+- コードは [MIT License](../LICENSE) です。画像・フォント・音声・Scoreなどの個別条件は [適用範囲](../LICENSE_SCOPE.md)、[第三者素材一覧](../THIRD_PARTY_NOTICES.md)、[素材台帳](asset-inventory.md) に明示しています。

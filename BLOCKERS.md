@@ -1,24 +1,20 @@
 # ブロッカー
 
-最終更新: 2026-07-19
+最終更新: 2026-07-20
 
 ## 現在のブロッカー
 
+なし。Devpostフォーム、動画、`/feedback` Session IDなど、提出作業そのものは [docs/submission-owner-checklist.md](docs/submission-owner-checklist.md) で管理します。
+
+## 解消済み
+
 ### BLOCKER-003: リポジトリ全体のコードライセンス
 
-- 状態: 提出者判断待ち。
-- 内容: ルート `LICENSE` は存在しない。第三者依存関係のライセンスとは別に、このリポジトリ自体のライセンスを決める必要がある。
-- 影響: 公開リポジトリを再利用可能な成果物として案内する前に判断が必要。今回の文書作成・ローカル検証・コミットは継続可能。
-- 参照: `THIRD_PARTY_NOTICES.md`、`docs/submission-owner-checklist.md`
+- 解消内容: コードをMIT License、Copyright © 2025–2026 hachi-moriとしてルート `LICENSE` に配置した。素材・第三者資源を再ライセンスしない境界は `LICENSE_SCOPE.md` に記録した。
 
 ### BLOCKER-004: 公開素材の出典・許諾証拠
 
-- 状態: 提出者確認待ち。
-- 内容: Webビルドに含まれる画像・GIF・フォント・伴奏・Scoreについて、リポジトリ内だけでは出典・許諾証拠を完結できない。VOICEVOXとずんだもんは公式条件を確認済みだが、表示クレジットの最終確認も必要。
-- 影響: Devpost公開・リポジトリの公開範囲を確定する前に判断が必要。今回の文書作成・ローカル検証・コミットは継続可能。
-- 参照: `docs/asset-inventory.md`、`THIRD_PARTY_NOTICES.md`、`docs/submission-owner-checklist.md`
-
-## 解消済み
+- 解消内容: 全画像/GIFの作者RyotsuとSingLink公開・Build Week提出用途の許諾根拠、hachi-mori本人制作の5曲Score・伴奏、ふてほど丸ゴシックのSIL OFL 1.1、VOICEVOX/ずんだもん条件を台帳化した。現行Web公開素材に公開を妨げる未解決項目はない。
 
 ### BLOCKER-001: 自作カード教材の入力元
 

@@ -1,16 +1,41 @@
 # Codex 作業状況
 
-最終更新: 2026-07-19
+最終更新: 2026-07-20
 
 ## 現在の状態
 
-最新 `origin/openai-build-week` の `2bc0f00 デモ音源を既存曲の替え歌へ変更` を基準に、公開固定デモをOpenAI Build Week提出資料へ統合し、検証と独立レビューを完了した。
+公開固定デモの提出資料統合後、所有者が確定したコードライセンスと公開素材の権利事実を実装した。ライセンス・権利文書、英語クレジット画面、自動検証、3画面幅のブラウザ確認、独立した最終レビューまで完了した。
 
 - 作業ブランチ: `codex/build-week-demo-docs`
-- 作業開始HEAD: `2bc0f00`
-- 作業開始時のワークツリー: クリーン
-- Webコード、教材JSON、Score、音源、画像、フォント、依存関係: 変更なし
+- 作業開始HEAD: `0451a47`
+- 教材JSON、Score、音源、画像、追跡TTF本体、依存関係: 変更なし
 - push、Pull Request、追加デプロイ: 未実施
+
+## 2026-07-20 ライセンス・権利文書
+
+- `LICENSE`: MIT License、Copyright © 2025–2026 hachi-mori
+- `LICENSE_SCOPE.md`: MIT対象をプロジェクト所有コード・文書へ限定し、個別素材を分離
+- `docs/permissions/ryotsu-assets.md`: 全画像/GIFの作者をRyotsuへ統一し、SingLink公開・Build Week提出用途の許諾根拠を公開要約
+- `web/assets/texture/OFL.txt`: ふてほど丸ゴシックのSIL OFL 1.1全文をフォントの隣へ配置
+- `web/assets/demo/NOTICE.md`: 事前生成WAVのVOICEVOX版・話者・クレジット・元資産を記録
+- `web/assets/README.md`: 素材ディレクトリが一括してMITにならないことを明示
+- `THIRD_PARTY_NOTICES.md` / `docs/asset-inventory.md`: hachi-mori制作の5曲Score・伴奏、VOICEVOX条件、フォント公式配布元・hashを更新
+- 英日README、Web README、審査ガイド、提出チェック、ブロッカー、バックログを上記事実へ整合
+- 英語クレジット画面: 英語「あそびかた」と同様の読みやすいカード構造へ変更。日本語は既存のStaticImage表示を維持
+
+### ライセンス実装後の自動確認
+
+- `npm.cmd run test`: 10ファイル、38件成功
+- `npm.cmd run typecheck`: 成功
+- `npm.cmd run build`: 成功、Vite 8.0.16、1598 modules transformed
+- `npm.cmd run audit:english-subtitles`: 335/335件成功
+- ビルド成果物に `assets/texture/OFL.txt`、`assets/demo/NOTICE.md`、demo manifestが存在
+- 英語クレジット画面: 1440px、768px、390px幅で横overflowなし。MIT、hachi-mori、Ryotsu、VOICEVOX、フォント表記を確認
+- Markdown相対リンク: 今回変更した提出資料の欠落0件。既存Siv3D同梱フォントREADMEの画像リンク4件は今回の対象外
+- 公開画像/GIF内訳: button PNG 6件、直下PNG 12件、GIF 7件、合計25件
+- `git diff --check`: 成功
+- C++ / Siv3Dビルド: リポジトリ指示により未実施
+- Terra最終レビュー: 重大0件、中程度0件。日本語旧クレジット画像との表記差を文書上で明確化し、軽微指摘を反映
 
 ## 更新した提出資料
 
@@ -78,10 +103,7 @@
 
 ## 提出者本人の残作業
 
-- リポジトリ全体のコードライセンスを決定する
-- 画像・GIF・フォント・5曲のScore・伴奏について、公開・Devpost・動画・改変・再配布の証拠を保存する
-- 事前生成デモWAVのVOICEVOX/ずんだもん条件、動画利用、ダウンロード、再配布を本人確認する
-- `VOICEVOX:ずんだもん` を動画または説明にも表示する
+- 動画または概要欄にも `VOICEVOX:ずんだもん` とRyotsuのクレジットを表示する
 - `/feedback` で正式Session IDを取得する
 - 3分未満のYouTube動画とDevpost本文を本人の言葉で完成させる
 

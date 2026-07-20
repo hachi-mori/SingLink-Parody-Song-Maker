@@ -189,7 +189,7 @@ These commands are run again for the submission-document commit; see the final r
 - Local VOICEVOX from a phone is not a supported synthesis path.
 - There is no user account, cloud synchronization, or server-side history database.
 - English learning records are structurally audited, but educational wording should continue to receive human language review.
-- Asset provenance is not fully evidenced inside the repository. Do not treat the repository as cleared for redistribution until the owner completes [the submission checklist](docs/submission-owner-checklist.md).
+- The MIT License covers project code, not every bundled asset. Artwork, fonts, audio, Scores, generated voice, and third-party packages retain the conditions documented in [the license scope](LICENSE_SCOPE.md) and [third-party notices](THIRD_PARTY_NOTICES.md).
 
 ## Privacy and local storage
 
@@ -197,10 +197,12 @@ SingLink sends normal-mode synthesis requests only to the VOICEVOX URL chosen on
 
 ## License and credits
 
-- Programming: はちもり
-- Design: りょつ
+- Programming: hachi-mori
+- Design and artwork: Ryotsu (used with permission)
 - Singing voice: **VOICEVOX:ずんだもん**
+- Code license: [MIT](LICENSE), copyright © 2025–2026 hachi-mori
+- License boundaries: [LICENSE_SCOPE.md](LICENSE_SCOPE.md)
 - Web dependencies: see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
 - Asset-by-asset evidence status: see [docs/asset-inventory.md](docs/asset-inventory.md)
 
-No repository-wide code license has been selected. Third-party assets are not licensed by this README. The owner must resolve the items marked **Needs evidence** before public Devpost submission, video publication, or redistribution.
+The MIT License does not relicense Ryotsu's artwork, Futehodo Maru Gothic, VOICEVOX/Zundamon resources, generated voice, music assets, or third-party dependencies. Follow the linked notices when redistributing the project.
