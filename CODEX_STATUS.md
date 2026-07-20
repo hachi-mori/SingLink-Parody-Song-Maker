@@ -123,5 +123,6 @@
 - Terra最終レビューの重大指摘は0件。正解文を歌う仕様、Build Week追加範囲、公開デモと通常モードの差、VOICEVOX・Ryotsu・hachi-mori・フォント表記を修正・再確認した。
 - Web検証は10ファイル38テスト、型検査、Vite build（1598 modules）、英語字幕335/335件が成功した。C++ / Siv3Dビルドはリポジトリ指示により未実施。
 - 提出者は `00_確認ガイド.md` から確認でき、本人音声への差し替えは `08_朝の音声差し替え手順.md` に従って行える。
+- 動画成果物コミット `c535ee0` を `origin/openai-build-week` へpushし、GitHub Pages run `29759245932` のbuild / deploy成功と公開デモHTTP 200を確認した。
 
 詳細は `BLOCKERS.md` と `docs/submission-owner-checklist.md` を参照する。
