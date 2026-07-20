@@ -1,0 +1,34 @@
+SINGLINK — OPENAI BUILD WEEK DEMO
+
+[SLIDE 1]
+Japanese has many sound words, such as kira-kira for sparkling.
+They are useful and fun, but they can be hard to remember from a list.
+
+[SLIDE 2]
+SingLink turns these words into a short quiz and karaoke experience.
+First, you choose one of five familiar melodies.
+Then you answer four Japanese questions.
+
+[SLIDE 3]
+After the quiz, Zundamon sings the four correct sentences.
+The Japanese lyrics light up with the melody, and English subtitles explain the meaning.
+
+[SLIDE 4]
+During OpenAI Build Week, I rebuilt important parts for the Web.
+I prepared three hundred and thirty-five learning records with original examples, meanings, singing readings, and English support.
+I also added a responsive English interface, five melody choices, and timing based on the notes in the score.
+
+[SLIDE 5]
+Judges can open a fixed demo on GitHub Pages with no setup.
+It uses four fixed questions and one pre-generated singing sample.
+Normal mode is different.
+It chooses four random questions and creates a new song from their correct sentences on a local Windows computer with VOICEVOX.
+
+[SLIDE 6]
+I used Codex and GPT five point six to study the old app, move the score logic to the Web, check the learning data, build the English features, and test the result.
+I made the final learning, design, and publishing decisions.
+
+[SLIDE 7]
+SingLink connects Japanese words, sound, and meaning through karaoke.
+It gives learners one more way to repeat and remember.
+You can try the public demo from the link on screen.

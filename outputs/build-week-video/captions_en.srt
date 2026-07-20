@@ -1,0 +1,71 @@
+1
+00:00:00,500 --> 00:00:06,100
+Japanese has many sound words, such as kira-kira for sparkling.
+
+2
+00:00:06,100 --> 00:00:12,500
+They are useful and fun, but they can be hard to remember from a list.
+
+3
+00:00:15,400 --> 00:00:21,500
+SingLink turns these words into a short quiz and karaoke experience.
+
+4
+00:00:21,500 --> 00:00:30,100
+First, you choose one of five familiar melodies. Then you answer four Japanese questions.
+
+5
+00:00:30,900 --> 00:00:36,000
+After the quiz, Zundamon sings the four correct sentences.
+
+6
+00:00:36,000 --> 00:00:42,300
+The Japanese lyrics light up with the melody, and English subtitles explain the meaning.
+
+7
+00:00:42,600 --> 00:00:50,600
+[SingLink karaoke sample]
+
+8
+00:00:51,400 --> 00:01:00,200
+During OpenAI Build Week, I rebuilt important parts for the Web.
+
+9
+00:01:00,200 --> 00:01:08,500
+I prepared 335 learning records with original examples, meanings, singing readings, and English support.
+
+10
+00:01:08,500 --> 00:01:14,600
+I also added a responsive English interface, five melody choices, and score-note timing.
+
+11
+00:01:15,400 --> 00:01:22,500
+Judges can open a fixed demo on GitHub Pages with no setup.
+
+12
+00:01:22,500 --> 00:01:28,100
+It uses four fixed questions and one pre-generated singing sample.
+
+13
+00:01:28,100 --> 00:01:35,500
+Normal mode chooses four random questions and creates a new song locally from their correct sentences with VOICEVOX.
+
+14
+00:01:36,400 --> 00:01:47,800
+I used Codex and GPT-5.6 to study the old app, move the score logic to the Web, check the data, build the English features, and test the result.
+
+15
+00:01:47,800 --> 00:01:54,500
+I made the final learning, design, and publishing decisions.
+
+16
+00:01:56,000 --> 00:02:03,000
+SingLink connects Japanese words, sound, and meaning through karaoke.
+
+17
+00:02:03,000 --> 00:02:08,000
+It gives learners one more way to repeat and remember.
+
+18
+00:02:08,000 --> 00:02:12,200
+You can try the public demo from the link on screen.
