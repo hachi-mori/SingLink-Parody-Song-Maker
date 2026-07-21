@@ -136,3 +136,10 @@
 - 完成動画は `outputs/build-week-video/SingLink_OpenAI_Build_Week_fullhd.mp4`。1920×1080、24fps、H.264/AAC 48kHz stereo、166.542秒、24,753,843 bytes。
 - 全編デコード、黒画面なし、BGM停止区間、字幕19キュー、最終URL表示を確認した。SHA-256は `21E4CFFC4C8CF03000C23DB2B72DDC9DC11BCD8CDB8F4AA000B15D455ADC19A0`。
 - 録音済みPowerPointのユーザー変更は変更・ステージングしていない。
+
+## 2026-07-21 提出動画資料の公開
+
+- 最終動画、英語字幕、クレジット画像、制作・QA記録をコミット `d7bf0d4` として `openai-build-week` へpushした。
+- GitHub Pages run `29840135193` でmain / Build Week双方のテスト、ビルド、デプロイが成功した。
+- 公開デモ `https://hachi-mori.github.io/SingLink-Parody-Song-Maker/openai-build-week/` のHTTP 200とページタイトルを確認した。
+- YouTube限定公開URLは未発行のため、READMEと審査ガイドへの動画リンク追加はアップロード後に行う。
