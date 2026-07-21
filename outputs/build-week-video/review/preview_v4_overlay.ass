@@ -1,0 +1,50 @@
+[Script Info]
+Title: SingLink OpenAI Build Week low-resolution preview V4
+ScriptType: v4.00+
+PlayResX: 960
+PlayResY: 540
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Telop,Segoe UI Semibold,25,&H00FFFFFF,&H000000FF,&H00000000,&H00345E38,-1,0,0,0,100,100,0,0,3,2,0,7,28,28,12,1
+Style: Subtitle,Segoe UI,17,&H00FFFFFF,&H000000FF,&H00000000,&HA8000000,0,0,0,0,100,100,0,0,3,2,0,2,54,54,18,1
+Style: UrlHead,Segoe UI Semibold,18,&H0000E8FF,&H000000FF,&H00000000,&HC0202A24,-1,0,0,0,100,100,0,0,3,2,0,8,36,36,18,1
+Style: Url,Consolas,13,&H00FFFFFF,&H000000FF,&H00000000,&HC0202A24,0,0,0,0,100,100,0,0,3,2,0,8,22,22,18,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 1,0:00:00.00,0:00:17.03,Telop,,0,0,0,,Why sound words are hard to remember
+Dialogue: 1,0:00:17.03,0:00:37.01,Telop,,0,0,0,,Choose a melody. Answer four questions.
+Dialogue: 1,0:00:37.01,0:00:54.70,Telop,,0,0,0,,Hear the four correct sentences
+Dialogue: 1,0:00:54.70,0:01:27.54,Telop,,0,0,0,,Built during OpenAI Build Week
+Dialogue: 1,0:01:27.54,0:01:56.21,Telop,,0,0,0,,Public demo and local mode
+Dialogue: 1,0:01:56.21,0:02:24.85,Telop,,0,0,0,,How Codex supported the work
+Dialogue: 1,0:02:24.85,0:02:39.85,Telop,,0,0,0,,Learning through karaoke
+Dialogue: 1,0:02:39.85,0:02:46.52,Telop,,0,0,0,,Credits and links
+Dialogue: 0,0:00:00.00,0:00:09.35,Subtitle,,0,0,0,,Japanese has many sound words, such as kira-kira for sparkling.
+Dialogue: 0,0:00:09.35,0:00:17.03,Subtitle,,0,0,0,,They are useful and fun, but they can be hard to remember from a list.
+Dialogue: 0,0:00:17.03,0:00:26.20,Subtitle,,0,0,0,,SingLink turns these words into a short quiz and karaoke experience.
+Dialogue: 0,0:00:26.20,0:00:31.66,Subtitle,,0,0,0,,First, you choose one of five familiar melodies.
+Dialogue: 0,0:00:31.66,0:00:37.01,Subtitle,,0,0,0,,Then you answer four Japanese questions.
+Dialogue: 0,0:00:37.01,0:00:44.79,Subtitle,,0,0,0,,After the quiz, Zundamon sings the four correct sentences.
+Dialogue: 0,0:00:44.79,0:00:54.70,Subtitle,,0,0,0,,The Japanese lyrics light up with the melody,\Nand English subtitles explain the meaning.
+Dialogue: 0,0:00:54.70,0:01:02.92,Subtitle,,0,0,0,,During OpenAI Build Week, I rebuilt important parts for the Web.
+Dialogue: 0,0:01:02.92,0:01:15.49,Subtitle,,0,0,0,,I prepared three hundred and thirty-five learning records with original examples,\Nmeanings, singing readings, and English support.
+Dialogue: 0,0:01:15.49,0:01:27.54,Subtitle,,0,0,0,,I also added a responsive English interface, five melody choices,\Nand timing based on the notes in the score.
+Dialogue: 0,0:01:27.54,0:01:35.90,Subtitle,,0,0,0,,Judges can open a fixed demo on GitHub Pages with no setup.
+Dialogue: 0,0:01:35.90,0:01:43.99,Subtitle,,0,0,0,,It uses four fixed questions and one pre-generated singing sample.
+Dialogue: 0,0:01:43.99,0:01:46.95,Subtitle,,0,0,0,,Normal mode is different.
+Dialogue: 0,0:01:46.95,0:01:56.21,Subtitle,,0,0,0,,It chooses four random questions and creates a new song from their correct sentences\Non a local Windows computer with VOICEVOX.
+Dialogue: 0,0:01:56.21,0:02:16.28,Subtitle,,0,0,0,,I used Codex and GPT five point six to study the old app, move the score logic to the Web,\Ncheck the learning data, build the English features, and test the result.
+Dialogue: 0,0:02:16.28,0:02:24.85,Subtitle,,0,0,0,,I made the final learning, design, and publishing decisions.
+Dialogue: 0,0:02:24.85,0:02:34.42,Subtitle,,0,0,0,,SingLink connects Japanese words, sound, and meaning through karaoke.
+Dialogue: 0,0:02:34.42,0:02:40.05,Subtitle,,0,0,0,,It gives learners one more way to repeat and remember.
+Dialogue: 0,0:02:40.05,0:02:46.52,Subtitle,,0,0,0,,You can try the public demo from the link on screen.
+Dialogue: 3,0:02:39.85,0:02:46.52,UrlHead,,0,0,0,,{\an8\pos(480,78)}GitHub Pages demo
+Dialogue: 3,0:02:39.85,0:02:46.52,Url,,0,0,0,,{\an8\pos(480,104)}https://hachi-mori.github.io/SingLink-Parody-Song-Maker/openai-build-week/?demo=1
+Dialogue: 3,0:02:39.85,0:02:46.52,UrlHead,,0,0,0,,{\an8\pos(480,154)}OpenAI Build Week
+Dialogue: 3,0:02:39.85,0:02:46.52,Url,,0,0,0,,{\an8\pos(480,180)}https://openai.devpost.com/
+Dialogue: 3,0:02:39.85,0:02:46.52,UrlHead,,0,0,0,,{\an8\pos(480,230)}Source branch
+Dialogue: 3,0:02:39.85,0:02:46.52,Url,,0,0,0,,{\an8\pos(480,256)}https://github.com/hachi-mori/SingLink-Parody-Song-Maker/tree/openai-build-week

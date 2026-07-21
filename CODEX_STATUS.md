@@ -126,3 +126,13 @@
 - 動画成果物コミット `c535ee0` を `origin/openai-build-week` へpushし、GitHub Pages run `29759245932` のbuild / deploy成功と公開デモHTTP 200を確認した。
 
 詳細は `BLOCKERS.md` と `docs/submission-owner-checklist.md` を参照する。
+
+## 2026-07-21 フルHD提出動画の確定
+
+- V4で確認した額縁、全素材の全体表示、左上テロップ、英語台本全文字幕、クレジットURLを維持して、元素材から1920×1080版を再生成した。
+- 35.000–54.704秒はBGMを停止し、35.000秒から公開デモ動画の音声トラックを映像と同期して追加した。
+- 107.544–116.210秒と144.851–152.851秒のBGM停止を維持し、152.851秒以降は動画素材音声を追加せずBGMを再開した。
+- scene2とscene3の元動画時刻を27.505秒で連続させ、素材末尾は最終フレーム保持で補完した。
+- 完成動画は `outputs/build-week-video/SingLink_OpenAI_Build_Week_fullhd.mp4`。1920×1080、24fps、H.264/AAC 48kHz stereo、166.542秒、24,753,843 bytes。
+- 全編デコード、黒画面なし、BGM停止区間、字幕19キュー、最終URL表示を確認した。SHA-256は `21E4CFFC4C8CF03000C23DB2B72DDC9DC11BCD8CDB8F4AA000B15D455ADC19A0`。
+- 録音済みPowerPointのユーザー変更は変更・ステージングしていない。
