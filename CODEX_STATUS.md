@@ -143,3 +143,10 @@
 - GitHub Pages run `29840135193` でmain / Build Week双方のテスト、ビルド、デプロイが成功した。
 - 公開デモ `https://hachi-mori.github.io/SingLink-Parody-Song-Maker/openai-build-week/` のHTTP 200とページタイトルを確認した。
 - YouTube限定公開URLは未発行のため、READMEと審査ガイドへの動画リンク追加はアップロード後に行う。
+
+## 2026-07-22 YouTube導線と提出用サムネイル
+
+- 限定公開YouTube動画 `https://youtu.be/B1NkSrOzdA8` のHTTP 200とYouTube再生URLへのリダイレクトを確認した。
+- `docs/images/build-week/openai-build-week-thumbnail.png` を追加し、英語・日本語READMEで画像をクリックするとYouTube動画を開くようにした。
+- 審査員向け手順、提出者チェックリスト、動画制作ノート、素材台帳、第三者素材一覧へ動画URLとサムネイルの出典・クレジット範囲を反映した。
+- `web` の `npm.cmd run test` は10ファイル・38テスト成功。ユーザー編集のPowerPointとローカルの低解像度レビュー素材はステージング対象外。

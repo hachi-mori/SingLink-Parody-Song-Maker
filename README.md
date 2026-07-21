@@ -2,13 +2,19 @@
 
 **A Japanese-learning web app inspired by karaoke culture: answer four onomatopoeia quizzes, then hear Zundamon sing the correct Japanese example sentences while the lyrics light up in time and English subtitles explain them.**
 
-[日本語 README](README.ja.md) · [Judge quick start](docs/judge-testing-guide.md) · [Build Week development record](docs/build-week-development.md) · [Third-party notices](THIRD_PARTY_NOTICES.md)
+[日本語 README](README.ja.md) · [Demo video](https://youtu.be/B1NkSrOzdA8) · [Judge quick start](docs/judge-testing-guide.md) · [Build Week development record](docs/build-week-development.md) · [Third-party notices](THIRD_PARTY_NOTICES.md)
 
 ## Try the live demo (no setup)
 
 [Start the fixed four-question demo on GitHub Pages](https://hachi-mori.github.io/SingLink-Parody-Song-Maker/openai-build-week/?demo=1). It loads the four fixed questions immediately and needs neither a local server nor a running VOICEVOX instance. After the quiz, play the bundled, pre-generated Zundamon singing and accompaniment with karaoke highlighting. The title page at the [public Build Week URL](https://hachi-mori.github.io/SingLink-Parody-Song-Maker/openai-build-week/) also provides a `Try fixed quiz demo` button.
 
 This is a reproducible presentation path, not real-time generation: its song is the same pre-generated sample regardless of quiz input. For an answer-derived singing result, use the local Windows path with VOICEVOX described below.
+
+## Watch the OpenAI Build Week demo video
+
+[![OpenAI Build Week demo video thumbnail](docs/images/build-week/openai-build-week-thumbnail.png)](https://youtu.be/B1NkSrOzdA8)
+
+[Watch the 2 minute 47 second OpenAI Build Week demo video on YouTube](https://youtu.be/B1NkSrOzdA8). It introduces the English Web app, the fixed public demo, karaoke playback, the 335-record learning-data work, and how Codex and GPT-5.6 supported the development workflow.
 
 ## Screenshots
 

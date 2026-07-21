@@ -1,6 +1,6 @@
 # OpenAI Build Week 提出者本人チェックリスト
 
-更新日: 2026-07-20
+更新日: 2026-07-22
 
 この文書はAI生成文をそのままDevpost本文へ提出するためのものではありません。提出者本人が事実を確認し、自分の言葉へ直し、外部公開・権利・本人情報を確定するためのチェックリストです。公式入口は [OpenAI Build Week on Devpost](https://openai.devpost.com/) です。
 
@@ -16,7 +16,7 @@
 
 - [ ] 動作するプロジェクト
 - [ ] 機能と仕組みを説明する本人のProject description
-- [ ] 3分未満のYouTubeデモ動画
+- [ ] [2分47秒のYouTubeデモ動画](https://youtu.be/B1NkSrOzdA8)
 - [ ] 動画をPublicまたはUnlistedで、未ログイン・シークレットウィンドウから再生確認する
 - [ ] 動画の音声で「何を作ったか」「Codexをどう使ったか」「GPT-5.6をどう使ったか」を説明する
 - [ ] 動画に許諾のない第三者商標・音楽・素材を含めていないことを確認する
@@ -79,7 +79,7 @@ Session IDはGit SHA、CodexタスクID、会話URLから推測しないでく�
 - [ ] 必要なら審査URL・ローカル手順欄へ [judge-testing-guide.md](judge-testing-guide.md) の要点を本人の言葉で記載する
 - [ ] 審査URLへGitHub Pagesの `?demo=1` 直リンクを入力し、通常モードはローカルVOICEVOXが必要と補足する
 - [ ] `/feedback` Session IDを入力する
-- [ ] 動画URLを入力する
+- [ ] 動画URL `https://youtu.be/B1NkSrOzdA8` を入力する
 - [ ] サムネイルとチーム情報を確認する
 - [ ] Official Rules、参加資格、知的財産、第三者連携条件へ本人が同意する
 

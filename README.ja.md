@@ -2,13 +2,19 @@
 
 **カラオケ文化をヒントにした日本語学習Webアプリです。4問のオノマトペクイズに答えると、ずんだもんが正しい日本語例文を歌い、歌声に合わせて歌詞が光ります。英語モードでは英訳と意味も確認できます。**
 
-[English README](README.md) · [審査員向け最短手順](docs/judge-testing-guide.md) · [Build Week開発記録](docs/build-week-development.md) · [第三者素材一覧](THIRD_PARTY_NOTICES.md)
+[English README](README.md) · [紹介動画](https://youtu.be/B1NkSrOzdA8) · [審査員向け最短手順](docs/judge-testing-guide.md) · [Build Week開発記録](docs/build-week-development.md) · [第三者素材一覧](THIRD_PARTY_NOTICES.md)
 
 ## 公開デモ（準備不要）
 
 [GitHub Pagesで固定4問デモを開始する](https://hachi-mori.github.io/SingLink-Parody-Song-Maker/openai-build-week/?demo=1)。ローカルサーバーやVOICEVOXを起動せず、固定4問の問題画面から始まります。回答後は、同梱済みのずんだもん歌唱・伴奏・カラオケ着色を再生できます。タイトルの[Build Week公開URL](https://hachi-mori.github.io/SingLink-Parody-Song-Maker/openai-build-week/)からも「固定問題デモを遊ぶ」を選べます。
 
 これは再現可能な提示用経路です。入力内容に応じて新しい歌声を作る機能ではなく、同じ事前生成サンプルを再生します。回答に基づくリアルタイム歌声の確認は、下記のWindowsローカル版とVOICEVOXで行います。
+
+## OpenAI Build Week紹介動画
+
+[![OpenAI Build Week紹介動画のサムネイル](docs/images/build-week/openai-build-week-thumbnail.png)](https://youtu.be/B1NkSrOzdA8)
+
+[2分47秒のOpenAI Build Week紹介動画をYouTubeで見る](https://youtu.be/B1NkSrOzdA8)。英語Web版、固定公開デモ、カラオケ再生、335件の教材整備、Codex / GPT-5.6を使った開発工程を紹介しています。
 
 ## スクリーンショット
 

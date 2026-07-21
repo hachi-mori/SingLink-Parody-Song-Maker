@@ -1,6 +1,6 @@
 # OpenAI Build Week demo video
 
-The final judge-facing video is [`SingLink_OpenAI_Build_Week_fullhd.mp4`](SingLink_OpenAI_Build_Week_fullhd.mp4).
+The final judge-facing video is [`SingLink_OpenAI_Build_Week_fullhd.mp4`](SingLink_OpenAI_Build_Week_fullhd.mp4). It is also available as an unlisted [YouTube video](https://youtu.be/B1NkSrOzdA8).
 
 ## Final delivery
 
@@ -29,4 +29,4 @@ The video uses the real English Web interface, the fixed GitHub Pages demo, the 
 
 Raw screen recordings, the BGM master, and intermediate low-resolution review renders are intentionally kept outside the public repository. The final MP4 and its review sources are included so judges can inspect the submitted result without those local production files.
 
-The unlisted YouTube URL will be added to the submission documents after upload and playback verification.
+The unlisted YouTube URL is included in the submission documents. The final external playback check remains the project owner's responsibility.

@@ -1,6 +1,6 @@
 # Third-Party Notices and Evidence Status
 
-Updated: 2026-07-20
+Updated: 2026-07-22
 
 This document records what the repository can currently prove about third-party software, services, voices, characters, music, scores, images, and fonts used by the SingLink Web submission. It is an evidence inventory, not legal advice and not a license grant.
 
@@ -13,7 +13,7 @@ Status labels:
 
 The file-by-file status is in [docs/asset-inventory.md](docs/asset-inventory.md). The root MIT License does not override the asset-specific conditions recorded here.
 
-The four screenshots under `docs/images/build-week/` were newly captured from the local Web app on July 19, 2026. The screenshots themselves are submission evidence, but embedded UI images, font rendering, and character depictions retain the evidence status of their source assets. They do not make those underlying assets cleared for redistribution.
+The four screenshots under `docs/images/build-week/` were newly captured from the local Web app on July 19, 2026. `docs/images/build-week/openai-build-week-thumbnail.png` is a July 22 submission thumbnail created by hachi-mori from the app presentation and existing permitted artwork. These images are submission evidence, but embedded UI images, font rendering, and character depictions retain the evidence status of their source assets. They do not make those underlying assets cleared for redistribution.
 
 ## Project code license
 

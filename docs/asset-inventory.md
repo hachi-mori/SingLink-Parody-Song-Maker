@@ -1,6 +1,6 @@
 # OpenAI Build Week 提出アセット台帳
 
-更新日: 2026-07-20
+更新日: 2026-07-22
 
 この台帳は、現行 `web/scripts/copy-assets.mjs` の公開許可リストから本番成果物へ入る追跡ファイルを一覧化します。法的判断は行わず、リポジトリ内で確認できる証拠と不足だけを記録します。
 
@@ -18,6 +18,7 @@
 | `docs/images/build-week/how-to-en.png` | Local Web screenshot | 同上 | 同上 | 同上 | READMEへ掲載 | 同上 | 実ブラウザ確認記録、Ryotsu許諾要約 | 確認済 | 同上 |
 | `docs/images/build-week/quiz-en.png` | Local Web screenshot | 同上 | 同上 | 同上 | READMEへ掲載 | 同上 | 実ブラウザ確認記録、Ryotsu許諾要約 | 確認済 | 同上 |
 | `docs/images/build-week/result-en.png` | Local Web screenshot | 同上 | 同上 | 同上 | READMEへ掲載 | 同上 | 実ブラウザ・VOICEVOX確認記録、Ryotsu許諾要約 | 確認済 | 生成した問題・歌詞・英語補助を含む。画面内素材は元素材に従う |
+| `docs/images/build-week/openai-build-week-thumbnail.png` | OpenAI Build Week video thumbnail | hachi-moriが2026-07-22に作成した提出用サムネイル。アプリ画面とRyotsu制作の既存UI・ずんだもん描写を含む | サムネイル自体は提出用に新規作成。画面内素材はRyotsu許諾・ずんだもんガイドラインの対象 | 編集済みの合成画像 | README英日へ掲載、YouTube動画へリンク | Design and artwork: Ryotsu、VOICEVOX音声を扱う動画は `VOICEVOX:ずんだもん` | Ryotsu許諾要約、動画クレジット、所有者確認 | 確認済 | SHA-256 `639FC570CB45A528A81AA718209FB1B2F23A2C3944DBEACED713FFB6AA2C1269` |
 
 ## 教材JSON
 
