@@ -24,6 +24,9 @@ export type SolvedTask = {
   rhymeMatchPercent?: number;
   matchesCount?: number;
   isCorrect?: boolean;
+  singingReading?: string;
+  englishMeaning?: string;
+  englishExample?: string;
 };
 
 export type VerbEntry = {
@@ -38,6 +41,26 @@ export type OnomatopoeiaEntry = {
   answer: string;
   explanation: string;
   questionText?: string;
+  displayText?: string;
+  singingReading?: string;
+  englishMeaning?: string;
+  englishExample?: string;
+  translationReviewStatus?: 'reviewed' | 'needsReview';
+  translationReviewNote?: string;
+};
+
+export type KaraokeNoteTiming = {
+  lyric: string;
+  startSeconds: number;
+  endSeconds: number;
+  startProgress: number;
+  endProgress: number;
+};
+
+export type KaraokeLineTiming = {
+  startSeconds: number;
+  endSeconds: number;
+  noteTimings: KaraokeNoteTiming[];
 };
 
 export type SongMode = 'freeText' | 'verbQuiz' | 'onomatopoeiaQuiz';
@@ -49,18 +72,31 @@ export type SongInfo = {
   vvprojUrl: string;
   instFileName?: string;
   instUrl?: string;
+  baseScoreFileName?: string;
+  baseScoreUrl?: string;
   mode: SongMode;
   trackName?: string;
+};
+
+export type SourceSongInfo = {
+  id: string;
+  title: string;
+  scoreFileName: string;
+  scoreUrl: string;
+  instFileName: string;
+  instUrl: string;
 };
 
 export type SongDetail = SongInfo & {
   problems: TalkProblem[];
   verbEntries?: VerbEntry[];
   onomatopoeiaEntries?: OnomatopoeiaEntry[];
+  sourceSong?: SourceSongInfo;
 };
 
 export type SynthesisRequest = {
   songId: string;
+  sourceSongId?: string;
   solvedTasks: SolvedTask[];
   fullLyrics: string;
   voicevoxBaseUrl?: string;

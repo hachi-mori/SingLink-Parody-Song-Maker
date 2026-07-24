@@ -1,21 +1,28 @@
-import { parseCsvRows } from '@shared/csv';
 import { buildResultDisplayLyrics, buildTalkProblems, extractTalkUtterances, getVvprojTrackName } from '@shared/vvproj';
-import { replaceChoonWithVowel, splitOnomatopoeiaMoras } from '@shared/kana';
-import { parseOnomatopoeiaCardEntries } from '@shared/onomatopoeiaCards';
-import type { OnomatopoeiaEntry, SongDetail, SongInfo, SongMode, SynthesisRequest, VerbEntry } from '@shared/types';
+import { attachEnglishCardData, parseOnomatopoeiaCardEntries } from '@shared/onomatopoeiaCards';
+import { memorizationSourceSongs } from '@shared/memorizationSongs';
+import type {
+  OnomatopoeiaEntry,
+  SongDetail,
+  SongInfo,
+  SongMode,
+  SourceSongInfo,
+  SynthesisRequest
+} from '@shared/types';
 import { assetUrl } from './assets';
 
 type StaticSongAsset = {
   vvprojFileName: string;
   instFileName?: string;
+  baseScoreFileName?: string;
 };
 
 const staticSongAssets: StaticSongAsset[] = [
-  { vvprojFileName: 'オノマトペ.vvproj', instFileName: 'オノマトペ.mp3' },
-  { vvprojFileName: 'ハッピーバースデー.vvproj', instFileName: 'HappyBirthday.wav' },
-  { vvprojFileName: '動詞グループ.vvproj', instFileName: '動詞グループ.mp3' },
-  { vvprojFileName: '呼び込みくん.vvproj', instFileName: '呼び込みくん.mp3' },
-  { vvprojFileName: '呼び込みくんっぽい曲.vvproj', instFileName: '呼び込みくんっぽい曲.mp3' }
+  {
+    vvprojFileName: 'オノマトペ.vvproj',
+    instFileName: '幸せなら手をたたこう.wav',
+    baseScoreFileName: '幸せなら手をたたこう.json'
+  }
 ];
 
 function makeSongId(title: string): string {
@@ -31,14 +38,8 @@ function titleFromVvproj(fileName: string): string {
   return fileName.replace(/\.vvproj$/i, '');
 }
 
-function detectMode(title: string): SongMode {
-  if (title === '動詞グループ') {
-    return 'verbQuiz';
-  }
-  if (title === 'オノマトペ') {
-    return 'onomatopoeiaQuiz';
-  }
-  return 'freeText';
+function detectMode(_title: string): SongMode {
+  return 'onomatopoeiaQuiz';
 }
 
 async function fetchText(path: string): Promise<string> {
@@ -53,43 +54,21 @@ async function fetchJson(path: string): Promise<unknown> {
   return JSON.parse(await fetchText(path)) as unknown;
 }
 
-async function fetchOptionalJson(path: string): Promise<unknown | undefined> {
-  try {
-    return await fetchJson(path);
-  } catch {
-    return undefined;
-  }
-}
-
-async function loadVerbEntries(): Promise<VerbEntry[]> {
-  const rows = parseCsvRows(await fetchText('assets/dict/Verb.csv'));
-  return rows.flatMap((fields) => {
-    const word = (fields[1] ?? '').trim();
-    const reading = (fields[2] ?? '').trim();
-    const group = (fields[4] ?? '').trim();
-    return word && reading && group.includes('動詞') ? [{ word, reading, group }] : [];
-  });
-}
-
 async function loadOnomatopoeiaEntries(): Promise<OnomatopoeiaEntry[]> {
-  const cardsJson = await fetchOptionalJson('assets/dict/cards_text_data.json');
-  const cardEntries = cardsJson ? parseOnomatopoeiaCardEntries(cardsJson) : [];
-  if (cardEntries.length > 0) {
-    return cardEntries;
-  }
+  const [cards, singingReadings, englishCards] = await Promise.all([
+    fetchJson('assets/dict/cards_text_data.json'),
+    fetchJson('assets/dict/cards_singing_readings.json'),
+    fetchJson('assets/dict/cards_english_data.json')
+  ]);
+  return attachEnglishCardData(parseOnomatopoeiaCardEntries(cards, singingReadings), englishCards);
+}
 
-  const rows = parseCsvRows(await fetchText('assets/dict/オノマトペ.csv'));
-  return rows.flatMap((fields) => {
-    const word = (fields[0] ?? '').trim();
-    const reading = (fields[1] ?? '').trim();
-    const answer = (fields[2] ?? '').trim();
-    const explanation = (fields[3] ?? '').trim();
-    const readingMoraCount = splitOnomatopoeiaMoras(replaceChoonWithVowel(reading)).length;
-    const answerMoraCount = splitOnomatopoeiaMoras(replaceChoonWithVowel(answer)).length;
-    return word && reading && answer && readingMoraCount <= 8 && answerMoraCount <= 6
-      ? [{ word, reading, answer, explanation }]
-      : [];
-  });
+export function getStaticMemorizationSourceSongs(): SourceSongInfo[] {
+  return memorizationSourceSongs.map((song) => ({
+    ...song,
+    scoreUrl: assetUrl(`assets/score/${song.scoreFileName}`),
+    instUrl: assetUrl(`assets/inst/${song.instFileName}`)
+  }));
 }
 
 export async function fetchStaticSongs(): Promise<SongInfo[]> {
@@ -109,8 +88,10 @@ export async function fetchStaticSongs(): Promise<SongInfo[]> {
       vvprojUrl: assetUrl(`assets/score/${asset.vvprojFileName}`),
       instFileName: asset.instFileName,
       instUrl: asset.instFileName ? assetUrl(`assets/inst/${asset.instFileName}`) : undefined,
+      baseScoreFileName: asset.baseScoreFileName,
+      baseScoreUrl: asset.baseScoreFileName ? assetUrl(`assets/score/${asset.baseScoreFileName}`) : undefined,
       mode: detectMode(title),
-      trackName
+      trackName: title === 'オノマトペ' ? '幸せなら手をたたこう' : trackName
     };
   }));
 
@@ -130,9 +111,6 @@ export async function fetchStaticSongDetail(songId: string): Promise<SongDetail>
     problems: info.mode === 'onomatopoeiaQuiz' ? [] : buildTalkProblems(extractTalkUtterances(vvproj))
   };
 
-  if (info.mode === 'verbQuiz') {
-    detail.verbEntries = await loadVerbEntries();
-  }
   if (info.mode === 'onomatopoeiaQuiz') {
     detail.onomatopoeiaEntries = await loadOnomatopoeiaEntries();
   }

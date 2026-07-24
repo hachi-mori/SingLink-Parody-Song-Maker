@@ -27,18 +27,22 @@ describe('kana utilities', () => {
   it('カードJSONから穴埋めオノマトペ問題を作る', () => {
     const entries = parseOnomatopoeiaCardEntries({
       records: [{
-        onomatopoeia: 'あつあつ',
-        usages: [{ text: 'あつあつのおでんはおいしいなあ。' }],
-        meanings: [{ text: '料理などができたてであついようす。' }]
+        onomatopoeia: 'てすとてすと',
+        usages: [{ text: 'てすとてすとをうたう。' }],
+        meanings: [{ text: 'パーサーの動きを確かめるための合成データ。' }]
       }]
+    }, {
+      readings: { てすとてすと: 'てすとてすとおうたう' }
     });
 
     expect(entries[0]).toMatchObject({
-      word: 'あつあつ',
-      reading: 'あつあつ',
-      answer: 'あつあつ',
-      explanation: '料理などができたてであついようす。',
-      questionText: '○○のおでんはおいしいなあ。'
+      word: 'てすとてすと',
+      reading: 'てすとてすと',
+      answer: 'てすとてすと',
+      explanation: 'パーサーの動きを確かめるための合成データ。',
+      questionText: '○○をうたう。',
+      displayText: 'てすとてすとをうたう。',
+      singingReading: 'てすとてすとおうたう'
     });
   });
 
@@ -51,7 +55,10 @@ describe('kana utilities', () => {
       questionText: '大きな犬が急に出てきて、○○する。'
     };
 
-    expect(buildOnomatopoeiaResultLyrics([problem])).toContain('大きな犬が急に出てきてるんるんする');
+    const resultLyrics = buildOnomatopoeiaResultLyrics([problem]);
+    expect(resultLyrics).toBe('大きな犬が急に出てきてるんるんする');
+    expect(resultLyrics).not.toContain('にほんごのおのまとぺ');
+    expect(resultLyrics).not.toContain('うたってたくさんべんきょー');
 
     const [, answerTask] = buildOnomatopoeiaTasks(problem, 'よたよた', false);
     expect(answerTask).toMatchObject({

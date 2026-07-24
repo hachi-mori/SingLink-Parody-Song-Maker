@@ -1,0 +1,299 @@
+﻿{
+  "16thnoteframe_length": 12,
+  "notes": [
+    {
+      "frame_length": 2,
+      "key": null,
+      "lyric": "",
+      "notelen": "R"
+    },
+    {
+      "frame_length": 35,
+      "key": 62,
+      "lyric": "い",
+      "notelen": "D4"
+    },
+    {
+      "frame_length": 12,
+      "key": 62,
+      "lyric": "い",
+      "notelen": "D4"
+    },
+    {
+      "frame_length": 35,
+      "key": 67,
+      "lyric": "い",
+      "notelen": "G4"
+    },
+    {
+      "frame_length": 12,
+      "key": 67,
+      "lyric": "い",
+      "notelen": "G4"
+    },
+    {
+      "frame_length": 35,
+      "key": 67,
+      "lyric": "い",
+      "notelen": "G4"
+    },
+    {
+      "frame_length": 12,
+      "key": 67,
+      "lyric": "い",
+      "notelen": "G4"
+    },
+    {
+      "frame_length": 35,
+      "key": 67,
+      "lyric": "い",
+      "notelen": "G4"
+    },
+    {
+      "frame_length": 12,
+      "key": 67,
+      "lyric": "い",
+      "notelen": "G4"
+    },
+    {
+      "frame_length": 35,
+      "key": 65,
+      "lyric": "い",
+      "notelen": "F4"
+    },
+    {
+      "frame_length": 12,
+      "key": 67,
+      "lyric": "い",
+      "notelen": "G4"
+    },
+    {
+      "frame_length": 141,
+      "key": 69,
+      "lyric": "い",
+      "notelen": "A4"
+    },
+    {
+      "frame_length": 35,
+      "key": 62,
+      "lyric": "ろ",
+      "notelen": "D4"
+    },
+    {
+      "frame_length": 12,
+      "key": 62,
+      "lyric": "ろ",
+      "notelen": "D4"
+    },
+    {
+      "frame_length": 35,
+      "key": 69,
+      "lyric": "ろ",
+      "notelen": "A4"
+    },
+    {
+      "frame_length": 12,
+      "key": 69,
+      "lyric": "ろ",
+      "notelen": "A4"
+    },
+    {
+      "frame_length": 35,
+      "key": 69,
+      "lyric": "ろ",
+      "notelen": "A4"
+    },
+    {
+      "frame_length": 12,
+      "key": 69,
+      "lyric": "ろ",
+      "notelen": "A4"
+    },
+    {
+      "frame_length": 35,
+      "key": 69,
+      "lyric": "ろ",
+      "notelen": "A4"
+    },
+    {
+      "frame_length": 12,
+      "key": 69,
+      "lyric": "ろ",
+      "notelen": "A4"
+    },
+    {
+      "frame_length": 35,
+      "key": 67,
+      "lyric": "ろ",
+      "notelen": "G4"
+    },
+    {
+      "frame_length": 12,
+      "key": 69,
+      "lyric": "ろ",
+      "notelen": "A4"
+    },
+    {
+      "frame_length": 140,
+      "key": 71,
+      "lyric": "ろ",
+      "notelen": "B4"
+    },
+    {
+      "frame_length": 35,
+      "key": 62,
+      "lyric": "は",
+      "notelen": "D4"
+    },
+    {
+      "frame_length": 12,
+      "key": 62,
+      "lyric": "は",
+      "notelen": "D4"
+    },
+    {
+      "frame_length": 35,
+      "key": 71,
+      "lyric": "は",
+      "notelen": "B4"
+    },
+    {
+      "frame_length": 12,
+      "key": 71,
+      "lyric": "は",
+      "notelen": "B4"
+    },
+    {
+      "frame_length": 35,
+      "key": 71,
+      "lyric": "は",
+      "notelen": "B4"
+    },
+    {
+      "frame_length": 12,
+      "key": 71,
+      "lyric": "は",
+      "notelen": "B4"
+    },
+    {
+      "frame_length": 35,
+      "key": 71,
+      "lyric": "は",
+      "notelen": "B4"
+    },
+    {
+      "frame_length": 12,
+      "key": 71,
+      "lyric": "は",
+      "notelen": "B4"
+    },
+    {
+      "frame_length": 35,
+      "key": 69,
+      "lyric": "は",
+      "notelen": "A4"
+    },
+    {
+      "frame_length": 12,
+      "key": 71,
+      "lyric": "は",
+      "notelen": "B4"
+    },
+    {
+      "frame_length": 35,
+      "key": 72,
+      "lyric": "は",
+      "notelen": "C5"
+    },
+    {
+      "frame_length": 12,
+      "key": 72,
+      "lyric": "は",
+      "notelen": "C5"
+    },
+    {
+      "frame_length": 35,
+      "key": 71,
+      "lyric": "は",
+      "notelen": "B4"
+    },
+    {
+      "frame_length": 12,
+      "key": 69,
+      "lyric": "は",
+      "notelen": "A4"
+    },
+    {
+      "frame_length": 47,
+      "key": 67,
+      "lyric": "は",
+      "notelen": "G4"
+    },
+    {
+      "frame_length": 35,
+      "key": 65,
+      "lyric": "に",
+      "notelen": "F4"
+    },
+    {
+      "frame_length": 12,
+      "key": 67,
+      "lyric": "に",
+      "notelen": "G4"
+    },
+    {
+      "frame_length": 35,
+      "key": 69,
+      "lyric": "に",
+      "notelen": "A4"
+    },
+    {
+      "frame_length": 12,
+      "key": 69,
+      "lyric": "に",
+      "notelen": "A4"
+    },
+    {
+      "frame_length": 35,
+      "key": 69,
+      "lyric": "に",
+      "notelen": "A4"
+    },
+    {
+      "frame_length": 12,
+      "key": 67,
+      "lyric": "に",
+      "notelen": "G4"
+    },
+    {
+      "frame_length": 35,
+      "key": 65,
+      "lyric": "に",
+      "notelen": "F4"
+    },
+    {
+      "frame_length": 12,
+      "key": 62,
+      "lyric": "に",
+      "notelen": "D4"
+    },
+    {
+      "frame_length": 35,
+      "key": 64,
+      "lyric": "に",
+      "notelen": "E4"
+    },
+    {
+      "frame_length": 12,
+      "key": 65,
+      "lyric": "に",
+      "notelen": "F4"
+    },
+    {
+      "frame_length": 141,
+      "key": 67,
+      "lyric": "に",
+      "notelen": "G4"
+    }
+  ]
+}

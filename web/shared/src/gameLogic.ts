@@ -13,6 +13,8 @@ export type SubmitAnswerResult =
   | { ok: true; task: SolvedTask }
   | { ok: false; message: string };
 
+export const onomatopoeiaQuestionsPerGame = 4;
+
 export function makeQuestionDisplayText(index: number, questionText: string): string {
   const circledNumbers = [
     '①',
@@ -160,14 +162,20 @@ export function buildOnomatopoeiaTasks(problem: OnomatopoeiaEntry, answer: strin
     },
     {
       phrase: problem.answer,
-      syllables: makePlaceholderSyllables('ル', 6),
+      syllables: makePlaceholderSyllables(
+        'ル',
+        Math.max(6, splitOnomatopoeiaMoras(replaceChoonWithVowel(problem.answer)).length)
+      ),
       userInput: answer,
       userSyllables: splitOnomatopoeiaMoras(replaceChoonWithVowel(problem.answer)),
       restPadding: true,
       score: 0,
       rhymeMatchPercent: 0,
       matchesCount: 0,
-      isCorrect
+      isCorrect,
+      singingReading: problem.singingReading,
+      englishMeaning: problem.englishMeaning,
+      englishExample: problem.englishExample
     }
   ];
 }
@@ -178,10 +186,13 @@ function cleanResultLyricLine(line: string): string {
 
 export function buildOnomatopoeiaResultLyrics(problems: OnomatopoeiaEntry[]): string {
   const lines = problems.map((problem) => {
+    if (problem.displayText) {
+      return problem.displayText;
+    }
     if (problem.questionText) {
       return cleanResultLyricLine(problem.questionText.replace('○○', problem.answer));
     }
     return cleanResultLyricLine(`${problem.word}　${problem.answer}`);
   });
-  return `${lines.join('\n')}\nにほんごのおのまとぺ\nうたってたくさんべんきょー`;
+  return lines.join('\n');
 }

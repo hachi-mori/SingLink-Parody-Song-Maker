@@ -1,5 +1,11 @@
 import type { JsonObject, SolvedTask } from '../../shared/src/types';
 import {
+  buildMemorizationSynthesisPlan,
+  extractOnomatopoeiaLineCorrects,
+  type PhraseRange
+} from '../../shared/src/memorizationScore';
+import { trimWavLeadingFrames } from '../../shared/src/wav';
+import {
   getKeyAdjustment,
   transposeScoreJSON,
   transposeSingQueryJSON,
@@ -9,7 +15,6 @@ import {
 import { concatWavBuffers } from './wav';
 
 const normalSpeakerId = 3003;
-const incorrectSpeakerId = 3076;
 const singingQuerySpeakerId = 6000;
 
 function withTimeout(ms: number): AbortSignal {
@@ -125,18 +130,35 @@ export async function getVoicevoxVersion(baseUrl: string): Promise<string> {
   return typeof body === 'string' ? body : String(body);
 }
 
-export function extractOnomatopoeiaLineCorrects(tasks: SolvedTask[]): boolean[] {
-  return tasks
-    .filter((task) => task.restPadding && task.syllables.length === 6 && task.syllables[0] === 'ル')
-    .map((task) => task.isCorrect !== false);
-}
-
-export async function synthesizeSongScore(score: ScoreJson, baseUrlRaw: string, solvedTasks: SolvedTask[], songTitle: string): Promise<Buffer> {
+export async function synthesizeSongScore(
+  score: ScoreJson,
+  baseUrlRaw: string,
+  solvedTasks: SolvedTask[],
+  songTitle: string,
+  phraseRanges?: ReadonlyArray<PhraseRange>
+): Promise<Buffer> {
   const baseUrl = normalizeBaseUrl(baseUrlRaw);
   const keyShift = getKeyAdjustment('ずんだもん', 'ノーマル');
 
-  if (songTitle === 'オノマトペ') {
-    return synthesizeOnomatopoeiaScore(score, baseUrl, extractOnomatopoeiaLineCorrects(solvedTasks), keyShift);
+  if (songTitle === 'オノマトペ' && phraseRanges?.length) {
+    const shiftedScore = keyShift !== 0 ? transposeScoreJSON(score, -keyShift) : score;
+    const plan = buildMemorizationSynthesisPlan(
+      shiftedScore,
+      phraseRanges,
+      extractOnomatopoeiaLineCorrects(solvedTasks)
+    );
+    const wavs: Buffer[] = [];
+    let processedPaddingFrames = 0;
+    for (const segment of plan) {
+      const wav = await synthesizeScoreSegment(segment.score, segment.speakerId, baseUrl, keyShift);
+      wavs.push(Buffer.from(trimWavLeadingFrames(
+        wav,
+        segment.leadingPaddingFrames,
+        processedPaddingFrames
+      )));
+      processedPaddingFrames += segment.leadingPaddingFrames;
+    }
+    return concatWavBuffers(wavs);
   }
 
   const shiftedScore = applyKeyShiftToScore(score, keyShift);
@@ -145,47 +167,6 @@ export async function synthesizeSongScore(score: ScoreJson, baseUrlRaw: string, 
 
   for (const segment of segments) {
     wavs.push(await synthesizeScoreSegment(segment, normalSpeakerId, baseUrl, keyShift));
-  }
-
-  return concatWavBuffers(wavs);
-}
-
-async function synthesizeOnomatopoeiaScore(score: ScoreJson, baseUrl: string, lineCorrects: boolean[], keyShift: number): Promise<Buffer> {
-  if (score.notes.length < 48) {
-    const shiftedScore = applyKeyShiftToScore(score, keyShift);
-    const segments = splitScore(shiftedScore, 2500);
-    const wavs: Buffer[] = [];
-    for (const segment of segments) {
-      wavs.push(await synthesizeScoreSegment(segment, normalSpeakerId, baseUrl, keyShift));
-    }
-    return concatWavBuffers(wavs);
-  }
-
-  const shiftedScore = keyShift !== 0 ? transposeScoreJSON(score, -keyShift) : score;
-  const ranges: Array<[number, number]> = [
-    [0, 16],
-    [16, 31],
-    [31, 47],
-    [47, shiftedScore.notes.length]
-  ];
-  const wavs: Buffer[] = [];
-
-  for (let i = 0; i < ranges.length; i += 1) {
-    const [start, end] = ranges[i] as [number, number];
-    if (start >= end || start >= shiftedScore.notes.length) {
-      continue;
-    }
-
-    const segmentNotes = shiftedScore.notes.slice(start, Math.min(end, shiftedScore.notes.length)).map((note) => ({ ...note }));
-    if (segmentNotes.length === 0) {
-      continue;
-    }
-    if (segmentNotes[0]?.notelen !== 'R') {
-      segmentNotes.unshift({ frame_length: 2, key: null, lyric: '', notelen: 'R' });
-    }
-
-    const speakerId = i < 3 && lineCorrects[i] === false ? incorrectSpeakerId : normalSpeakerId;
-    wavs.push(await synthesizeScoreSegment({ notes: segmentNotes }, speakerId, baseUrl, keyShift));
   }
 
   return concatWavBuffers(wavs);
