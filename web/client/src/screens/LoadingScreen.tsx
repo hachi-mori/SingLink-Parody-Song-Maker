@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { SolvedTask, SongDetail } from '@shared/types';
+import type { DatasetId, SolvedTask, SongDetail } from '@shared/types';
 import { synthesizeSong } from '../lib/api';
 import { buildGeneratedFileName } from '../lib/fileName';
 import { saveGeneratedTrack } from '../lib/historyDb';
@@ -8,9 +8,11 @@ import { assetUrl } from '../lib/assets';
 import type { GeneratedResult } from '../lib/generatedResult';
 import { buildSongKaraokeTimings } from '../lib/karaoke';
 import { useLanguage } from '../lib/i18n';
+import { savesHistoryForDataset } from '../lib/quizDatasets';
 
 type LoadingScreenProps = {
   song: SongDetail;
+  datasetId: DatasetId;
   tasks: SolvedTask[];
   fullLyrics: string;
   inputTexts: string[];
@@ -20,7 +22,7 @@ type LoadingScreenProps = {
   onBack: () => void;
 };
 
-export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, voicevoxConnected, onDone, onBack }: LoadingScreenProps) {
+export function LoadingScreen({ song, datasetId, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, voicevoxConnected, onDone, onBack }: LoadingScreenProps) {
   const { language, t } = useLanguage();
   const [message, setMessage] = useState(() => t('preparingVoice'));
   const [error, setError] = useState('');
@@ -68,17 +70,19 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
         }
 
         const fileName = buildGeneratedFileName(song.title);
-        const id = crypto.randomUUID();
-        await saveGeneratedTrack({
-          id,
-          songTitle: song.title,
-          fileName,
-          createdAt: new Date().toISOString(),
-          lyrics: fullLyrics,
-          userInputs: inputTexts,
-          voicevoxBaseUrl,
-          wavBlob: blob
-        });
+        if (savesHistoryForDataset(datasetId)) {
+          const id = crypto.randomUUID();
+          await saveGeneratedTrack({
+            id,
+            songTitle: song.title,
+            fileName,
+            createdAt: new Date().toISOString(),
+            lyrics: fullLyrics,
+            userInputs: inputTexts,
+            voicevoxBaseUrl,
+            wavBlob: blob
+          });
+        }
 
         if (cancelled || doneRef.current) {
           return;
@@ -104,7 +108,7 @@ export function LoadingScreen({ song, tasks, fullLyrics, inputTexts, voicevoxBas
       cancelled = true;
       window.clearTimeout(skipTimer);
     };
-  }, [song, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, voicevoxConnected, onDone, language, t]);
+  }, [song, datasetId, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, voicevoxConnected, onDone, language, t]);
 
   const skipVoice = () => {
     if (doneRef.current) {

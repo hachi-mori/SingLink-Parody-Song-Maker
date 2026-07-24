@@ -1,4 +1,6 @@
 import type {
+  QuizDataset,
+  QuizRound,
   SongDetail,
   SongInfo,
   SynthesisErrorResponse,
@@ -7,6 +9,7 @@ import type {
 } from '@shared/types';
 import { fetchStaticSongDetail, fetchStaticSongs, previewStaticLyrics } from './staticSongs';
 import { checkDirectVoicevox, synthesizeDirectVoicevox } from './directVoicevox';
+import { isLocalBookQuizRound, normalizeQuizDatasets, original335Dataset } from './quizDatasets';
 
 const directSynthesisMessage = 'ローカルVOICEVOXへ接続できませんでした。ブラウザのローカルネットワーク権限とVOICEVOXのCORS設定を確認してください。';
 const synthesisTimeoutMessage = '歌声生成の応答がありませんでした。VOICEVOX未接続、またはブラウザからローカルVOICEVOXへ接続できない可能性があります。';
@@ -55,6 +58,29 @@ export async function fetchSongs(): Promise<SongInfo[]> {
     }
     throw error;
   }
+}
+
+/** The local-book option is unavailable by default, including on static Pages. */
+export async function fetchQuizDatasets(): Promise<QuizDataset[]> {
+  try {
+    const response = await fetch(apiUrl('/api/datasets'));
+    if (!response.ok) return [original335Dataset];
+    return normalizeQuizDatasets(await response.json());
+  } catch {
+    return [original335Dataset];
+  }
+}
+
+export async function fetchLocalBookQuizRound(): Promise<QuizRound> {
+  const response = await fetch(apiUrl('/api/local-book/round'), { cache: 'no-store' });
+  if (!response.ok) {
+    throw new Error('The local book quiz is unavailable.');
+  }
+  const round: unknown = await response.json();
+  if (!isLocalBookQuizRound(round)) {
+    throw new Error('The local book quiz response is invalid.');
+  }
+  return round;
 }
 
 export async function fetchSongDetail(songId: string): Promise<SongDetail> {

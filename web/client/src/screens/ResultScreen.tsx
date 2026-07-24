@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Download, Pause, Play, RotateCcw } from 'lucide-react';
-import type { KaraokeLineTiming, SolvedTask, SongDetail } from '@shared/types';
+import type { DatasetId, KaraokeLineTiming, SolvedTask, SongDetail } from '@shared/types';
 import { getKaraokeLineProgress } from '@shared/memorizationScore';
 import { AssetButton } from '../components/AssetButton';
 import { ScreenShell } from '../components/ScreenShell';
@@ -10,9 +10,11 @@ import type { GeneratedResult } from '../lib/generatedResult';
 import { hasGeneratedAudio } from '../lib/generatedResult';
 import { useLanguage } from '../lib/i18n';
 import { showsEnglishLearningSupport } from '@shared/languageMode';
+import { savesHistoryForDataset, supportsEnglishForDataset } from '../lib/quizDatasets';
 
 type ResultScreenProps = {
   song: SongDetail;
+  datasetId: DatasetId;
   tasks: SolvedTask[];
   fullLyrics: string;
   result: GeneratedResult;
@@ -50,9 +52,9 @@ function usePrefersReducedMotion(): boolean {
   return reduced;
 }
 
-export function ResultScreen({ song, tasks, fullLyrics, result, demoDisclosure, demoCredits, onTitle, onHistory }: ResultScreenProps) {
+export function ResultScreen({ song, datasetId, tasks, fullLyrics, result, demoDisclosure, demoCredits, onTitle, onHistory }: ResultScreenProps) {
   const { language, t } = useLanguage();
-  const showEnglishLearningSupport = showsEnglishLearningSupport(language);
+  const showEnglishLearningSupport = supportsEnglishForDataset(datasetId) && showsEnglishLearningSupport(language);
   const prefersReducedMotion = usePrefersReducedMotion();
   const audioContextRef = useRef<AudioContext | undefined>(undefined);
   const voiceBufferRef = useRef<AudioBuffer | undefined>(undefined);
@@ -306,7 +308,7 @@ export function ResultScreen({ song, tasks, fullLyrics, result, demoDisclosure, 
               </button>
               <button onClick={() => void restart()}><RotateCcw />{t('restart')}</button>
               <button onClick={() => downloadBlob(result.blob, result.fileName)}><Download />{t('download')}</button>
-              {!isDemo ? <button onClick={onHistory}>{t('history')}</button> : null}
+              {!isDemo && savesHistoryForDataset(datasetId) ? <button onClick={onHistory}>{t('history')}</button> : null}
             </div>
           ) : (
             <div className="result-notice">

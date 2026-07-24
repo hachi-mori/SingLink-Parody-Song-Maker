@@ -1,5 +1,5 @@
 import { RefreshCw } from 'lucide-react';
-import type { SongInfo, SourceSongInfo, VoicevoxVersionResponse } from '@shared/types';
+import type { DatasetId, QuizDataset, SongInfo, SourceSongInfo, VoicevoxVersionResponse } from '@shared/types';
 import { AssetButton } from '../components/AssetButton';
 import { ScreenShell } from '../components/ScreenShell';
 import { assetUrl } from '../lib/assets';
@@ -16,6 +16,8 @@ const englishSongNames: Record<string, string> = {
 
 type TitleScreenProps = {
   songs: SongInfo[];
+  datasets: QuizDataset[];
+  selectedDatasetId: DatasetId;
   selectedSongId: string;
   sourceSongs: SourceSongInfo[];
   selectedSourceSongId: string;
@@ -25,6 +27,7 @@ type TitleScreenProps = {
   loading: boolean;
   error?: string;
   onSelectSong: (songId: string) => void;
+  onSelectDataset: (datasetId: DatasetId) => void;
   onSelectSourceSong: (songId: string) => void;
   onBaseUrlChange: (baseUrl: string) => void;
   onCheckVoicevox: () => void;
@@ -79,6 +82,21 @@ export function TitleScreen(props: TitleScreenProps) {
         <div className="title-main">
           <img className="title-logo" src={assetUrl('assets/texture/assets/title_logo.png')} alt="シングリンク" />
           <div className="song-picker">
+            {props.datasets.length > 1 ? (
+              <div className="song-picker-row">
+                <label htmlFor="dataset-select">{language === 'en' ? 'Learning set' : '教材'}</label>
+                <select
+                  id="dataset-select"
+                  value={props.selectedDatasetId}
+                  disabled={props.loading}
+                  onChange={(event) => props.onSelectDataset(event.target.value as DatasetId)}
+                >
+                  {props.datasets.map((dataset) => (
+                    <option key={dataset.id} value={dataset.id}>{dataset.label}</option>
+                  ))}
+                </select>
+              </div>
+            ) : null}
             <div className="song-picker-row">
               <label htmlFor="song-select">{t('quizType')}</label>
               <select
