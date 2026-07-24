@@ -49,6 +49,23 @@ export type OnomatopoeiaEntry = {
   translationReviewNote?: string;
 };
 
+/** Identifies which locally available teaching dataset supplied a quiz round. */
+export type DatasetId = 'original335' | 'localBook100';
+
+/** Metadata safe to expose in the title screen; it never contains card text. */
+export type QuizDataset = {
+  id: DatasetId;
+  label: string;
+  localOnly: boolean;
+  supportsEnglish: boolean;
+};
+
+/** A server-selected quiz round. Local book rounds are deliberately limited to four cards. */
+export type QuizRound = {
+  datasetId: DatasetId;
+  entries: OnomatopoeiaEntry[];
+};
+
 export type KaraokeNoteTiming = {
   lyric: string;
   startSeconds: number;

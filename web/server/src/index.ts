@@ -11,9 +11,11 @@ import {
   type PhraseRange
 } from '../../shared/src/memorizationScore';
 import type { ScoreJson } from '../../shared/src/vvproj';
-import type { SynthesisErrorResponse, SynthesisRequest } from '../../shared/src/types';
+import type { QuizDataset, SynthesisErrorResponse, SynthesisRequest } from '../../shared/src/types';
 import { getConfig } from './config';
+import { createLocalBookQuizRound, loadLocalBookEntries } from './localBookDataset';
 import { assetsDir } from './paths';
+import { isAllowedLocalOrigin, isLoopbackHost, normalizeLocalVoicevoxBaseUrl } from './security';
 import { getSongDetail, listSongs, resolveMemorizationSourceScore, resolveSong } from './songRepository';
 import { getVoicevoxVersion, synthesizeSongScore } from './voicevox';
 
@@ -50,7 +52,18 @@ const previewSchema = synthesisSchema.pick({
 });
 
 await app.register(cors, {
-  origin: true
+  origin: (origin, callback) => {
+    callback(null, isAllowedLocalOrigin(origin, config.localBook.allowedOrigins));
+  }
+});
+
+app.addHook('onRequest', async (request, reply) => {
+  if (!request.url.startsWith('/api/local-book/')) return;
+  const isAllowed = isLoopbackHost(request.hostname)
+    && isAllowedLocalOrigin(request.headers.origin, config.localBook.allowedOrigins);
+  if (!isAllowed) {
+    return reply.code(403).send({ ok: false, message: 'Local-only endpoint is unavailable' });
+  }
 });
 
 await fs.mkdir(assetsDir, { recursive: true });
@@ -70,7 +83,14 @@ app.get('/api/health', async () => {
 
 app.get('/api/voicevox/version', async (request) => {
   const query = request.query as { baseUrl?: string };
-  const baseUrl = query.baseUrl ?? config.voicevoxBaseUrl;
+  const baseUrl = normalizeLocalVoicevoxBaseUrl(query.baseUrl ?? config.voicevoxBaseUrl);
+  if (!baseUrl) {
+    return {
+      ok: false,
+      baseUrl: config.voicevoxBaseUrl,
+      message: 'VOICEVOX URL must point to the local engine'
+    };
+  }
   try {
     const version = await getVoicevoxVersion(baseUrl);
     return {
@@ -86,6 +106,47 @@ app.get('/api/voicevox/version', async (request) => {
       message: 'VOICEVOX に接続できませんでした。VOICEVOX を起動してから再確認してください。',
       detail: error instanceof Error ? error.message : String(error)
     };
+  }
+});
+
+const originalDataset: QuizDataset = {
+  id: 'original335',
+  label: '自作オノマトペ335語',
+  localOnly: false,
+  supportsEnglish: true
+};
+
+const localBookDataset: QuizDataset = {
+  id: 'localBook100',
+  label: 'このPC内の書籍教材100語',
+  localOnly: true,
+  supportsEnglish: false
+};
+
+app.get('/api/datasets', async () => {
+  const datasets = [originalDataset];
+  if (!config.localBook.enabled) return { datasets };
+  try {
+    await loadLocalBookEntries(config.localBook.dataRoot);
+    datasets.push(localBookDataset);
+  } catch {
+    // Treat missing or invalid local-only files as unavailable without exposing details.
+  }
+  return { datasets };
+});
+
+app.get('/api/local-book/round', async (_request, reply) => {
+  if (!config.localBook.enabled) {
+    return reply.code(404).send({ ok: false, message: 'Not found' });
+  }
+  try {
+    const round = await createLocalBookQuizRound(config.localBook.dataRoot);
+    return reply
+      .header('Cache-Control', 'no-store, private')
+      .header('Pragma', 'no-cache')
+      .send(round);
+  } catch {
+    return reply.code(404).send({ ok: false, message: 'Not found' });
   }
 });
 
@@ -134,6 +195,13 @@ app.post('/api/synthesis', async (request, reply) => {
   }
 
   const body: SynthesisRequest = parsed.data;
+  const voicevoxBaseUrl = normalizeLocalVoicevoxBaseUrl(body.voicevoxBaseUrl ?? config.voicevoxBaseUrl);
+  if (!voicevoxBaseUrl) {
+    return reply.code(400).send({
+      ok: false,
+      message: 'VOICEVOX URL must point to the local engine'
+    } satisfies SynthesisErrorResponse);
+  }
   const resolved = await resolveSong(body.songId);
   if (!resolved) {
     return reply.code(404).send({ ok: false, message: '曲が見つかりません' } satisfies SynthesisErrorResponse);
@@ -161,7 +229,7 @@ app.post('/api/synthesis', async (request, reply) => {
     }
     const wav = await synthesizeSongScore(
       score,
-      body.voicevoxBaseUrl ?? config.voicevoxBaseUrl,
+      voicevoxBaseUrl,
       body.solvedTasks,
       resolved.info.title,
       phraseRanges
@@ -172,11 +240,10 @@ app.post('/api/synthesis', async (request, reply) => {
       .header('Content-Disposition', `attachment; filename*=UTF-8''singlink_${encodedTitle}.wav`)
       .send(wav);
   } catch (error) {
-    request.log.error(error);
+    request.log.error({ err: error }, 'Voice synthesis failed');
     return reply.code(500).send({
       ok: false,
-      message: '歌声合成に失敗しました。VOICEVOX の起動状態と曲データを確認してください。',
-      detail: error instanceof Error ? error.message : String(error)
+      message: '歌声合成に失敗しました。VOICEVOX の起動状態と曲データを確認してください。'
     } satisfies SynthesisErrorResponse);
   }
 });

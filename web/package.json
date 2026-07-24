@@ -11,9 +11,10 @@
     "generate:onomatopoeia-readings": "node scripts/generate-onomatopoeia-readings.mjs",
     "generate:demo-assets": "tsx scripts/generate-demo-assets.mjs",
     "audit:english-subtitles": "node scripts/audit-english-subtitles.mjs",
+    "audit:public-assets": "node scripts/audit-public-assets.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run --config vitest.config.ts",
-    "build": "npm run typecheck && vite build --config client/vite.config.ts && node scripts/copy-assets.mjs"
+    "build": "npm run typecheck && vite build --config client/vite.config.ts && node scripts/copy-assets.mjs && npm run audit:public-assets"
   },
   "dependencies": {
     "@fastify/cors": "^11.1.0",
