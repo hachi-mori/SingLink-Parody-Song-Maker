@@ -32,7 +32,6 @@ type TitleScreenProps = {
   onBaseUrlChange: (baseUrl: string) => void;
   onCheckVoicevox: () => void;
   onStart: () => void;
-  onStartDemo: () => void;
   onOpenHowTo: () => void;
   onOpenCredit: () => void;
   onOpenHistory: () => void;
@@ -54,7 +53,7 @@ export function TitleScreen(props: TitleScreenProps) {
               ? props.voicevoxStatus.ok
                 ? t('voicevoxConnected', { version: props.voicevoxStatus.version ? ` (${props.voicevoxStatus.version})` : '' })
                 : t('voicevoxDisconnected')
-              : t('voicevoxNotChecked')}</div>
+              : t('voicevoxLocalNotChecked')}</div>
             <label>
               <span>{t('voicevoxUrl')}</span>
               <input
@@ -133,10 +132,6 @@ export function TitleScreen(props: TitleScreenProps) {
 
           <nav className="title-actions" aria-label={t('titleMenu')}>
             <AssetButton imageSrc={assetUrl('assets/texture/assets/button/start.png')} label={t('start')} onClick={props.onStart} disabled={props.loading} />
-            <button className="demo-button" onClick={props.onStartDemo} disabled={props.loading}>
-              <strong>{t('instantDemo')}</strong>
-              <span>{t('instantDemoHelp')}</span>
-            </button>
             <AssetButton imageSrc={assetUrl('assets/texture/assets/button/howtoplay.png')} label={t('howTo')} onClick={props.onOpenHowTo} />
             <button className="history-button" onClick={props.onOpenHistory}>{t('savedSongs')}</button>
           </nav>

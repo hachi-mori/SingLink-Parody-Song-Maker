@@ -260,7 +260,6 @@ export function App() {
       onBaseUrlChange={setVoicevoxBaseUrl}
       onCheckVoicevox={refreshVoicevox}
       onStart={startGame}
-      onStartDemo={() => void startDemo()}
       onOpenHowTo={() => setScreen('howto')}
       onOpenCredit={() => setScreen('credit')}
       onOpenHistory={() => setScreen('history')}

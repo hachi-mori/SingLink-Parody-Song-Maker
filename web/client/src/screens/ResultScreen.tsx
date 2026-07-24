@@ -242,7 +242,7 @@ export function ResultScreen({ song, datasetId, tasks, fullLyrics, result, demoD
 
   return (
     <ScreenShell background={assetUrl('assets/texture/assets/result_sunny.gif')} fit="cover">
-      <section className="result-layout">
+      <section className={`result-layout${showEnglishLearningSupport ? '' : ' result-layout--japanese-only'}`}>
         <img className="result-character" src={assetUrl('assets/texture/assets/zunda_singing.gif')} alt="" aria-hidden="true" />
         <div className="result-card">
           {isDemo ? (
