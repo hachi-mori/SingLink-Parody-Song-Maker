@@ -15,7 +15,12 @@ import type { QuizDataset, SynthesisErrorResponse, SynthesisRequest } from '../.
 import { getConfig } from './config';
 import { createLocalBookQuizRound, loadLocalBookEntries } from './localBookDataset';
 import { assetsDir } from './paths';
-import { isAllowedLocalOrigin, isLoopbackHost, normalizeLocalVoicevoxBaseUrl } from './security';
+import {
+  isAllowedLocalBrowserRequest,
+  isAllowedLocalOrigin,
+  isLoopbackHost,
+  normalizeLocalVoicevoxBaseUrl
+} from './security';
 import { getSongDetail, listSongs, resolveMemorizationSourceScore, resolveSong } from './songRepository';
 import { getVoicevoxVersion, synthesizeSongScore } from './voicevox';
 
@@ -60,7 +65,11 @@ await app.register(cors, {
 app.addHook('onRequest', async (request, reply) => {
   if (!request.url.startsWith('/api/local-book/')) return;
   const isAllowed = isLoopbackHost(request.hostname)
-    && isAllowedLocalOrigin(request.headers.origin, config.localBook.allowedOrigins);
+    && isAllowedLocalBrowserRequest(
+      request.headers.origin,
+      request.headers['sec-fetch-site'],
+      config.localBook.allowedOrigins
+    );
   if (!isAllowed) {
     return reply.code(403).send({ ok: false, message: 'Local-only endpoint is unavailable' });
   }

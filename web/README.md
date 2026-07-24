@@ -92,6 +92,28 @@ Browser -> /assets/demo（VOICEVOXへの実行時通信なし）
 
 3ファイルはオノマトペをキーに結合し、英語データは日本語例文の完全一致も確認します。クイズは毎回4件をランダム抽出します。
 
+### ローカル限定の書籍教材
+
+権利制限のある書籍教材は `web/assets/` へ置かず、Git管理外のディレクトリに次の2ファイルを保存します。
+
+```text
+cards_text_data.json
+cards_singing_readings.json
+```
+
+Fastifyへ絶対パスを明示し、loopbackで起動した場合だけ教材選択に表示されます。
+
+```powershell
+$env:SINGLINK_ENABLE_LOCAL_BOOK_DATA = "1"
+$env:SINGLINK_LOCAL_BOOK_DATA_ROOT = "C:\path\to\local-only\legacy-web-assets\dict"
+$env:SINGLINK_HOST = "127.0.0.1"
+npm.cmd run dev
+```
+
+サーバーは100件の整合性を検査し、ブラウザへは選ばれた4問だけを返します。この教材は日本語表示専用で、生成した歌詞・回答・WAVをブラウザ履歴へ保存しません。環境変数未設定、データ不在、localhost以外、またはGitHub Pagesでは教材自体を表示しません。書籍教材や派生音声を `web/assets/`、`dist/`、デモ素材へコピーしないでください。
+
+このアクセス制限は、外部Webサイトからlocalhostの教材を読み出されることを防ぐためのものです。同じPC上で動くプロセスを認証する仕組みではないため、OSのアカウントとファイルアクセス権も適切に管理してください。
+
 英語字幕の監査:
 
 ```powershell
@@ -144,6 +166,7 @@ node scripts/audit-english-subtitles.mjs --all
 | `npm.cmd run typecheck` | TypeScript型チェック |
 | `npm.cmd run build` | 型チェック、Vite build、公開許可リストのアセットコピー |
 | `npm.cmd run audit:english-subtitles` | 335件の英語字幕監査 |
+| `npm.cmd run audit:public-assets` | 公開成果物と許可リスト、335件の公開教材を監査 |
 | `npm.cmd run generate:demo-assets` | 「幸せなら手をたたこう」の楽譜とローカルVOICEVOXからデモ歌唱WAV・同期manifestを再生成 |
 | `npm.cmd run generate:onomatopoeia-readings` | ローカルVOICEVOXを使う読みデータ再生成 |
 
@@ -156,6 +179,7 @@ npm.cmd run test
 npm.cmd run typecheck
 npm.cmd run build
 npm.cmd run audit:english-subtitles
+npm.cmd run audit:public-assets
 ```
 
 Build Week提出版の確認範囲:

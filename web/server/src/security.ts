@@ -40,6 +40,20 @@ export function isAllowedLocalOrigin(origin: string | undefined, allowedOrigins:
   }
 }
 
+export function isAllowedLocalBrowserRequest(
+  origin: string | undefined,
+  secFetchSite: string | undefined,
+  allowedOrigins: readonly string[]
+): boolean {
+  if (secFetchSite?.toLowerCase() === 'cross-site') {
+    return false;
+  }
+  if (origin) {
+    return isAllowedLocalOrigin(origin, allowedOrigins);
+  }
+  return secFetchSite?.toLowerCase() === 'same-origin';
+}
+
 export function normalizeLocalVoicevoxBaseUrl(value: string): string | undefined {
   try {
     const url = new URL(value);

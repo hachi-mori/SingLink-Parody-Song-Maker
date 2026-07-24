@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  isAllowedLocalBrowserRequest,
   isAllowedLocalOrigin,
   isLoopbackHost,
   normalizeLocalVoicevoxBaseUrl,
@@ -23,6 +24,16 @@ describe('localhost-only security helpers', () => {
     expect(isAllowedLocalOrigin('http://localhost:5173', origins)).toBe(false);
     expect(isAllowedLocalOrigin('http://example.test:5173', origins)).toBe(false);
     expect(isAllowedLocalOrigin(undefined, origins)).toBe(false);
+  });
+
+  it('accepts same-origin browser fetch metadata when a GET omits Origin', () => {
+    const origins = ['http://127.0.0.1:5173'];
+    expect(isAllowedLocalBrowserRequest(undefined, 'same-origin', origins)).toBe(true);
+    expect(isAllowedLocalBrowserRequest(undefined, 'cross-site', origins)).toBe(false);
+    expect(isAllowedLocalBrowserRequest(undefined, undefined, origins)).toBe(false);
+    expect(isAllowedLocalBrowserRequest('http://127.0.0.1:5173', 'same-origin', origins)).toBe(true);
+    expect(isAllowedLocalBrowserRequest('http://127.0.0.1:5173', 'cross-site', origins)).toBe(false);
+    expect(isAllowedLocalBrowserRequest('http://example.test:5173', 'same-origin', origins)).toBe(false);
   });
 
   it('accepts only the local VOICEVOX engine URL', () => {
