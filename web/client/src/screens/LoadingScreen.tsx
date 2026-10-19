@@ -52,7 +52,7 @@ export function LoadingScreen({ song, datasetId, tasks, fullLyrics, inputTexts, 
     const run = async () => {
       try {
         if (datasetId === 'browserImport' && tasks.filter((task) => task.singingReading).length !== 4) {
-          skipWithMessage('この回には歌唱読みのない問題があります。singingReading または readings を含む教材を読み込むと、同じPCのVOICEVOXで歌声を作れます。');
+      skipWithMessage('歌うための読みがないので、歌声はありません。');
           return;
         }
         if (!voicevoxConnected) {
