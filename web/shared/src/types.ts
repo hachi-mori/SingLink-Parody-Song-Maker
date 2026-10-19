@@ -49,8 +49,8 @@ export type OnomatopoeiaEntry = {
   translationReviewNote?: string;
 };
 
-/** Identifies which locally available teaching dataset supplied a quiz round. */
-export type DatasetId = 'original335' | 'localBook100';
+/** Imported data may use only loopback synthesis and browser-local history. */
+export type DatasetId = 'original335' | 'browserImport';
 
 /** Metadata safe to expose in the title screen; it never contains card text. */
 export type QuizDataset = {
@@ -60,7 +60,7 @@ export type QuizDataset = {
   supportsEnglish: boolean;
 };
 
-/** A server-selected quiz round. Local book rounds are deliberately limited to four cards. */
+/** A quiz round, with its data handling policy. */
 export type QuizRound = {
   datasetId: DatasetId;
   entries: OnomatopoeiaEntry[];
@@ -112,6 +112,7 @@ export type SongDetail = SongInfo & {
 };
 
 export type SynthesisRequest = {
+  datasetId?: DatasetId;
   songId: string;
   sourceSongId?: string;
   solvedTasks: SolvedTask[];
@@ -133,6 +134,8 @@ export type VoicevoxVersionResponse = {
 };
 
 export type GeneratedTrackRecord = {
+  /** Absent only for records created before dataset provenance was recorded. */
+  datasetId?: DatasetId;
   id: string;
   songTitle: string;
   fileName: string;

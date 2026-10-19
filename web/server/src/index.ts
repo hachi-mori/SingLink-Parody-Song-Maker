@@ -11,14 +11,11 @@ import {
   type PhraseRange
 } from '../../shared/src/memorizationScore';
 import type { ScoreJson } from '../../shared/src/vvproj';
-import type { QuizDataset, SynthesisErrorResponse, SynthesisRequest } from '../../shared/src/types';
+import type { SynthesisErrorResponse, SynthesisRequest } from '../../shared/src/types';
 import { getConfig } from './config';
-import { createLocalBookQuizRound, loadLocalBookEntries } from './localBookDataset';
 import { assetsDir } from './paths';
 import {
-  isAllowedLocalBrowserRequest,
   isAllowedLocalOrigin,
-  isLoopbackHost,
   normalizeLocalVoicevoxBaseUrl
 } from './security';
 import { getSongDetail, listSongs, resolveMemorizationSourceScore, resolveSong } from './songRepository';
@@ -33,6 +30,7 @@ const app = Fastify({
 });
 
 const synthesisSchema = z.object({
+  datasetId: z.literal('original335').optional(),
   songId: z.string().min(1),
   sourceSongId: z.string().min(1).optional(),
   solvedTasks: z.array(z.object({
@@ -52,26 +50,14 @@ const synthesisSchema = z.object({
 });
 
 const previewSchema = synthesisSchema.pick({
+  datasetId: true,
   songId: true,
   solvedTasks: true
 });
 
 await app.register(cors, {
   origin: (origin, callback) => {
-    callback(null, isAllowedLocalOrigin(origin, config.localBook.allowedOrigins));
-  }
-});
-
-app.addHook('onRequest', async (request, reply) => {
-  if (!request.url.startsWith('/api/local-book/')) return;
-  const isAllowed = isLoopbackHost(request.hostname)
-    && isAllowedLocalBrowserRequest(
-      request.headers.origin,
-      request.headers['sec-fetch-site'],
-      config.localBook.allowedOrigins
-    );
-  if (!isAllowed) {
-    return reply.code(403).send({ ok: false, message: 'Local-only endpoint is unavailable' });
+    callback(null, isAllowedLocalOrigin(origin, config.allowedOrigins));
   }
 });
 
@@ -115,47 +101,6 @@ app.get('/api/voicevox/version', async (request) => {
       message: 'VOICEVOX に接続できませんでした。VOICEVOX を起動してから再確認してください。',
       detail: error instanceof Error ? error.message : String(error)
     };
-  }
-});
-
-const originalDataset: QuizDataset = {
-  id: 'original335',
-  label: '自作オノマトペ335語',
-  localOnly: false,
-  supportsEnglish: true
-};
-
-const localBookDataset: QuizDataset = {
-  id: 'localBook100',
-  label: 'このPC内の書籍教材100語',
-  localOnly: true,
-  supportsEnglish: false
-};
-
-app.get('/api/datasets', async () => {
-  const datasets = [originalDataset];
-  if (!config.localBook.enabled) return { datasets };
-  try {
-    await loadLocalBookEntries(config.localBook.dataRoot);
-    datasets.push(localBookDataset);
-  } catch {
-    // Treat missing or invalid local-only files as unavailable without exposing details.
-  }
-  return { datasets };
-});
-
-app.get('/api/local-book/round', async (_request, reply) => {
-  if (!config.localBook.enabled) {
-    return reply.code(404).send({ ok: false, message: 'Not found' });
-  }
-  try {
-    const round = await createLocalBookQuizRound(config.localBook.dataRoot);
-    return reply
-      .header('Cache-Control', 'no-store, private')
-      .header('Pragma', 'no-cache')
-      .send(round);
-  } catch {
-    return reply.code(404).send({ ok: false, message: 'Not found' });
   }
 });
 

@@ -1,10 +1,8 @@
-name: Deploy main and Build Week to GitHub Pages
+name: Deploy audited SingLink to GitHub Pages
 
 on:
   push:
-    branches:
-      - main
-      - openai-build-week
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -16,94 +14,47 @@ concurrency:
   group: pages
   cancel-in-progress: true
 
-env:
-  NODE_VERSION: 22
-  BUILD_WEEK_PATH: openai-build-week
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout main
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: main
-          path: sources/main
-
-      - name: Checkout OpenAI Build Week
-        uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          ref: openai-build-week
-          path: sources/openai-build-week
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: 22
           cache: npm
-          cache-dependency-path: |
-            sources/main/web/package-lock.json
-            sources/openai-build-week/web/package-lock.json
-
-      - name: Install main dependencies
-        working-directory: sources/main/web
+          cache-dependency-path: web/package-lock.json
+      - name: Install dependencies
+        working-directory: web
         run: npm ci
-
-      - name: Test main Web
-        working-directory: sources/main/web
+      - name: Test Web
+        working-directory: web
         run: npm test
-
-      - name: Build main Web
-        working-directory: sources/main/web
+      - name: Build and audit public assets
+        working-directory: web
         run: npm run build
-
-      - name: Install Build Week dependencies
-        working-directory: sources/openai-build-week/web
-        run: npm ci
-
-      - name: Test Build Week Web
-        working-directory: sources/openai-build-week/web
-        run: npm test
-
-      - name: Build Build Week Web
-        working-directory: sources/openai-build-week/web
-        run: npm run build
-
-      - name: Assemble Pages site
+      - name: Assemble identical audited apps at both public paths
         run: |
-          mkdir -p "pages-site/${BUILD_WEEK_PATH}"
-          cp -a sources/main/web/dist/client/. pages-site/
-          cp -a sources/openai-build-week/web/dist/client/. "pages-site/${BUILD_WEEK_PATH}/"
+          mkdir -p pages-site/openai-build-week
+          cp -a web/dist/client/. pages-site/
+          cp -a web/dist/client/. pages-site/openai-build-week/
+          printf '%s\n' "$(git rev-parse HEAD)" > pages-site/version.txt
+          cp pages-site/version.txt pages-site/openai-build-week/version.txt
           test -f pages-site/index.html
-          test -f "pages-site/${BUILD_WEEK_PATH}/index.html"
-          ls pages-site/assets/index-*.js > /dev/null
-          ls pages-site/assets/index-*.css > /dev/null
-          ls "pages-site/${BUILD_WEEK_PATH}"/assets/index-*.js > /dev/null
-          ls "pages-site/${BUILD_WEEK_PATH}"/assets/index-*.css > /dev/null
-
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v4
+          test -f pages-site/openai-build-week/index.html
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: pages-site
-
   deploy:
     runs-on: ubuntu-latest
     needs: build
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-      - name: Publish deployment URLs
-        run: |
-          echo "### GitHub Pages" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Main: ${{ steps.deployment.outputs.page_url }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- OpenAI Build Week: ${{ steps.deployment.outputs.page_url }}${BUILD_WEEK_PATH}/" >> "$GITHUB_STEP_SUMMARY"

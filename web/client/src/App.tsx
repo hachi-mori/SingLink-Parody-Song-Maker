@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { defaultMemorizationSourceSongId } from '@shared/memorizationSongs';
-import type { DatasetId, QuizDataset, SolvedTask, SongDetail, SongInfo, SourceSongInfo, VoicevoxVersionResponse } from '@shared/types';
-import { fetchLocalBookQuizRound, fetchQuizDatasets, fetchSongDetail, fetchSongs, checkVoicevox } from './lib/api';
+import type { DatasetId, OnomatopoeiaEntry, SolvedTask, SongDetail, SongInfo, VoicevoxVersionResponse } from '@shared/types';
+import { fetchSongDetail, fetchSongs, checkVoicevox } from './lib/api';
 import { getStaticMemorizationSourceSongs } from './lib/staticSongs';
 import { TitleScreen } from './screens/TitleScreen';
 import { WriteLyricsScreen } from './screens/WriteLyricsScreen';
@@ -16,7 +16,7 @@ import type { GeneratedResult } from './lib/generatedResult';
 import { useLanguage } from './lib/i18n';
 import { loadDemoBundle, type DemoBundle } from './lib/demo';
 import { completeFixedDemo, getFixedDemoQuestions, shouldCheckVoicevoxOnInitialLoad } from './lib/demoFlow';
-import { original335Dataset, supportsEnglishForDataset } from './lib/quizDatasets';
+import { browserImportDataset, original335Dataset, readImportedDataset, supportsEnglishForDataset } from './lib/quizDatasets';
 
 type Screen = 'title' | 'write' | 'loading' | 'result' | 'howto' | 'credit' | 'history';
 
@@ -26,7 +26,7 @@ export function App() {
   const demoRequested = new URLSearchParams(window.location.search).get('demo') === '1';
   const [screen, setScreen] = useState<Screen>('title');
   const [songs, setSongs] = useState<SongInfo[]>([]);
-  const [datasets, setDatasets] = useState<QuizDataset[]>([original335Dataset]);
+  const [importedEntries, setImportedEntries] = useState<OnomatopoeiaEntry[]>();
   const [selectedDatasetId, setSelectedDatasetId] = useState<DatasetId>('original335');
   const [activeDatasetId, setActiveDatasetId] = useState<DatasetId>('original335');
   const [selectedSongId, setSelectedSongId] = useState('');
@@ -43,16 +43,68 @@ export function App() {
   const [demoInfo, setDemoInfo] = useState<Pick<DemoBundle, 'disclosure' | 'credits'>>();
   const [demoBundle, setDemoBundle] = useState<DemoBundle>();
   const demoRequestedRef = useRef(false);
+  const importGenerationRef = useRef(0);
+  const connectionGenerationRef = useRef(0);
+  const datasets = importedEntries ? [original335Dataset, browserImportDataset] : [original335Dataset];
 
   const refreshVoicevox = useCallback(async () => {
-    setVoicevoxStatus(await checkVoicevox(voicevoxBaseUrl));
-  }, [voicevoxBaseUrl]);
+    const generation = ++connectionGenerationRef.current;
+    const status = await checkVoicevox(voicevoxBaseUrl, selectedDatasetId);
+    if (generation === connectionGenerationRef.current) setVoicevoxStatus(status);
+  }, [voicevoxBaseUrl, selectedDatasetId]);
+
+  const clearRound = () => {
+    setSongDetail(undefined);
+    setSolvedTasks([]);
+    setFullLyrics('');
+    setInputTexts([]);
+    if (generatedResult?.status === 'generated') URL.revokeObjectURL(generatedResult.blobUrl);
+    setGeneratedResult(undefined);
+    setDemoInfo(undefined);
+    setDemoBundle(undefined);
+    setActiveDatasetId('original335');
+  };
+
+  const importDataset = async (file: File) => {
+    const generation = ++importGenerationRef.current;
+    setLoading(true);
+    setTitleError('');
+    try {
+      const entries = await readImportedDataset(file);
+      if (generation !== importGenerationRef.current) return;
+      clearRound();
+      setImportedEntries(entries);
+      setSelectedDatasetId('browserImport');
+      setSelectedSongId(songs.find((song) => song.mode === 'onomatopoeiaQuiz')?.id ?? '');
+      setLanguage('ja');
+      connectionGenerationRef.current += 1;
+      setVoicevoxBaseUrl('http://localhost:50021');
+      setVoicevoxStatus(undefined);
+    } catch (error) {
+      if (generation === importGenerationRef.current) {
+        setTitleError(error instanceof Error ? error.message : '教材を読み込めませんでした。現在の教材は変更していません。');
+      }
+    } finally {
+      if (generation === importGenerationRef.current) setLoading(false);
+    }
+  };
+
+  const clearImportedDataset = () => {
+    importGenerationRef.current += 1;
+    clearRound();
+    setImportedEntries(undefined);
+    setSelectedDatasetId('original335');
+    setTitleError('');
+    setLoading(false);
+    setScreen('title');
+  };
 
   const startDemo = useCallback(async () => {
     setLoading(true);
     setTitleError('');
     try {
       const demo = await loadDemoBundle();
+      setSongs([demo.song]);
       setSongDetail(demo.song);
       setActiveDatasetId('original335');
       setSolvedTasks([]);
@@ -76,9 +128,7 @@ export function App() {
     if (demoRequested) return;
     const load = async () => {
       try {
-        const [nextSongs, nextDatasets] = await Promise.all([fetchSongs(), fetchQuizDatasets()]);
-        setSongs(nextSongs);
-        setDatasets(nextDatasets);
+        setSongs(await fetchSongs());
       } catch (error) {
         setTitleError(language === 'en' ? t('genericLoadError') : error instanceof Error ? error.message : String(error));
       }
@@ -87,10 +137,16 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    if (selectedDatasetId === 'localBook100' && language !== 'ja') {
+    if (selectedDatasetId === 'browserImport' && language !== 'ja') {
       setLanguage('ja');
     }
   }, [selectedDatasetId, language, setLanguage]);
+
+  useEffect(() => {
+    if (selectedDatasetId === 'browserImport' && !selectedSongId) {
+      setSelectedSongId(songs.find((song) => song.mode === 'onomatopoeiaQuiz')?.id ?? '');
+    }
+  }, [selectedDatasetId, selectedSongId, songs]);
 
   useEffect(() => {
     if (!shouldCheckVoicevoxOnInitialLoad(window.location.search)) return;
@@ -112,15 +168,16 @@ export function App() {
     setLoading(true);
     setTitleError('');
     try {
-      const detail = await fetchSongDetail(selectedSongId);
-      if (selectedDatasetId === 'localBook100' && detail.mode !== 'onomatopoeiaQuiz') {
-        throw new Error(language === 'en'
-          ? 'The local book dataset is available only for the onomatopoeia quiz.'
-          : 'ローカルの書籍教材はオノマトペクイズでのみ利用できます。');
+      const imported = selectedDatasetId === 'browserImport';
+      const importedSong = songs.find((song) => song.id === selectedSongId && song.mode === 'onomatopoeiaQuiz');
+      if (imported && (!importedSong || !importedEntries)) {
+        throw new Error('教材を読み込み、オノマトペクイズを選んでください。');
       }
-      const localBookRound = selectedDatasetId === 'localBook100'
-        ? await fetchLocalBookQuizRound()
-        : undefined;
+      // Imported rounds use existing metadata and local question data. Only
+      // synthesis may later send text to the strictly validated loopback engine.
+      const detail: SongDetail = imported
+        ? { ...importedSong!, problems: [], onomatopoeiaEntries: importedEntries }
+        : await fetchSongDetail(selectedSongId);
       let selectedDetail: SongDetail = detail;
       if (detail.mode === 'onomatopoeiaQuiz') {
         const sourceSong = sourceSongs.find((song) => song.id === selectedSourceSongId);
@@ -135,12 +192,6 @@ export function App() {
           baseScoreFileName: sourceSong.scoreFileName,
           baseScoreUrl: sourceSong.scoreUrl,
           trackName: sourceSong.title
-        };
-      }
-      if (localBookRound) {
-        selectedDetail = {
-          ...selectedDetail,
-          onomatopoeiaEntries: localBookRound.entries
         };
       }
       setSongDetail(selectedDetail);
@@ -243,6 +294,10 @@ export function App() {
       songs={songs}
       datasets={datasets}
       selectedDatasetId={selectedDatasetId}
+      importedEntryCount={importedEntries?.length}
+      importedSingingReadingCount={importedEntries?.filter((entry) => entry.singingReading).length}
+      onImportDataset={importDataset}
+      onClearImportedDataset={clearImportedDataset}
       selectedSongId={selectedSongId}
       sourceSongs={sourceSongs}
       selectedSourceSongId={selectedSourceSongId}
@@ -253,6 +308,7 @@ export function App() {
       error={titleError}
       onSelectSong={setSelectedSongId}
       onSelectDataset={(datasetId) => {
+        clearRound();
         setSelectedDatasetId(datasetId);
         if (!supportsEnglishForDataset(datasetId)) setLanguage('ja');
       }}

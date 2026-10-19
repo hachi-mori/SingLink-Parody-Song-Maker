@@ -248,6 +248,23 @@ button:disabled {
   margin: 0;
 }
 
+.dataset-import-panel {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 10px;
+  text-align: left;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(134, 79, 9, 0.3);
+  overflow-wrap: anywhere;
+}
+
+.dataset-import-panel p { margin: 0; }
+.song-picker .dataset-import-panel label { font-size: 20px; line-height: 1.4; }
+.dataset-import-panel input { max-width: 100%; }
+.dataset-import-panel .small-button { justify-self: start; }
+.dataset-privacy-notice, .private-quiz-notice { font-size: 13px; line-height: 1.6; }
+.private-quiz-notice { text-align: left; color: var(--brown); }
+
 .title-actions {
   display: flex;
   align-items: center;

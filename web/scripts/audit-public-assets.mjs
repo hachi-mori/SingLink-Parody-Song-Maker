@@ -1,6 +1,7 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 
 const webRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const assetsRoot = resolve(webRoot, 'assets');
@@ -36,6 +37,13 @@ const requiredDictionaryFiles = [
 ];
 const managedAssetRoots = ['texture', 'demo', 'dict', 'score', 'inst'];
 const forbiddenPathFragments = ['local-only', 'legacy-web-assets', 'book'];
+// Reviewed original curriculum. JSON canonicalization ignores checkout line endings.
+// Any curriculum change requires explicitly reviewing and updating these fingerprints.
+const approvedDictionaryHashes = {
+  'dict/cards_text_data.json': '60936c088a040f6e00a9ddbe1901df6e77953bb428a554d3ee64ffbd9a5470dc',
+  'dict/cards_singing_readings.json': 'f5015e717c6e5c775aee53ec19f142bcda0b3368f462f1dffd3a0290db94dbc2',
+  'dict/cards_english_data.json': '4108989b27a5d18e74737968bb6bf9e9cec61ea1c3b174984fa53db842c0d2a8'
+};
 
 function fail(message) {
   throw new Error(`公開アセット監査に失敗しました: ${message}`);
@@ -113,11 +121,23 @@ async function readJson(relativePath) {
 
 const copiedAllowlist = await parseCopyAssetAllowlist();
 assertSamePaths(copiedAllowlist, expectedPublicAssets, 'copy-assets.mjs の publicAssets');
+const topLevelDistribution = await readdir(resolve(webRoot, 'dist/client'));
+assertSamePaths(topLevelDistribution, ['index.html', 'assets'], 'dist/client 直下');
 
 const actualDistributionFiles = (await listFiles(distributionRoot))
   .map((filePath) => normalizePath(relative(distributionRoot, filePath)))
   .sort();
 const expectedFiles = await expectedDistributionFiles();
+const bundledFonts = actualDistributionFiles.filter((filePath) => /^Futehodo-MaruGothic-[A-Za-z0-9_-]+\.ttf$/.test(filePath));
+for (const filePath of bundledFonts) {
+  const source = await readFile(resolve(assetsRoot, 'texture/Futehodo-MaruGothic.ttf'));
+  const bundled = await readFile(resolve(distributionRoot, filePath));
+  if (!source.equals(bundled)) fail('バンドルされたフォントの内容が一致しません。');
+}
+const unexpectedFiles = actualDistributionFiles.filter((filePath) =>
+  !expectedFiles.includes(filePath) && !bundledFonts.includes(filePath) && !/^index-[A-Za-z0-9_-]+\.(js|css)$/.test(filePath)
+);
+if (unexpectedFiles.length) fail(`許可されていない公開ファイルがあります (${unexpectedFiles.length}件)。`);
 const copiedDistributionFiles = actualDistributionFiles.filter((filePath) => {
   const root = filePath.split('/', 1)[0];
   return managedAssetRoots.includes(root);
@@ -149,6 +169,11 @@ const [cards, readings, english] = await Promise.all([
   readJson('dict/cards_singing_readings.json'),
   readJson('dict/cards_english_data.json')
 ]);
+for (const [filePath, expectedHash] of Object.entries(approvedDictionaryHashes)) {
+  const value = await readJson(filePath);
+  const actualHash = createHash('sha256').update(JSON.stringify(value)).digest('hex');
+  if (actualHash !== expectedHash) fail(`承認済み自作教材と内容が一致しません: ${filePath}`);
+}
 const cardRecords = recordsOf(cards, 'カードデータ');
 const englishRecords = recordsOf(english, '英語データ');
 const readingMap = readings?.readings;

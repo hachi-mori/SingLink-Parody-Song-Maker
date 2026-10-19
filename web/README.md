@@ -1,6 +1,6 @@
 # SingLink Web 開発・ローカル実行ガイド
 
-ルートの [English README](../README.md) はOpenAI Build Week提出向けの概要です。この文書は、Web版を実装・検証する開発者向けです。
+ルートの [README](../README.md) はアプリ全体の概要です。この文書は、Web版を実装・検証する開発者向けです。
 
 既存のC++ / Siv3D版を参照して構築した独立Web版で、Build Weekの主な審査対象は `web/` 以下です。C++版はWeb版のビルド・実行に使いません。
 
@@ -92,27 +92,21 @@ Browser -> /assets/demo（VOICEVOXへの実行時通信なし）
 
 3ファイルはオノマトペをキーに結合し、英語データは日本語例文の完全一致も確認します。クイズは毎回4件をランダム抽出します。
 
-### ローカル限定の書籍教材
+### 端末内で使うローカル教材
 
-権利制限のある書籍教材は `web/assets/` へ置かず、Git管理外のディレクトリに次の2ファイルを保存します。
+公開版には自作335問だけを同梱します。タイトル画面から教材JSONを選ぶと、そのタブのメモリに読み込みます。書籍教材100問はGit管理外の `local-only/legacy-web-assets/dict/` に保管します。公開教材や `dist/` にコピーしません。
 
-```text
-cards_text_data.json
-cards_singing_readings.json
-```
+旧形式の `records` 配列に加え、独自形式の `entries` 配列（`answer`、`explanation`、`questionText` に穴埋め記号 `○○`、任意の `displayText`、`singingReading`）を読めます。旧形式で歌生成する場合は、同じJSONの `readings` に答えをキーとした歌唱用ひらがな読みを含めます。既存の書籍教材と読みを結合した `book100.local.json` はローカル保管用で、Gitへ追加しません。
 
-Fastifyへ絶対パスを明示し、loopbackで起動した場合だけ教材選択に表示されます。
+2 MiB以下、4〜1000件、答えの重複、型、各文字列の長さなどを読み込み時に検証します。HTMLのような文字列もHTMLとして実行しません。失敗時は現在の教材を維持します。
 
-```powershell
-$env:SINGLINK_ENABLE_LOCAL_BOOK_DATA = "1"
-$env:SINGLINK_LOCAL_BOOK_DATA_ROOT = "C:\path\to\local-only\legacy-web-assets\dict"
-$env:SINGLINK_HOST = "127.0.0.1"
-npm.cmd run dev
-```
+インポート教材の歌詞・楽譜生成はブラウザ内で行い、歌声合成は同じPCのVOICEVOXだけに直接リクエストします。許可宛先は `http://localhost:50021`、`http://127.0.0.1:50021`、`http://[::1]:50021`。外部サーバー・クラウドAI・クラウド音声・分析への送信、外部へのフォールバック、HTTPリダイレクトは禁止です。教材に歌唱読みがない場合はクイズを利用でき、歌声は読み不足を案内します。
 
-サーバーは100件の整合性を検査し、ブラウザへは選ばれた4問だけを返します。この教材は日本語表示専用で、生成した歌詞・回答・WAVをブラウザ履歴へ保存しません。環境変数未設定、データ不在、localhost以外、またはGitHub Pagesでは教材自体を表示しません。書籍教材や派生音声を `web/assets/`、`dist/`、デモ素材へコピーしないでください。
+公開HTTPSページからloopbackへ接続すると、ブラウザのローカルネットワーク許可やVOICEVOXのCORS設定により接続が制限されることがあります。接続できない場合は音声なしで結果を確認するか、このWeb版をlocalhostで起動してください。接続制限を回避する外部サービスは使いません。規約への適合をこの実装だけで保証するものではありません。
 
-このアクセス制限は、外部Webサイトからlocalhostの教材を読み出されることを防ぐためのものです。同じPC上で動くプロセスを認証する仕組みではないため、OSのアカウントとファイルアクセス権も適切に管理してください。
+生成したWAV・歌詞・回答は、このブラウザのIndexedDBに保存できます。クラウド同期・外部バックアップ処理はありません。「保存した曲」から再生・端末へのダウンロード・削除ができます。教材の解除や再読み込みはメモリ内教材を破棄しますが、保存済みの履歴は別途削除してください。OSや利用者自身による端末バックアップとは別の話です。IndexedDBはURLのパス別ではなくorigin単位のため、ルート版とBuild Week版の履歴は共有されます。同じ `hachi-mori.github.io` 上の別アプリからの隔離や暗号化を保証するものではありません。
+
+旧 `SINGLINK_ENABLE_LOCAL_BOOK_DATA` / `SINGLINK_LOCAL_BOOK_DATA_ROOT` 設定と書籍教材APIは撤去しました。インポート利用にFastifyサーバーは不要です。
 
 英語字幕の監査:
 

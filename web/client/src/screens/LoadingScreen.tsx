@@ -51,6 +51,10 @@ export function LoadingScreen({ song, datasetId, tasks, fullLyrics, inputTexts, 
 
     const run = async () => {
       try {
+        if (datasetId === 'browserImport' && tasks.filter((task) => task.singingReading).length !== 4) {
+          skipWithMessage('この回には歌唱読みのない問題があります。singingReading または readings を含む教材を読み込むと、同じPCのVOICEVOXで歌声を作れます。');
+          return;
+        }
         if (!voicevoxConnected) {
           skipWithMessage(t('generationOffline'));
           return;
@@ -58,12 +62,13 @@ export function LoadingScreen({ song, datasetId, tasks, fullLyrics, inputTexts, 
 
         setMessage(t('requestingVoice'));
         const [blob, karaokeTimings] = await Promise.all([synthesizeSong({
+          datasetId,
           songId: song.id,
           sourceSongId: song.sourceSong?.id,
           solvedTasks: tasks,
           fullLyrics,
           voicevoxBaseUrl
-        }, song), buildSongKaraokeTimings(song, tasks, fullLyrics)]);
+        }, song, datasetId), buildSongKaraokeTimings(song, tasks, fullLyrics, datasetId)]);
 
         if (cancelled || doneRef.current) {
           return;
@@ -73,6 +78,7 @@ export function LoadingScreen({ song, datasetId, tasks, fullLyrics, inputTexts, 
         if (savesHistoryForDataset(datasetId)) {
           const id = crypto.randomUUID();
           await saveGeneratedTrack({
+            datasetId,
             id,
             songTitle: song.title,
             fileName,
@@ -81,7 +87,7 @@ export function LoadingScreen({ song, datasetId, tasks, fullLyrics, inputTexts, 
             userInputs: inputTexts,
             voicevoxBaseUrl,
             wavBlob: blob
-          });
+          }, datasetId);
         }
 
         if (cancelled || doneRef.current) {

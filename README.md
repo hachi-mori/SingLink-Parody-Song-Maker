@@ -1,5 +1,17 @@
 # シングリンク～かえうたずんだもん～
 
+## Web版
+
+[公開版を開く](https://hachi-mori.github.io/SingLink-Parody-Song-Maker/) · [固定4問デモ](https://hachi-mori.github.io/SingLink-Parody-Song-Maker/?demo=1) · [開発・ローカル教材の利用ガイド](web/README.md)
+
+自作335問のオノマトペクイズとカラオケ学習を提供します。手元の教材JSONをブラウザ内へインポートし、同じPCのVOICEVOXで歌を生成できます。クラウドには送信しません。教材はタブを閉じるか解除すると破棄し、生成履歴はこのブラウザ内に保存・削除できます。
+
+GitHub Pagesのルートと `/openai-build-week/` は、`main` から作成した同じ監査済みビルドを公開します。公開用辞書は335件の承認済み内容と照合してから配信します。
+
+## 以前のWindows版
+
+以下はC++ / Siv3D版の案内です。
+
 ### アプリ開発メンバー
  - 💻プログラム：はちもり
  - 🎨デザイン：りょつ

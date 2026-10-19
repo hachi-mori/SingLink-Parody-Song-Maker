@@ -17,7 +17,7 @@ import { previewLyrics } from '../lib/api';
 import { assetUrl } from '../lib/assets';
 import { shuffle, takeShuffled } from '../lib/random';
 import { useLanguage } from '../lib/i18n';
-import { supportsEnglishForDataset } from '../lib/quizDatasets';
+import { privateDatasetNotice, supportsEnglishForDataset } from '../lib/quizDatasets';
 
 type WriteLyricsScreenProps = {
   song: SongDetail;
@@ -140,7 +140,7 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
     }
 
     try {
-      const lyrics = await previewLyrics(song.id, nextTasks);
+      const lyrics = await previewLyrics(song.id, nextTasks, datasetId);
       onComplete(nextTasks, lyrics, nextInputTexts);
     } catch (previewError) {
       setError(previewError instanceof Error ? previewError.message : String(previewError));
@@ -288,8 +288,10 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
       <section className="game-hud">
         <span>{Math.min(currentIndex + 1, problemCount)} / {problemCount}</span>
         <strong className={remainingSeconds <= 3 ? 'danger-time' : ''}>{remainingSeconds}</strong>
+        {datasetId === 'browserImport' ? <button className="small-button" onClick={onCancel}>教材設定へ戻る</button> : null}
       </section>
       <section className="game-card">
+        {datasetId === 'browserImport' ? <p className="private-quiz-notice">{privateDatasetNotice}</p> : null}
         {isCardOnomatopoeiaProblem && currentOnomatopoeia?.questionText ? (
           <section className="game-question-card">
             <p className="game-question-prompt">{makeQuestionDisplayText(currentIndex, t('fillBlank'))}</p>

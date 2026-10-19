@@ -4,6 +4,7 @@ import { AssetButton } from '../components/AssetButton';
 import { ScreenShell } from '../components/ScreenShell';
 import { assetUrl } from '../lib/assets';
 import { useLanguage } from '../lib/i18n';
+import { localVoicevoxNotice, privateDatasetNotice } from '../lib/quizDatasets';
 
 const englishSongNames: Record<string, string> = {
   'オノマトペ': 'Onomatopoeia',
@@ -18,6 +19,10 @@ type TitleScreenProps = {
   songs: SongInfo[];
   datasets: QuizDataset[];
   selectedDatasetId: DatasetId;
+  importedEntryCount?: number;
+  importedSingingReadingCount?: number;
+  onImportDataset: (file: File) => Promise<void>;
+  onClearImportedDataset: () => void;
   selectedSongId: string;
   sourceSongs: SourceSongInfo[];
   selectedSourceSongId: string;
@@ -39,6 +44,7 @@ type TitleScreenProps = {
 
 export function TitleScreen(props: TitleScreenProps) {
   const { language, setLanguage, t } = useLanguage();
+  const privateMode = props.selectedDatasetId === 'browserImport';
   const statusClass = props.voicevoxStatus?.ok ? 'status-ok' : 'status-warn';
   const displaySong = (title: string) => language === 'en' && englishSongNames[title]
     ? `${title} (${englishSongNames[title]})`
@@ -58,18 +64,20 @@ export function TitleScreen(props: TitleScreenProps) {
               <span>{t('voicevoxUrl')}</span>
               <input
                 value={props.voicevoxBaseUrl}
+                disabled={props.loading}
                 onChange={(event) => props.onBaseUrlChange(event.target.value)}
                 onBlur={props.onCheckVoicevox}
               />
             </label>
-            <button className="small-button" onClick={props.onCheckVoicevox}>
+            <button className="small-button" onClick={props.onCheckVoicevox} disabled={props.loading}>
               <RefreshCw size={16} />
-              {t('recheck')}
+              {privateMode ? 'このPCのVOICEVOXへ接続' : t('recheck')}
             </button>
+            {privateMode ? <small>{localVoicevoxNotice}</small> : null}
           </div>
           <label className="language-panel">
             <span>{t('language')}</span>
-            <select value={language} onChange={(event) => setLanguage(event.target.value as 'en' | 'ja')}>
+            <select value={language} disabled={privateMode} onChange={(event) => setLanguage(event.target.value as 'en' | 'ja')}>
               <option value="en">English</option>
               <option value="ja">日本語</option>
             </select>
@@ -81,26 +89,54 @@ export function TitleScreen(props: TitleScreenProps) {
         <div className="title-main">
           <img className="title-logo" src={assetUrl('assets/texture/assets/title_logo.png')} alt="シングリンク" />
           <div className="song-picker">
-            {props.datasets.length > 1 ? (
-              <div className="song-picker-row">
-                <label htmlFor="dataset-select">{language === 'en' ? 'Learning set' : '教材'}</label>
-                <select
-                  id="dataset-select"
-                  value={props.selectedDatasetId}
-                  disabled={props.loading}
-                  onChange={(event) => props.onSelectDataset(event.target.value as DatasetId)}
-                >
-                  {props.datasets.map((dataset) => (
-                    <option key={dataset.id} value={dataset.id}>{dataset.label}</option>
-                  ))}
-                </select>
-              </div>
-            ) : null}
+            <section className="dataset-import-panel" aria-label={language === 'en' ? 'Local learning material' : 'ローカル教材'}>
+              <p>{language === 'en' ? 'Included: 335 original questions' : '同梱教材：自作335問'}</p>
+              <label htmlFor="dataset-file">{language === 'en' ? 'Import learning JSON' : '教材JSONを読み込む'}</label>
+              <input
+                id="dataset-file"
+                type="file"
+                accept=".json,application/json"
+                disabled={props.loading}
+                onChange={(event) => {
+                  const file = event.currentTarget.files?.[0];
+                  event.currentTarget.value = '';
+                  if (file) void props.onImportDataset(file);
+                }}
+              />
+              <small>{language === 'en'
+                ? 'JSON only · up to 2 MiB · 4–1000 unique answers. Legacy records with optional readings, or entries with answer, explanation and questionText (○○ blank). Add singingReading to sing.'
+                : 'JSON・2 MiB以下・異なる答え4〜1000件。旧records＋readings、またはentries（answer・explanation・○○を含むquestionText）に対応。歌声生成には歌唱読み（singingReading）が必要です。'}</small>
+              <p className="dataset-privacy-notice">{language === 'en'
+                ? 'Imported questions stay in this tab. Singing sends text only to VOICEVOX on this PC, and generated audio and lyrics are saved in this browser’s history. No external server, cloud AI, analytics or sync. Clear/reload removes the question set; delete saved songs separately in History.'
+                : privateDatasetNotice}</p>
+              <small>{language === 'en'
+                ? 'The browser may request local-network permission to connect to VOICEVOX. Only http://localhost:50021, http://127.0.0.1:50021 or http://[::1]:50021 are allowed; redirects and external fallbacks are blocked.'
+                : localVoicevoxNotice}</small>
+              {props.importedEntryCount !== undefined ? <>
+                <p role="status">{language === 'en' ? `${props.importedEntryCount} questions loaded in this tab` : `このタブに${props.importedEntryCount}問を読み込みました`}</p>
+                <p>{`歌唱読み：${props.importedSingingReadingCount ?? 0} / ${props.importedEntryCount}問。${props.importedSingingReadingCount === props.importedEntryCount ? 'このPCのVOICEVOXで歌声を作れます。' : '読みのない問題を含む回は音声なしで結果を表示します。'}`}</p>
+                <button className="small-button" onClick={props.onClearImportedDataset}>{language === 'en' ? 'Clear imported material' : '読み込んだ教材を解除'}</button>
+              </> : null}
+            </section>
+            <div className="song-picker-row">
+              <label htmlFor="dataset-select">{language === 'en' ? 'Learning set' : '教材'}</label>
+              <select
+                id="dataset-select"
+                value={props.selectedDatasetId}
+                disabled={props.loading}
+                onChange={(event) => props.onSelectDataset(event.target.value as DatasetId)}
+              >
+                {props.datasets.map((dataset) => (
+                  <option key={dataset.id} value={dataset.id}>{language === 'en' && dataset.id === 'original335' ? '335 original questions' : dataset.label}</option>
+                ))}
+              </select>
+            </div>
             <div className="song-picker-row">
               <label htmlFor="song-select">{t('quizType')}</label>
               <select
                 id="song-select"
                 value={props.selectedSongId}
+                disabled={props.loading || privateMode}
                 onChange={(event) => props.onSelectSong(event.target.value)}
               >
                 <option value="">{t('chooseQuiz')}</option>
@@ -127,7 +163,7 @@ export function TitleScreen(props: TitleScreenProps) {
               </select>
               <small>{props.sourceSelectionEnabled ? t('sourceSongHelp') : t('sourceSongDisabled')}</small>
             </div>
-            {props.error ? <p className="error-text">{props.error}</p> : null}
+            {props.error ? <p className="error-text" role="alert">{props.error}</p> : null}
           </div>
 
           <nav className="title-actions" aria-label={t('titleMenu')}>
