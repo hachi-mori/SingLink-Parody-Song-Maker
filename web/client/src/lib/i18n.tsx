@@ -60,7 +60,13 @@ const messages = {
     voiceDataError: 'Could not load the singing voice.',
     playbackError: 'Audio could not be played. Press Play again.',
     songSourceEyebrow: 'Your four answers, sung karaoke-style',
-    songMadeWith: 'Sung to {song}',
+    songMadeWith: 'Review with {song}',
+    quizResultTitle: 'Quiz results',
+    quizResultEyebrow: 'Review the four correct sentences',
+    playbackReady: 'Ready to play',
+    playbackPlaying: 'Playing',
+    playbackPaused: 'Paused',
+    playbackEnded: 'Playback finished',
     play: 'Play',
     pause: 'Pause',
     restart: 'Sing again',
@@ -86,9 +92,9 @@ const messages = {
     howToStepChooseTitle: 'Choose a melody',
     howToStepChooseBody: 'Pick one of five familiar karaoke songs.',
     howToStepAnswerTitle: 'Answer four questions',
-    howToStepAnswerBody: 'Choose the onomatopoeia that completes each Japanese sentence.',
+    howToStepAnswerBody: 'Choose from three answers to complete each Japanese sentence. Review the feedback, then select Next. There are four questions.',
     howToStepListenTitle: 'Listen to Zundamon',
-    howToStepListenBody: 'After the quiz, Zundamon sings the correct Japanese sentences.',
+    howToStepListenBody: 'When VOICEVOX is connected, press Play on the result screen to hear Zundamon sing the correct sentences. Without audio, you can still review every answer.',
     howToStepFollowTitle: 'Follow the lyrics',
     howToStepFollowBody: 'Watch the Japanese words light up and read the English subtitles.',
     creditsTitle: 'Credits',
@@ -98,9 +104,15 @@ const messages = {
     genericLoadError: 'The requested data could not be loaded.'
   },
   ja: {
+    quizResultTitle: 'クイズの結果',
+    quizResultEyebrow: '4問の正しい例文を復習',
+    playbackReady: '再生できます',
+    playbackPlaying: '再生中',
+    playbackPaused: '一時停止中',
+    playbackEnded: '再生が終わりました',
     appTitle: 'シングリンク Web', selectSongError: '←きょくをえらんでね！', sourceSongMissing: 'もとの曲が見つかりませんでした',
     voicevoxLocalNotChecked: 'VOICEVOXは未確認です。',
-    voicevoxChecking: 'VOICEVOX確認中...', voicevoxNotChecked: 'VOICEVOXは未確認です。固定問題デモでは不要です。', voicevoxConnected: 'VOICEVOX接続済み{version}', voicevoxDisconnected: 'VOICEVOX未接続: クイズは遊べます。歌声生成にはローカル版の起動が必要です。', voicevoxUrl: 'VOICEVOX URL', recheck: '再確認', language: '言語', credits: 'クレジット', quizType: 'あそぶ問題', chooseQuiz: '問題をえらんでね', sourceSong: 'もとの曲', sourceSongHelp: '5曲からもとの曲を選べます', sourceSongDisabled: 'オノマトペで選べます', titleMenu: 'タイトルメニュー', story: 'ストーリー', start: 'スタート', instantDemo: '固定問題デモを遊ぶ', instantDemoHelp: '固定4問に答える・VOICEVOXの準備は不要', demoLoadError: '固定問題デモを読み込めませんでした。', demoLabel: '事前生成デモ', demoDisclosure: 'これは事前生成したデモサンプルです。通常モードでは、クイズの回答から歌声をリアルタイム生成します。', demoEyebrow: '固定問題に答えたあと、カラオケ学習を体験', demoSongTitle: 'ずんだもんが自作例文4つを歌います', howTo: 'あそびかた', savedSongs: '保存した曲', noQuestions: 'お題がありません', noQuestionsHelp: '曲データか辞書CSVを確認してください。', backToTitle: 'タイトルへ', fillBlank: '○○に入るオノマトペは？', answerPlaceholder: 'ひらがなで入力', submit: '決定', timeUp: 'タイムアップ！', correct: 'せいかい！', incorrect: 'ふせいかい', prompt: 'おだい', yourAnswer: 'あなたのこたえ', correctAnswer: 'せいかい', unanswered: 'みかいとう', next: 'つぎへ', preparingVoice: 'ずんだもん が おうた を れんしゅう しているよ', requestingVoice: 'VOICEVOXに歌声をお願いしています...', generationTimeout: '歌声生成に時間がかかっているため、音声なしでリザルトを表示しました。クイズ結果は確認できます。', generationOffline: 'VOICEVOXに接続されていないため、音声生成をスキップしました。クイズ結果は確認できます。', skipVoice: '音声なしでリザルトを見る', backToQuiz: '入力画面へ戻る', generationSkippedFallback: 'VOICEVOXに接続できなかったため、音声生成をスキップしました。', accompanimentError: '伴奏を読み込めませんでした: {detail}', skippedAudioError: '音声生成をスキップしたため、再生できる音声はありません。', voiceDataError: '歌声データを読み込めませんでした。', playbackError: '音声を再生できませんでした。再生ボタンをもう一度押してください。', songSourceEyebrow: '4問の正しい例文をカラオケで復習', songMadeWith: '{song}の曲で歌っています', play: '再生', pause: '一時停止', restart: 'もう一度', download: 'ダウンロード', history: '履歴', audioSkipped: '音声生成をスキップしました', lyricsStillAvailable: '歌詞と字幕はこの画面で確認できます。', translationUnavailable: '英訳がありません', pendingLyric: 'まだ歌っていない', currentLyric: '歌唱中', completedLyric: '歌唱済み', savedInBrowser: 'ブラウザに保存された歌声', generationHistory: '生成履歴', noHistory: 'まだ保存された歌声がありません。', downloadWav: 'WAVをダウンロード', selectHistory: '履歴を選ぶと歌詞と再生プレイヤーが表示されます。', delete: '削除', storyTitle: 'ストーリー', storyBody: '4問のオノマトペクイズに答えると、ずんだもんが正しい例文を歌います。', howToTitle: 'あそびかた', howToBody: '曲を選び、4問に答え、光る歌詞と歌声で正しい例文を覚えます。', howToEyebrow: 'カラオケで日本語を学ぼう', howToStepChooseTitle: '曲をえらぶ', howToStepChooseBody: '5曲から好きな曲をえらびます。', howToStepAnswerTitle: '4問に答える', howToStepAnswerBody: '文に合うオノマトペをえらびます。', howToStepListenTitle: 'ずんだもんの歌を聞く', howToStepListenBody: 'クイズのあと、正しい例文をずんだもんが歌います。', howToStepFollowTitle: '歌詞を追いかける', howToStepFollowBody: '光る日本語の歌詞を見ながら復習します。', creditsTitle: 'クレジット', creditsBody: 'Build Week版は自作335教材を使用しています。下の画像は既存のクレジットです。', japaneseReference: '日本語の参考画像', refreshFailed: 'VOICEVOXを確認できませんでした。', genericLoadError: 'データを読み込めませんでした。'
+    voicevoxChecking: 'VOICEVOX確認中...', voicevoxNotChecked: 'VOICEVOXは未確認です。固定問題デモでは不要です。', voicevoxConnected: 'VOICEVOX接続済み{version}', voicevoxDisconnected: 'VOICEVOX未接続: クイズは遊べます。歌声生成にはローカル版の起動が必要です。', voicevoxUrl: 'VOICEVOX URL', recheck: '再確認', language: '言語', credits: 'クレジット', quizType: 'あそぶ問題', chooseQuiz: '問題をえらんでね', sourceSong: 'もとの曲', sourceSongHelp: '5曲からもとの曲を選べます', sourceSongDisabled: 'オノマトペで選べます', titleMenu: 'タイトルメニュー', story: 'ストーリー', start: 'スタート', instantDemo: '固定問題デモを遊ぶ', instantDemoHelp: '固定4問に答える・VOICEVOXの準備は不要', demoLoadError: '固定問題デモを読み込めませんでした。', demoLabel: '事前生成デモ', demoDisclosure: 'これは事前生成したデモサンプルです。通常モードでは、クイズの回答から歌声をリアルタイム生成します。', demoEyebrow: '固定問題に答えたあと、カラオケ学習を体験', demoSongTitle: 'ずんだもんが自作例文4つを歌います', howTo: 'あそびかた', savedSongs: '保存した曲', noQuestions: 'お題がありません', noQuestionsHelp: '曲データか辞書CSVを確認してください。', backToTitle: 'タイトルへ', fillBlank: '○○に入るオノマトペは？', answerPlaceholder: 'ひらがなで入力', submit: '決定', timeUp: 'タイムアップ！', correct: 'せいかい！', incorrect: 'ふせいかい', prompt: 'おだい', yourAnswer: 'あなたのこたえ', correctAnswer: 'せいかい', unanswered: 'みかいとう', next: 'つぎへ', preparingVoice: 'ずんだもん が おうた を れんしゅう しているよ', requestingVoice: 'VOICEVOXに歌声をお願いしています...', generationTimeout: '歌声生成に時間がかかっているため、音声なしでリザルトを表示しました。クイズ結果は確認できます。', generationOffline: 'VOICEVOXに接続されていないため、音声生成をスキップしました。クイズ結果は確認できます。', skipVoice: '音声なしでリザルトを見る', backToQuiz: '入力画面へ戻る', generationSkippedFallback: 'VOICEVOXに接続できなかったため、音声生成をスキップしました。', accompanimentError: '伴奏を読み込めませんでした: {detail}', skippedAudioError: '音声生成をスキップしたため、再生できる音声はありません。', voiceDataError: '歌声データを読み込めませんでした。', playbackError: '音声を再生できませんでした。再生ボタンをもう一度押してください。', songSourceEyebrow: '4問の正しい例文をカラオケで復習', songMadeWith: '{song}の曲で復習', play: '再生', pause: '一時停止', restart: 'もう一度', download: 'ダウンロード', history: '履歴', audioSkipped: '音声生成をスキップしました', lyricsStillAvailable: '歌詞と字幕はこの画面で確認できます。', translationUnavailable: '英訳がありません', pendingLyric: 'まだ歌っていない', currentLyric: '歌唱中', completedLyric: '歌唱済み', savedInBrowser: 'ブラウザに保存された歌声', generationHistory: '生成履歴', noHistory: 'まだ保存された歌声がありません。', downloadWav: 'WAVをダウンロード', selectHistory: '履歴を選ぶと歌詞と再生プレイヤーが表示されます。', delete: '削除', storyTitle: 'ストーリー', storyBody: '4問のオノマトペクイズに答えると、ずんだもんが正しい例文を歌います。', howToTitle: 'あそびかた', howToBody: '曲を選び、4問に答え、光る歌詞と歌声で正しい例文を覚えます。', howToEyebrow: 'カラオケで日本語を学ぼう', howToStepChooseTitle: '曲をえらぶ', howToStepChooseBody: '5曲から好きな曲をえらびます。', howToStepAnswerTitle: '4問に答える', howToStepAnswerBody: '3つの選択肢から文に合うオノマトペをえらびます。答えを確認して「つぎへ」を押します。全部で4問です。', howToStepListenTitle: 'ずんだもんの歌を聞く', howToStepListenBody: 'VOICEVOXにつながっているときは、結果画面の「再生」を押すと正しい例文をずんだもんが歌います。音声がなくても、答えは復習できます。', howToStepFollowTitle: '歌詞を追いかける', howToStepFollowBody: '光る日本語の歌詞を見ながら復習します。', creditsTitle: 'クレジット', creditsBody: 'Build Week版は自作335教材を使用しています。下の画像は既存のクレジットです。', japaneseReference: '日本語の参考画像', refreshFailed: 'VOICEVOXを確認できませんでした。', genericLoadError: 'データを読み込めませんでした。'
   }
 } as const;
 

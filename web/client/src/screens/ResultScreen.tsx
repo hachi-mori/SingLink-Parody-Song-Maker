@@ -12,6 +12,7 @@ import { useLanguage } from '../lib/i18n';
 import { showsEnglishLearningSupport } from '@shared/languageMode';
 import { privateDatasetNotice, savesHistoryForDataset, supportsEnglishForDataset } from '../lib/quizDatasets';
 import { privateFetchOptions, privateSourceSong } from '../lib/localVoicevox';
+import { buildResultLines } from '../lib/resultLines';
 
 type ResultScreenProps = {
   song: SongDetail;
@@ -27,6 +28,9 @@ type ResultScreenProps = {
 
 type PlaybackState = 'idle' | 'playing' | 'paused' | 'ended';
 type LyricState = 'pending' | 'active' | 'completed';
+const playbackStatusKeys = {
+  idle: 'playbackReady', playing: 'playbackPlaying', paused: 'playbackPaused', ended: 'playbackEnded'
+} as const;
 
 function getLyricState(playbackState: PlaybackState, playbackTime: number, timing?: KaraokeLineTiming): LyricState {
   if (!timing || playbackState === 'idle') return 'pending';
@@ -72,14 +76,13 @@ export function ResultScreen({ song, datasetId, tasks, fullLyrics, result, demoD
   const generatedAudio = hasGeneratedAudio(result);
   const isDemo = generatedAudio && result.source === 'demo';
 
-  const lines = useMemo(() => fullLyrics.replace(/[{}]/g, '').split('\n').filter(Boolean), [fullLyrics]);
-  const singingTasks = useMemo(
-    () => tasks.filter((task) => typeof task.singingReading === 'string' && task.singingReading.length > 0),
-    [tasks]
-  );
   const timings = generatedAudio ? result.karaokeTimings : [];
-  const activeLineIndex = timings.findIndex(
-    (timing) => getLyricState(playbackState, playbackTime, timing) === 'active'
+  const lines = useMemo(
+    () => buildResultLines(fullLyrics, tasks, generatedAudio ? result.karaokeTimings : [], song.mode),
+    [fullLyrics, tasks, result, song.mode]
+  );
+  const activeLineIndex = lines.findIndex(
+    ({ timing }) => getLyricState(playbackState, playbackTime, timing) === 'active'
   );
 
   const stopSources = useCallback(() => {
@@ -243,7 +246,7 @@ export function ResultScreen({ song, datasetId, tasks, fullLyrics, result, demoD
 
   return (
     <ScreenShell background={assetUrl('assets/texture/assets/result_sunny.gif')} fit="cover">
-      <section className={`result-layout${showEnglishLearningSupport ? '' : ' result-layout--japanese-only'}`}>
+      <section className={`result-layout${showEnglishLearningSupport ? '' : ' result-layout--japanese-only'}${generatedAudio ? '' : ' result-layout--no-audio'}`}>
         <img className="result-character" src={assetUrl('assets/texture/assets/zunda_singing.gif')} alt="" aria-hidden="true" />
         <div className="result-card">
           {datasetId === 'browserImport' ? <p className="dataset-privacy-notice">{privateDatasetNotice}</p> : null}
@@ -253,12 +256,11 @@ export function ResultScreen({ song, datasetId, tasks, fullLyrics, result, demoD
               <p>{demoDisclosure ?? t('demoDisclosure')}</p>
             </aside>
           ) : null}
-          <p className="result-song-source">{datasetId === 'browserImport' ? 'インポート教材・同じPC内で処理' : isDemo ? t('demoEyebrow') : t('songSourceEyebrow')}</p>
-          <h1>{datasetId === 'browserImport' ? 'クイズの結果' : t('songMadeWith', { song: song.sourceSong?.title ?? song.trackName ?? song.title })}</h1>
+          <p className="result-song-source">{datasetId === 'browserImport' ? 'インポート教材・同じPC内で処理' : isDemo ? t('demoEyebrow') : generatedAudio ? t('songSourceEyebrow') : t('quizResultEyebrow')}</p>
+          <h1>{generatedAudio ? t('songMadeWith', { song: song.sourceSong?.title ?? song.trackName ?? song.title }) : t('quizResultTitle')}</h1>
+          {generatedAudio ? <p className="result-playback-status" role="status">{t(playbackStatusKeys[playbackState])}</p> : null}
           <div className="lyrics-box karaoke-lyrics" aria-live="polite">
-            {lines.map((line, lineIndex) => {
-              const timing = timings[lineIndex];
-              const task = singingTasks[lineIndex];
+            {lines.map(({ text: line, task, timing }, lineIndex) => {
               const state = getLyricState(playbackState, playbackTime, timing);
               const progress = getLineProgress(state, playbackTime, timing);
               const characters = Array.from(line);

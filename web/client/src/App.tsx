@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { defaultMemorizationSourceSongId } from '@shared/memorizationSongs';
 import type { DatasetId, OnomatopoeiaEntry, SolvedTask, SongDetail, SongInfo, VoicevoxVersionResponse } from '@shared/types';
 import { fetchSongDetail, fetchSongs, checkVoicevox } from './lib/api';
@@ -46,6 +46,21 @@ export function App() {
   const importGenerationRef = useRef(0);
   const connectionGenerationRef = useRef(0);
   const datasets = importedEntries ? [original335Dataset, browserImportDataset] : [original335Dataset];
+
+  useLayoutEffect(() => {
+    const main = document.querySelector<HTMLElement>('main');
+    if (!main) return;
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    main.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    const target = main.querySelector<HTMLElement>('h1') ?? main;
+    const previousTabIndex = target.getAttribute('tabindex');
+    target.setAttribute('tabindex', '-1');
+    target.focus({ preventScroll: true });
+    return () => {
+      if (previousTabIndex === null) target.removeAttribute('tabindex');
+      else target.setAttribute('tabindex', previousTabIndex);
+    };
+  }, [screen]);
 
   const refreshVoicevox = useCallback(async () => {
     const generation = ++connectionGenerationRef.current;
@@ -272,10 +287,7 @@ export function App() {
   }
 
   if (screen === 'howto') {
-    if (language === 'en') {
-      return <HowToScreen onBack={() => setScreen('title')} />;
-    }
-    return <StaticImageScreen title={t('howToTitle')} description={t('howToBody')} imageSrc={language === 'ja' ? assetUrl('assets/texture/assets/howtoplay.png') : undefined} onBack={() => setScreen('title')} />;
+    return <HowToScreen onBack={() => setScreen('title')} />;
   }
 
   if (screen === 'credit') {

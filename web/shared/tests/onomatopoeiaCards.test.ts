@@ -127,6 +127,23 @@ describe('335語のオノマトペカード', () => {
     }
   });
 
+  it('校正した表示文と問題文を使い、既存の歌唱用読みを合成に渡す', () => {
+    const selected = entries.find((entry) => entry.word === 'あっさり');
+    expect(selected).toMatchObject({
+      displayText: 'あっさりした塩味のスープを飲む。',
+      questionText: '○○した塩味のスープを飲む。',
+      singingReading: 'あっさりしたしおあじのすーぷおのむ'
+    });
+    const tasks = buildOnomatopoeiaTasks(selected!, selected!.answer, true);
+    expect(buildOnomatopoeiaLyricsRows(tasks)).toEqual([
+      ['あっさり', 'あっさりしたしおあじのすーぷおのむ']
+    ]);
+
+    // 「あめ」の解釈は元の自作例文だけでは確定できないため、表記を維持する。
+    expect(entries.find((entry) => entry.word === 'べとべと')?.displayText)
+      .toBe('あめでかばんがべとべとだ。');
+  });
+
   it('英語字幕335件が重複・空欄・日本語例文との対応ずれなくそろう', () => {
     const englishRoot = getRecord(englishJson);
     const translations = parseEnglishCardRecords(englishJson);

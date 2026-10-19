@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import {
   buildOnomatopoeiaResultLyrics,
   buildOnomatopoeiaTasks,
@@ -18,6 +18,7 @@ import { assetUrl } from '../lib/assets';
 import { shuffle, takeShuffled } from '../lib/random';
 import { useLanguage } from '../lib/i18n';
 import { privateDatasetNotice, supportsEnglishForDataset } from '../lib/quizDatasets';
+import { createQuestionGate } from '../lib/questionGate';
 
 type WriteLyricsScreenProps = {
   song: SongDetail;
@@ -30,6 +31,21 @@ type WriteLyricsScreenProps = {
 const timeLimit = 60;
 const countdownSeconds = 3;
 const onomatopoeiaTimeoutAnswer = 'ら'.repeat(6);
+
+type AnswerFeedback = {
+  active: true;
+  correct: boolean;
+  timeUp: boolean;
+  question: string;
+  selected: string;
+  correctAnswer: string;
+  explanation: string;
+  answerForRecord: string;
+};
+
+function preventRepeatedActivation(event: KeyboardEvent<HTMLElement>) {
+  if (event.repeat && (event.key === 'Enter' || event.key === ' ')) event.preventDefault();
+}
 
 function useTick(active: boolean) {
   const [, setTick] = useState(0);
@@ -83,16 +99,11 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
   const [tasks, setTasks] = useState<SolvedTask[]>([]);
   const [inputTexts, setInputTexts] = useState<string[]>([]);
   const [error, setError] = useState('');
-  const [feedback, setFeedback] = useState<{
-    active: boolean;
-    correct: boolean;
-    timeUp: boolean;
-    question: string;
-    selected: string;
-    correctAnswer: string;
-    explanation: string;
-    answerForRecord: string;
-  }>();
+  const [feedback, setFeedback] = useState<Readonly<AnswerFeedback>>();
+  const questionGate = useRef(createQuestionGate<AnswerFeedback>());
+  const nextButtonRef = useRef<HTMLButtonElement>(null);
+  const gameCardRef = useRef<HTMLElement>(null);
+  const feedbackTitleId = useId();
 
   const onomatopoeiaProblems = useMemo(() => {
     if (song.mode !== 'onomatopoeiaQuiz') {
@@ -117,7 +128,17 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
     return prepareOnomatopoeiaOptions(song.onomatopoeiaEntries ?? [], currentOnomatopoeia.answer);
   }, [song, currentOnomatopoeia]);
 
-  useTick(true);
+  const settlement = questionGate.current.get(currentIndex);
+  const answerLocked = settlement !== undefined;
+  useTick(!started || !answerLocked);
+
+  useEffect(() => {
+    if (feedback?.active) {
+      nextButtonRef.current?.focus();
+    } else if (started && !answerLocked) {
+      gameCardRef.current?.querySelector<HTMLElement>('input:not(:disabled), button:not(:disabled)')?.focus();
+    }
+  }, [feedback, started, currentIndex, answerLocked]);
 
   useEffect(() => {
     if (started) {
@@ -130,7 +151,7 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
     return () => window.clearTimeout(id);
   }, [started]);
 
-  const elapsedSeconds = started ? Math.floor((Date.now() - problemStartedAt) / 1000) : 0;
+  const elapsedSeconds = started ? Math.floor(((settlement?.settledAt ?? Date.now()) - problemStartedAt) / 1000) : 0;
   const remainingSeconds = Math.max(0, timeLimit - elapsedSeconds);
 
   const finish = async (nextTasks: SolvedTask[], nextInputTexts: string[]) => {
@@ -163,23 +184,33 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
     }
   };
 
+  const settleOnomatopoeia = (answer?: string) => {
+    if (!started || !currentOnomatopoeia || questionGate.current.get(currentIndex)) return;
+    const now = Date.now();
+    const deadline = problemStartedAt + timeLimit * 1000;
+    const timeUp = now >= deadline;
+    if (answer === undefined && !timeUp) return;
+    const accepted = questionGate.current.settle(currentIndex, {
+      active: true,
+      correct: !timeUp && answer === currentOnomatopoeia.answer,
+      timeUp,
+      question: currentOnomatopoeia.questionText ?? currentOnomatopoeia.word,
+      selected: timeUp ? t('unanswered') : answer!,
+      correctAnswer: currentOnomatopoeia.answer,
+      explanation: showEnglishLearningSupport
+        ? currentOnomatopoeia.englishMeaning ?? t('translationUnavailable')
+        : currentOnomatopoeia.explanation,
+      answerForRecord: timeUp ? onomatopoeiaTimeoutAnswer : answer!
+    }, timeUp ? deadline : now);
+    if (accepted) setFeedback(accepted.value);
+  };
+
   useEffect(() => {
     if (!started || feedback?.active || problemCount === 0 || remainingSeconds > 0) {
       return;
     }
     if (song.mode === 'onomatopoeiaQuiz' && currentOnomatopoeia) {
-      setFeedback({
-        active: true,
-        correct: false,
-        timeUp: true,
-        question: currentOnomatopoeia.questionText ?? currentOnomatopoeia.word,
-        selected: t('unanswered'),
-        correctAnswer: currentOnomatopoeia.answer,
-        explanation: showEnglishLearningSupport
-          ? currentOnomatopoeia.englishMeaning ?? t('translationUnavailable')
-          : currentOnomatopoeia.explanation,
-        answerForRecord: onomatopoeiaTimeoutAnswer
-      });
+      settleOnomatopoeia();
       return;
     }
     if (currentProblem) {
@@ -216,31 +247,19 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
   };
 
   const submitOnomatopoeia = (answer: string) => {
-    if (!currentOnomatopoeia) {
-      return;
-    }
-    const correct = answer === currentOnomatopoeia.answer;
-    setFeedback({
-      active: true,
-      correct,
-      timeUp: false,
-      question: currentOnomatopoeia.questionText ?? currentOnomatopoeia.word,
-      selected: answer,
-      correctAnswer: currentOnomatopoeia.answer,
-      explanation: showEnglishLearningSupport
-        ? currentOnomatopoeia.englishMeaning ?? t('translationUnavailable')
-        : currentOnomatopoeia.explanation,
-      answerForRecord: answer
-    });
+    settleOnomatopoeia(answer);
   };
 
   const advanceFeedback = () => {
-    if (!feedback || !currentOnomatopoeia) {
+    if (!currentOnomatopoeia) {
       return;
     }
-    const generatedTasks = buildOnomatopoeiaTasks(currentOnomatopoeia, feedback.answerForRecord, feedback.correct);
+    const accepted = questionGate.current.consume(currentIndex);
+    if (!accepted) return;
+    const recordedFeedback = accepted.value;
+    const generatedTasks = buildOnomatopoeiaTasks(currentOnomatopoeia, recordedFeedback.answerForRecord, recordedFeedback.correct);
     const nextTasks = [...tasks, ...generatedTasks];
-    const nextInputTexts = [...inputTexts, currentOnomatopoeia.word, feedback.answerForRecord];
+    const nextInputTexts = [...inputTexts, currentOnomatopoeia.word, recordedFeedback.answerForRecord];
     setFeedback(undefined);
     setTasks(nextTasks);
     setInputTexts(nextInputTexts);
@@ -261,6 +280,7 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
         <section className="countdown-screen">
           <p>{song.title}</p>
           <strong>{remaining > 0 ? remaining : 'START!'}</strong>
+          <button className="small-button" onClick={onCancel}>{t('backToTitle')}</button>
         </section>
       </ScreenShell>
     );
@@ -285,12 +305,12 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
 
   return (
     <ScreenShell background={assetUrl('assets/texture/assets/game_background2.gif')} fit="cover">
-      <section className="game-hud">
+      <section className="game-hud" inert={feedback?.active}>
         <span>{Math.min(currentIndex + 1, problemCount)} / {problemCount}</span>
         <strong className={remainingSeconds <= 3 ? 'danger-time' : ''}>{remainingSeconds}</strong>
-        {datasetId === 'browserImport' ? <button className="small-button" onClick={onCancel}>教材設定へ戻る</button> : null}
+        <button className="small-button" onClick={onCancel} disabled={feedback?.active}>{t('backToTitle')}</button>
       </section>
-      <section className="game-card">
+      <section className="game-card" ref={gameCardRef} inert={feedback?.active} onKeyDownCapture={preventRepeatedActivation}>
         {datasetId === 'browserImport' ? <p className="private-quiz-notice">{privateDatasetNotice}</p> : null}
         {isCardOnomatopoeiaProblem && currentOnomatopoeia?.questionText ? (
           <section className="game-question-card">
@@ -328,7 +348,7 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
         {song.mode === 'onomatopoeiaQuiz' ? (
           <div className="choice-grid">
             {(onomatopoeiaOptions?.options ?? []).map((answer, index) => (
-              <button key={`${answer}-${index}`} onClick={() => submitOnomatopoeia(answer)}>
+              <button key={`${answer}-${index}`} disabled={answerLocked} onClick={() => submitOnomatopoeia(answer)}>
                 <span>{index + 1} {answer}</span>
               </button>
             ))}
@@ -339,15 +359,27 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
       </section>
 
       {feedback?.active ? (
-        <section className="feedback-overlay" onClick={advanceFeedback}>
+        <section
+          className="feedback-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={feedbackTitleId}
+          onKeyDownCapture={preventRepeatedActivation}
+          onKeyDown={(event) => {
+            if (event.key === 'Tab') {
+              event.preventDefault();
+              nextButtonRef.current?.focus();
+            }
+          }}
+        >
           <div className="feedback-panel">
             <div className="judge-mark">{feedback.correct ? '○' : '×'}</div>
-            <h2>{feedback.timeUp ? t('timeUp') : feedback.correct ? t('correct') : t('incorrect')}</h2>
+            <h2 id={feedbackTitleId}>{feedback.timeUp ? t('timeUp') : feedback.correct ? t('correct') : t('incorrect')}</h2>
             <p><span className="feedback-label">{t('prompt')}:</span> {feedback.question}</p>
             <p><span className="feedback-label">{t('yourAnswer')}:</span> {feedback.selected}</p>
             <p><span className="feedback-label">{t('correctAnswer')}:</span> {feedback.correctAnswer}</p>
             <small>{feedback.explanation}</small>
-            <button>{t('next')}</button>
+            <button ref={nextButtonRef} onClick={advanceFeedback}>{t('next')}</button>
           </div>
         </section>
       ) : null}

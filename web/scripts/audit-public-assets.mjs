@@ -40,9 +40,9 @@ const forbiddenPathFragments = ['local-only', 'legacy-web-assets', 'book'];
 // Reviewed original curriculum. JSON canonicalization ignores checkout line endings.
 // Any curriculum change requires explicitly reviewing and updating these fingerprints.
 const approvedDictionaryHashes = {
-  'dict/cards_text_data.json': '60936c088a040f6e00a9ddbe1901df6e77953bb428a554d3ee64ffbd9a5470dc',
+  'dict/cards_text_data.json': 'b2cdb1c155a5e37f2fae2b5e32a240c858985400c3a02ae2a9905690650b99fc',
   'dict/cards_singing_readings.json': 'f5015e717c6e5c775aee53ec19f142bcda0b3368f462f1dffd3a0290db94dbc2',
-  'dict/cards_english_data.json': '4108989b27a5d18e74737968bb6bf9e9cec61ea1c3b174984fa53db842c0d2a8'
+  'dict/cards_english_data.json': 'aaf3d33909c692910d48304b698163a1bdadede9bc9e29c48639cad6193f4bc3'
 };
 
 function fail(message) {
