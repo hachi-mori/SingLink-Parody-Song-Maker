@@ -242,9 +242,14 @@ export function ResultScreen({ song, datasetId, tasks, fullLyrics, result, demoD
   }, [stopSources]);
 
   return (
-    <ScreenShell background={assetUrl('assets/texture/assets/result_sunny.gif')} fit="cover">
+    <ScreenShell>
       <section className={`result-layout${generatedAudio ? '' : ' result-layout--no-audio'}`}>
-        <img className="result-character" src={assetUrl('assets/texture/assets/zunda_singing.gif')} alt="" aria-hidden="true" />
+        <div className="result-stage" aria-hidden="true">
+          <div className="result-scene">
+            <img className="result-scenery" src={assetUrl('assets/texture/assets/result_sunny.gif')} alt="" />
+            <img className="result-character" src={assetUrl('assets/texture/assets/zunda_singing.gif')} alt="" />
+          </div>
+        </div>
         <div className="result-card">
           {isDemo ? (
             <aside className="demo-disclosure" aria-label={t('demoLabel')}>
