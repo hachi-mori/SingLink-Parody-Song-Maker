@@ -10,6 +10,13 @@ type DemoManifestLine = {
   englishMeaning: string;
 };
 
+const japaneseDemoMeanings: Record<string, string> = {
+  'きらきら': '明るく小さく光るようす。',
+  'しとしと': '細かな雨が静かに降るようす。',
+  'すやすや': '安心して静かに眠るようす。',
+  'りんりん': 'すんだ音がくり返し鳴るようす。'
+};
+
 type DemoManifest = {
   version: 1;
   id: string;
@@ -125,7 +132,7 @@ export async function loadDemoBundle(): Promise<DemoBundle> {
     word: line.keyword,
     reading: line.keyword,
     answer: line.keyword,
-    explanation: line.englishMeaning,
+    explanation: japaneseDemoMeanings[line.keyword] ?? '',
     questionText: line.japanese.replace(line.keyword, '○○'),
     displayText: line.japanese,
     singingReading: line.singingReading,
@@ -168,7 +175,7 @@ export async function loadDemoBundle(): Promise<DemoBundle> {
       fileName: manifest.voice.path.split('/').at(-1) ?? 'singlink-demo.wav',
       karaokeTimings: manifest.karaokeTimings
     },
-    disclosure: manifest.disclosure,
-    credits: [manifest.voice.credit, manifest.accompaniment.credit]
+    disclosure: { ...manifest.disclosure, ja: 'この歌は先に作ったものです。' },
+    credits: [manifest.voice.credit, manifest.accompaniment.credit.replace(/^Score and accompaniment:\s*/, '楽譜・伴奏：')]
   };
 }

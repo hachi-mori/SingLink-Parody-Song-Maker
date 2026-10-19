@@ -110,9 +110,9 @@ const messages = {
     playbackPlaying: '再生中',
     playbackPaused: '一時停止中',
     playbackEnded: '再生が終わりました',
-    appTitle: 'シングリンク Web', selectSongError: '←きょくをえらんでね！', sourceSongMissing: 'もとの曲が見つかりませんでした',
-    voicevoxLocalNotChecked: 'VOICEVOXは未確認です。',
-    voicevoxChecking: 'VOICEVOX確認中...', voicevoxNotChecked: 'VOICEVOXは未確認です。固定問題デモでは不要です。', voicevoxConnected: 'VOICEVOX接続済み{version}', voicevoxDisconnected: 'VOICEVOX未接続: クイズは遊べます。歌声生成にはローカル版の起動が必要です。', voicevoxUrl: 'VOICEVOX URL', recheck: '再確認', language: '言語', credits: 'クレジット', quizType: 'あそぶ問題', chooseQuiz: '問題をえらんでね', sourceSong: 'もとの曲', sourceSongHelp: '5曲からもとの曲を選べます', sourceSongDisabled: 'オノマトペで選べます', titleMenu: 'タイトルメニュー', story: 'ストーリー', start: 'スタート', instantDemo: '固定問題デモを遊ぶ', instantDemoHelp: '固定4問に答える・VOICEVOXの準備は不要', demoLoadError: '固定問題デモを読み込めませんでした。', demoLabel: '事前生成デモ', demoDisclosure: 'これは事前生成したデモサンプルです。通常モードでは、クイズの回答から歌声をリアルタイム生成します。', demoEyebrow: '固定問題に答えたあと、カラオケ学習を体験', demoSongTitle: 'ずんだもんが自作例文4つを歌います', howTo: 'あそびかた', savedSongs: '保存した曲', noQuestions: 'お題がありません', noQuestionsHelp: '曲データか辞書CSVを確認してください。', backToTitle: 'タイトルへ', fillBlank: '○○に入るオノマトペは？', answerPlaceholder: 'ひらがなで入力', submit: '決定', timeUp: 'タイムアップ！', correct: 'せいかい！', incorrect: 'ふせいかい', prompt: 'おだい', yourAnswer: 'あなたのこたえ', correctAnswer: 'せいかい', unanswered: 'みかいとう', next: 'つぎへ', preparingVoice: 'ずんだもん が おうた を れんしゅう しているよ', requestingVoice: 'VOICEVOXに歌声をお願いしています...', generationTimeout: '歌声生成に時間がかかっているため、音声なしでリザルトを表示しました。クイズ結果は確認できます。', generationOffline: 'VOICEVOXに接続されていないため、音声生成をスキップしました。クイズ結果は確認できます。', skipVoice: '音声なしでリザルトを見る', backToQuiz: '入力画面へ戻る', generationSkippedFallback: 'VOICEVOXに接続できなかったため、音声生成をスキップしました。', accompanimentError: '伴奏を読み込めませんでした: {detail}', skippedAudioError: '音声生成をスキップしたため、再生できる音声はありません。', voiceDataError: '歌声データを読み込めませんでした。', playbackError: '音声を再生できませんでした。再生ボタンをもう一度押してください。', songSourceEyebrow: '4問の正しい例文をカラオケで復習', songMadeWith: '{song}の曲で復習', play: '再生', pause: '一時停止', restart: 'もう一度', download: 'ダウンロード', history: '履歴', audioSkipped: '音声生成をスキップしました', lyricsStillAvailable: '歌詞と字幕はこの画面で確認できます。', translationUnavailable: '英訳がありません', pendingLyric: 'まだ歌っていない', currentLyric: '歌唱中', completedLyric: '歌唱済み', savedInBrowser: 'ブラウザに保存された歌声', generationHistory: '生成履歴', noHistory: 'まだ保存された歌声がありません。', downloadWav: 'WAVをダウンロード', selectHistory: '履歴を選ぶと歌詞と再生プレイヤーが表示されます。', delete: '削除', storyTitle: 'ストーリー', storyBody: '4問のオノマトペクイズに答えると、ずんだもんが正しい例文を歌います。', howToTitle: 'あそびかた', howToBody: '曲を選び、4問に答え、光る歌詞と歌声で正しい例文を覚えます。', howToEyebrow: 'カラオケで日本語を学ぼう', howToStepChooseTitle: '曲をえらぶ', howToStepChooseBody: '5曲から好きな曲をえらびます。', howToStepAnswerTitle: '4問に答える', howToStepAnswerBody: '3つの選択肢から文に合うオノマトペをえらびます。答えを確認して「つぎへ」を押します。全部で4問です。', howToStepListenTitle: 'ずんだもんの歌を聞く', howToStepListenBody: 'VOICEVOXにつながっているときは、結果画面の「再生」を押すと正しい例文をずんだもんが歌います。音声がなくても、答えは復習できます。', howToStepFollowTitle: '歌詞を追いかける', howToStepFollowBody: '光る日本語の歌詞を見ながら復習します。', creditsTitle: 'クレジット', creditsBody: 'Build Week版は自作335教材を使用しています。下の画像は既存のクレジットです。', japaneseReference: '日本語の参考画像', refreshFailed: 'VOICEVOXを確認できませんでした。', genericLoadError: 'データを読み込めませんでした。'
+    appTitle: 'シングリンク', selectSongError: '問題をえらんでね。', sourceSongMissing: 'もとの曲が見つかりませんでした',
+    voicevoxLocalNotChecked: 'VOICEVOXをまだ確認していません',
+    voicevoxChecking: 'VOICEVOXを確認しています', voicevoxNotChecked: 'VOICEVOXは未確認です。固定問題デモでは不要です。', voicevoxConnected: 'VOICEVOXにつながりました{version}', voicevoxDisconnected: 'VOICEVOXにつながっていません', voicevoxUrl: 'VOICEVOX URL', recheck: 'もう一度確認', language: '言語', credits: 'クレジット', quizType: 'あそぶ問題', chooseQuiz: '問題をえらんでね', sourceSong: 'もとの曲', sourceSongHelp: '5曲からもとの曲を選べます', sourceSongDisabled: 'オノマトペで選べます', titleMenu: 'タイトルメニュー', story: 'ストーリー', start: 'スタート', instantDemo: '固定問題デモを遊ぶ', instantDemoHelp: '固定4問に答える・VOICEVOXの準備は不要', demoLoadError: '固定問題デモを読み込めませんでした。', demoLabel: '事前生成デモ', demoDisclosure: 'これは事前生成したデモサンプルです。通常モードでは、クイズの回答から歌声をリアルタイム生成します。', demoEyebrow: '固定問題に答えたあと、カラオケ学習を体験', demoSongTitle: 'ずんだもんが自作例文4つを歌います', howTo: 'あそびかた', savedSongs: '保存した曲', noQuestions: 'お題がありません', noQuestionsHelp: '曲データか辞書CSVを確認してください。', backToTitle: 'タイトルへ', fillBlank: '○○に入るオノマトペは？', answerPlaceholder: 'ひらがなで入力', submit: '決定', timeUp: 'タイムアップ！', correct: 'せいかい！', incorrect: 'ふせいかい', prompt: 'おだい', yourAnswer: 'あなたのこたえ', correctAnswer: 'せいかい', unanswered: 'こたえなし', next: 'つぎへ', preparingVoice: 'ずんだもん が おうた を れんしゅう しているよ', requestingVoice: '歌を作っています', generationTimeout: '時間がかかっているため、歌声なしで進みます。', generationOffline: 'VOICEVOXにつながらないため、今回は歌声なしです。', skipVoice: '歌声なしで進む', backToQuiz: '問題にもどる', generationSkippedFallback: 'VOICEVOXにつながりませんでした。', accompanimentError: '伴奏を読み込めませんでした: {detail}', skippedAudioError: '今回は歌声がありません。', voiceDataError: '歌声データを読み込めませんでした。', playbackError: '音声を再生できませんでした。再生ボタンをもう一度押してください。', songSourceEyebrow: '4問の正しい例文をカラオケで復習', songMadeWith: '「{song}」の歌', play: '再生', pause: '一時停止', restart: 'もう一度', download: 'ダウンロード', history: '保存した曲', audioSkipped: '今回は歌声なしです', lyricsStillAvailable: '歌詞と字幕はこの画面で確認できます。', translationUnavailable: '英訳がありません', pendingLyric: 'まだ歌っていない', currentLyric: '歌唱中', completedLyric: '歌唱済み', savedInBrowser: 'ブラウザに保存された歌声', generationHistory: '保存した曲', noHistory: 'まだ保存した曲はありません。', downloadWav: 'WAVをダウンロード', selectHistory: '聞きたい曲をえらんでね。', delete: '消す', storyTitle: 'ストーリー', storyBody: '4問のオノマトペクイズに答えると、ずんだもんが正しい例文を歌います。', howToTitle: 'あそびかた', howToBody: '曲を選び、4問に答え、光る歌詞と歌声で正しい例文を覚えます。', howToEyebrow: 'カラオケで日本語を学ぼう', howToStepChooseTitle: '曲をえらぶ', howToStepChooseBody: '5曲から好きな曲をえらびます。', howToStepAnswerTitle: '4問に答える', howToStepAnswerBody: '3つのこたえからえらびます。こたえを見たら「つぎへ」。全部で4問です。', howToStepListenTitle: '歌を聞く', howToStepListenBody: '「再生」を押すと、ずんだもんが歌います。', howToStepFollowTitle: '歌詞を見る', howToStepFollowBody: '光る歌詞を見ながら聞きます。', creditsTitle: 'クレジット', creditsBody: 'Build Week版は自作335教材を使用しています。下の画像は既存のクレジットです。', japaneseReference: '日本語の参考画像', refreshFailed: 'VOICEVOXを確認できませんでした。', genericLoadError: 'データを読み込めませんでした。'
   }
 } as const;
 
@@ -122,7 +122,7 @@ function detectLanguage(): Language {
   try {
     return resolveInitialLanguage(window.localStorage.getItem(languageStorageKey));
   } catch {
-    return 'en';
+    return 'ja';
   }
 }
 
@@ -137,8 +137,9 @@ const LanguageContext = createContext<LanguageContextValue | undefined>(undefine
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(detectLanguage);
   const setLanguage = (next: Language) => {
-    setLanguageState(next);
-    try { window.localStorage.setItem(languageStorageKey, next); } catch { /* Storage can be unavailable. */ }
+    const fixedLanguage = resolveInitialLanguage(next);
+    setLanguageState(fixedLanguage);
+    try { window.localStorage.setItem(languageStorageKey, fixedLanguage); } catch { /* Storage can be unavailable. */ }
   };
   const value = useMemo<LanguageContextValue>(() => ({
     language,
@@ -150,6 +151,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }), [language]);
 
   useEffect(() => {
+    try { window.localStorage.setItem(languageStorageKey, language); } catch { /* Storage can be unavailable. */ }
     document.documentElement.lang = language;
     document.title = messages[language].appTitle;
   }, [language]);

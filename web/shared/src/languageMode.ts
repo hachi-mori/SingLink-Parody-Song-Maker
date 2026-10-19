@@ -3,12 +3,11 @@ export type AppLanguage = 'en' | 'ja';
 export const languageStorageKey = 'singlink.language';
 
 /**
- * This Build Week branch starts in English unless the learner has explicitly
- * chosen a language before. Keeping this pure also makes storage behaviour
- * straightforward to verify without a browser.
+ * The study UI is Japanese-only. Keep accepting old saved values so an older
+ * English preference cannot bring back English labels after an update.
  */
-export function resolveInitialLanguage(savedLanguage: string | null | undefined): AppLanguage {
-  return savedLanguage === 'ja' ? 'ja' : 'en';
+export function resolveInitialLanguage(_savedLanguage: string | null | undefined): AppLanguage {
+  return 'ja';
 }
 
 export function showsEnglishLearningSupport(language: AppLanguage): boolean {

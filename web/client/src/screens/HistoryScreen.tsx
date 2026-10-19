@@ -11,7 +11,7 @@ type HistoryScreenProps = {
 };
 
 export function HistoryScreen({ onBack }: HistoryScreenProps) {
-  const { language, t } = useLanguage();
+  const { t } = useLanguage();
   const [records, setRecords] = useState<GeneratedTrackRecord[]>([]);
   const [selected, setSelected] = useState<GeneratedTrackRecord>();
   const selectedUrl = useMemo(() => selected ? URL.createObjectURL(selected.wavBlob) : '', [selected]);
@@ -44,11 +44,7 @@ export function HistoryScreen({ onBack }: HistoryScreenProps) {
     <ScreenShell>
       <section className="history-screen">
         <header>
-          <div>
-            <p>{t('savedInBrowser')}</p>
-            <p>{language === 'ja' ? '音声と歌詞はこの端末・ブラウザのIndexedDBに保存します。クラウド同期や外部への再送信はしません。教材の解除後も履歴は残り、各項目の削除ボタンで消せます。' : 'Audio and lyrics stay in this device’s browser storage. No cloud sync or retransmission. Clearing imported questions does not delete saved songs; use each item’s Delete button.'}</p>
-            <h1>{t('generationHistory')}</h1>
-          </div>
+          <h1>{t('generationHistory')}</h1>
           <button onClick={onBack}>{t('backToTitle')}</button>
         </header>
 
@@ -63,9 +59,8 @@ export function HistoryScreen({ onBack }: HistoryScreenProps) {
                 <article key={record.id} className={selected?.id === record.id ? 'selected-history' : ''}>
                   <button className="history-main" onClick={() => setSelected(record)}>
                     <strong>{record.songTitle}</strong>
-                    <span>{new Date(record.createdAt).toLocaleString(language === 'ja' ? 'ja-JP' : 'en-US')}</span>
-                    <small>{record.fileName}</small>
-                    {record.datasetId === 'browserImport' ? <small>{language === 'ja' ? 'インポート教材・端末内のみ' : 'Imported material · this device only'}</small> : null}
+                    <span>{new Date(record.createdAt).toLocaleString('ja-JP')}</span>
+                    {record.datasetId === 'browserImport' ? <small>読みこんだ問題</small> : null}
                   </button>
                   <div className="history-actions">
                     <button onClick={() => setSelected(record)} aria-label={t('play')}><Play size={18} /></button>
@@ -80,7 +75,7 @@ export function HistoryScreen({ onBack }: HistoryScreenProps) {
               {selected ? (
                 <>
                   <h2>{selected.songTitle}</h2>
-                  <audio src={selectedUrl} controls />
+                  <audio src={selectedUrl} controls aria-label={`${selected.songTitle}を聞く`} />
                   <pre>{selected.lyrics}</pre>
                   <button onClick={() => downloadBlob(selected.wavBlob, selected.fileName)}>{t('downloadWav')}</button>
                 </>

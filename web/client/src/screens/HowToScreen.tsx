@@ -15,7 +15,6 @@ export function HowToScreen({ onBack }: { onBack: () => void }) {
       <section className="howto-screen">
         <header className="howto-header">
           <div>
-            <p>{t('howToEyebrow')}</p>
             <h1>{t('howToTitle')}</h1>
           </div>
           <button className="small-button" onClick={onBack}>{t('backToTitle')}</button>

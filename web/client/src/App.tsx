@@ -294,7 +294,7 @@ export function App() {
     if (language === 'en') {
       return <CreditsScreen onBack={() => setScreen('title')} />;
     }
-    return <StaticImageScreen title={t('creditsTitle')} description={t('creditsBody')} imageSrc={assetUrl('assets/texture/assets/credit.png')} onBack={() => setScreen('title')} />;
+    return <StaticImageScreen title={t('creditsTitle')} imageSrc={assetUrl('assets/texture/assets/credit.png')} onBack={() => setScreen('title')} />;
   }
 
   if (screen === 'history') {

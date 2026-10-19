@@ -17,7 +17,7 @@ import { previewLyrics } from '../lib/api';
 import { assetUrl } from '../lib/assets';
 import { shuffle, takeShuffled } from '../lib/random';
 import { useLanguage } from '../lib/i18n';
-import { privateDatasetNotice, supportsEnglishForDataset } from '../lib/quizDatasets';
+import { supportsEnglishForDataset } from '../lib/quizDatasets';
 import { createQuestionGate } from '../lib/questionGate';
 
 type WriteLyricsScreenProps = {
@@ -311,7 +311,6 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
         <button className="small-button" onClick={onCancel} disabled={feedback?.active}>{t('backToTitle')}</button>
       </section>
       <section className="game-card" ref={gameCardRef} inert={feedback?.active} onKeyDownCapture={preventRepeatedActivation}>
-        {datasetId === 'browserImport' ? <p className="private-quiz-notice">{privateDatasetNotice}</p> : null}
         {isCardOnomatopoeiaProblem && currentOnomatopoeia?.questionText ? (
           <section className="game-question-card">
             <p className="game-question-prompt">{makeQuestionDisplayText(currentIndex, t('fillBlank'))}</p>

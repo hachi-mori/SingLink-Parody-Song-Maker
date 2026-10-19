@@ -1,16 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Download, Pause, Play, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Download, Pause, Play, RotateCcw } from 'lucide-react';
 import type { DatasetId, KaraokeLineTiming, SolvedTask, SongDetail } from '@shared/types';
 import { getKaraokeLineProgress } from '@shared/memorizationScore';
-import { AssetButton } from '../components/AssetButton';
 import { ScreenShell } from '../components/ScreenShell';
 import { downloadBlob } from '../lib/fileName';
 import { assetUrl } from '../lib/assets';
 import type { GeneratedResult } from '../lib/generatedResult';
 import { hasGeneratedAudio } from '../lib/generatedResult';
 import { useLanguage } from '../lib/i18n';
-import { showsEnglishLearningSupport } from '@shared/languageMode';
-import { privateDatasetNotice, savesHistoryForDataset, supportsEnglishForDataset } from '../lib/quizDatasets';
+import { savesHistoryForDataset } from '../lib/quizDatasets';
 import { privateFetchOptions, privateSourceSong } from '../lib/localVoicevox';
 import { buildResultLines } from '../lib/resultLines';
 
@@ -58,8 +56,7 @@ function usePrefersReducedMotion(): boolean {
 }
 
 export function ResultScreen({ song, datasetId, tasks, fullLyrics, result, demoDisclosure, demoCredits, onTitle, onHistory }: ResultScreenProps) {
-  const { language, t } = useLanguage();
-  const showEnglishLearningSupport = supportsEnglishForDataset(datasetId) && showsEnglishLearningSupport(language);
+  const { t } = useLanguage();
   const prefersReducedMotion = usePrefersReducedMotion();
   const audioContextRef = useRef<AudioContext | undefined>(undefined);
   const voiceBufferRef = useRef<AudioBuffer | undefined>(undefined);
@@ -246,17 +243,15 @@ export function ResultScreen({ song, datasetId, tasks, fullLyrics, result, demoD
 
   return (
     <ScreenShell background={assetUrl('assets/texture/assets/result_sunny.gif')} fit="cover">
-      <section className={`result-layout${showEnglishLearningSupport ? '' : ' result-layout--japanese-only'}${generatedAudio ? '' : ' result-layout--no-audio'}`}>
+      <section className={`result-layout${generatedAudio ? '' : ' result-layout--no-audio'}`}>
         <img className="result-character" src={assetUrl('assets/texture/assets/zunda_singing.gif')} alt="" aria-hidden="true" />
         <div className="result-card">
-          {datasetId === 'browserImport' ? <p className="dataset-privacy-notice">{privateDatasetNotice}</p> : null}
           {isDemo ? (
             <aside className="demo-disclosure" aria-label={t('demoLabel')}>
               <strong>{t('demoLabel')}</strong>
               <p>{demoDisclosure ?? t('demoDisclosure')}</p>
             </aside>
           ) : null}
-          <p className="result-song-source">{datasetId === 'browserImport' ? 'インポート教材・同じPC内で処理' : isDemo ? t('demoEyebrow') : generatedAudio ? t('songSourceEyebrow') : t('quizResultEyebrow')}</p>
           <h1>{generatedAudio ? t('songMadeWith', { song: song.sourceSong?.title ?? song.trackName ?? song.title }) : t('quizResultTitle')}</h1>
           {generatedAudio ? <p className="result-playback-status" role="status">{t(playbackStatusKeys[playbackState])}</p> : null}
           <div className="lyrics-box karaoke-lyrics" aria-live="polite">
@@ -296,10 +291,6 @@ export function ResultScreen({ song, datasetId, tasks, fullLyrics, result, demoD
                       })}
                     </span>
                   </p>
-                  {showEnglishLearningSupport ? <>
-                    <p className="karaoke-english" lang="en">{task?.englishExample ?? t('translationUnavailable')}</p>
-                    <p className="karaoke-meaning" lang="en">{task?.englishMeaning ?? t('translationUnavailable')}</p>
-                  </> : null}
                 </article>
               );
             })}
@@ -318,15 +309,16 @@ export function ResultScreen({ song, datasetId, tasks, fullLyrics, result, demoD
             <div className="result-notice">
               <strong>{t('audioSkipped')}</strong>
               <p>{result.status === 'skipped' ? result.message : ''}</p>
-              <p>{t('lyricsStillAvailable')}</p>
             </div>
           )}
-          {playError ? <p className="error-text">{playError}</p> : null}
+          {playError ? <p className="error-text" role="alert">{playError}</p> : null}
           {isDemo && demoCredits?.length ? (
             <p className="demo-credits">{demoCredits.join(' / ')}</p>
           ) : null}
+          <div className="result-navigation">
+            <button onClick={onTitle} className="result-title-button"><ArrowLeft aria-hidden="true" />{t('backToTitle')}</button>
+          </div>
         </div>
-        <AssetButton imageSrc={assetUrl('assets/texture/assets/button/title.png')} label={t('backToTitle')} onClick={onTitle} className="result-title-button" />
       </section>
     </ScreenShell>
   );

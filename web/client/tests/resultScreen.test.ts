@@ -29,7 +29,7 @@ describe('result screen reports available playback accurately', () => {
   it('labels a skipped result as a quiz result, without claiming karaoke or playback', () => {
     const markup = renderResult({ status: 'skipped', message: '検証用の音声なし結果' });
     expect(markup).toContain('<h1>クイズの結果</h1>');
-    expect(markup).toContain('4問の正しい例文を復習');
+    expect(markup).not.toContain('result-song-source');
     expect(markup).toContain('result-layout--no-audio');
     expect(markup).not.toContain('歌っています');
     expect(markup).not.toContain('カラオケで復習');
@@ -41,7 +41,7 @@ describe('result screen reports available playback accurately', () => {
       status: 'generated', source: 'live', blob: new Blob(), blobUrl: 'blob:synthetic',
       fileName: 'synthetic.wav', karaokeTimings: []
     });
-    expect(markup).toContain('<h1>架空の曲の曲で復習</h1>');
+    expect(markup).toContain('<h1>「架空の曲」の歌</h1>');
     expect(markup).toContain('role="status">再生できます</p>');
     expect(markup).not.toContain('歌っています');
     expect(markup).not.toContain('result-layout--no-audio');
