@@ -13,6 +13,7 @@ import {
   type ScoreNote
 } from '../../shared/src/vvproj';
 import { concatWavBuffers } from './wav';
+import { normalizeLocalVoicevoxBaseUrl } from './security';
 
 const normalSpeakerId = 3003;
 const singingQuerySpeakerId = 6000;
@@ -24,7 +25,11 @@ function withTimeout(ms: number): AbortSignal {
 }
 
 function normalizeBaseUrl(baseUrl: string): string {
-  return baseUrl.replace(/\/+$/, '');
+  const normalized = normalizeLocalVoicevoxBaseUrl(baseUrl);
+  if (!normalized) {
+    throw new Error('VOICEVOX base URL must target loopback port 50021');
+  }
+  return normalized;
 }
 
 async function postJson(url: string, body: unknown, timeoutMs = 60_000): Promise<Response> {
@@ -36,8 +41,7 @@ async function postJson(url: string, body: unknown, timeoutMs = 60_000): Promise
   });
 
   if (!response.ok) {
-    const text = await response.text().catch(() => '');
-    throw new Error(`VOICEVOX API エラー: ${response.status} ${response.statusText}${text ? ` / ${text}` : ''}`);
+    throw new Error(`VOICEVOX API エラー: ${response.status} ${response.statusText}`);
   }
 
   return response;

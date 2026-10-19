@@ -1,4 +1,5 @@
-import type { JsonObject, SolvedTask, SongDetail } from '@shared/types';
+import type { DatasetId, JsonObject, SolvedTask, SongDetail } from '@shared/types';
+import { privateFetchOptions, privateSourceSong, voicevoxBaseUrlForDataset } from './localVoicevox';
 import {
   buildMemorizationSynthesisPlan,
   buildOnomatopoeiaLyricsRows,
@@ -39,19 +40,17 @@ function timeoutSignal(ms: number): AbortSignal {
   return controller.signal;
 }
 
-function normalizeBaseUrl(baseUrl: string): string {
-  return baseUrl.replace(/\/+$/, '');
-}
-
-async function postJson(url: string, body: unknown, timeoutMs = 60_000): Promise<Response> {
+async function postJson(url: string, body: unknown, datasetId: DatasetId, timeoutMs = 60_000): Promise<Response> {
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
-    signal: timeoutSignal(timeoutMs)
+    signal: timeoutSignal(timeoutMs),
+    ...(datasetId === 'browserImport' ? privateFetchOptions : {})
   });
 
   if (!response.ok) {
+    if (datasetId === 'browserImport') throw new Error(`同じPCのVOICEVOXで歌声を生成できませんでした (${response.status})。`);
     const text = await response.text().catch(() => '');
     throw new Error(`VOICEVOX API エラー: ${response.status} ${response.statusText}${text ? ` / ${text}` : ''}`);
   }
@@ -212,10 +211,11 @@ function concatWavBuffers(buffers: ArrayBuffer[]): Blob {
   return new Blob([output], { type: 'audio/wav' });
 }
 
-async function synthesizeSegment(segment: SynthesisSegment, baseUrl: string): Promise<ArrayBuffer> {
+async function synthesizeSegment(segment: SynthesisSegment, baseUrl: string, datasetId: DatasetId): Promise<ArrayBuffer> {
   const queryResponse = await postJson(
     `${baseUrl}/sing_frame_audio_query?speaker=${singingQuerySpeakerId}`,
-    segment.score
+    segment.score,
+    datasetId
   );
   let query = (await queryResponse.json()) as JsonObject;
   if (segment.keyShift !== 0) {
@@ -226,16 +226,18 @@ async function synthesizeSegment(segment: SynthesisSegment, baseUrl: string): Pr
   const wavResponse = await postJson(
     `${baseUrl}/frame_synthesis?speaker=${segment.speakerId}`,
     query,
+    datasetId,
     120_000
   );
   return wavResponse.arrayBuffer();
 }
 
-export async function checkDirectVoicevox(baseUrlRaw: string): Promise<string> {
-  const baseUrl = normalizeBaseUrl(baseUrlRaw);
+export async function checkDirectVoicevox(baseUrlRaw: string, datasetId: DatasetId): Promise<string> {
+  const baseUrl = voicevoxBaseUrlForDataset(baseUrlRaw, datasetId);
   const response = await fetch(`${baseUrl}/version`, {
     cache: 'no-store',
-    signal: timeoutSignal(5_000)
+    signal: timeoutSignal(5_000),
+    ...(datasetId === 'browserImport' ? privateFetchOptions : {})
   });
   if (!response.ok) {
     throw new Error(`VOICEVOXに接続できませんでした: ${response.status}`);
@@ -247,13 +249,20 @@ export async function checkDirectVoicevox(baseUrlRaw: string): Promise<string> {
 export async function synthesizeDirectVoicevox(
   song: SongDetail,
   tasks: SolvedTask[],
-  baseUrlRaw: string
+  baseUrlRaw: string,
+  datasetId: DatasetId
 ): Promise<Blob> {
+  const baseUrl = voicevoxBaseUrlForDataset(baseUrlRaw, datasetId);
+  if (datasetId === 'browserImport' && buildOnomatopoeiaLyricsRows(tasks).length !== 4) {
+    throw new Error('歌声生成には選ばれた4問すべての歌唱読みが必要です。');
+  }
   let score: ScoreJson;
   let phraseRanges: PhraseRange[] | undefined;
-  const selectedBaseScoreUrl = song.sourceSong?.scoreUrl ?? song.baseScoreUrl;
+  const selectedBaseScoreUrl = datasetId === 'browserImport'
+    ? privateSourceSong(song).scoreUrl
+    : song.sourceSong?.scoreUrl ?? song.baseScoreUrl;
   if (song.mode === 'onomatopoeiaQuiz' && selectedBaseScoreUrl) {
-    const scoreResponse = await fetch(selectedBaseScoreUrl);
+    const scoreResponse = await fetch(selectedBaseScoreUrl, datasetId === 'browserImport' ? privateFetchOptions : undefined);
     if (!scoreResponse.ok) {
       throw new Error('曲の基礎Scoreデータを読み込めませんでした');
     }
@@ -273,12 +282,11 @@ export async function synthesizeDirectVoicevox(
     score = convertVVProjToScoreJSON(applyParodyLyrics(vvproj, tasks), 0);
   }
   const segments = buildSegments(score, tasks, song.title, phraseRanges);
-  const baseUrl = normalizeBaseUrl(baseUrlRaw);
   const wavs: ArrayBuffer[] = [];
   let processedPaddingFrames = 0;
 
   for (const segment of segments) {
-    const wav = await synthesizeSegment(segment, baseUrl);
+    const wav = await synthesizeSegment(segment, baseUrl, datasetId);
     const trimmed = trimWavLeadingFrames(
       new Uint8Array(wav),
       segment.leadingPaddingFrames,

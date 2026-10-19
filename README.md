@@ -1,3 +1,4 @@
+> Current deployment: both the root URL and `/openai-build-week/` serve the audited `main` build. Only the original 335 questions are bundled. Local JSON imports can use same-PC VOICEVOX and browser-local history; cloud transmission and remote fallbacks are blocked. See [the current Web guide](web/README.md). The submission materials below are retained for reference.
 # SingLink
 
 **A Japanese-learning web app inspired by karaoke culture: answer four onomatopoeia quizzes, then hear Zundamon sing the correct Japanese example sentences while the lyrics light up in time and English subtitles explain them.**

@@ -46,6 +46,7 @@ export function HistoryScreen({ onBack }: HistoryScreenProps) {
         <header>
           <div>
             <p>{t('savedInBrowser')}</p>
+            <p>{language === 'ja' ? '音声と歌詞はこの端末・ブラウザのIndexedDBに保存します。クラウド同期や外部への再送信はしません。教材の解除後も履歴は残り、各項目の削除ボタンで消せます。' : 'Audio and lyrics stay in this device’s browser storage. No cloud sync or retransmission. Clearing imported questions does not delete saved songs; use each item’s Delete button.'}</p>
             <h1>{t('generationHistory')}</h1>
           </div>
           <button onClick={onBack}>{t('backToTitle')}</button>
@@ -64,6 +65,7 @@ export function HistoryScreen({ onBack }: HistoryScreenProps) {
                     <strong>{record.songTitle}</strong>
                     <span>{new Date(record.createdAt).toLocaleString(language === 'ja' ? 'ja-JP' : 'en-US')}</span>
                     <small>{record.fileName}</small>
+                    {record.datasetId === 'browserImport' ? <small>{language === 'ja' ? 'インポート教材・端末内のみ' : 'Imported material · this device only'}</small> : null}
                   </button>
                   <div className="history-actions">
                     <button onClick={() => setSelected(record)} aria-label={t('play')}><Play size={18} /></button>

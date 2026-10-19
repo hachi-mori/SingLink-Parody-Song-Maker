@@ -4,17 +4,19 @@ import {
   createMemorizationScore,
   type MemorizationScoreJson
 } from '@shared/memorizationScore';
-import type { KaraokeLineTiming, SolvedTask, SongDetail } from '@shared/types';
+import type { DatasetId, KaraokeLineTiming, SolvedTask, SongDetail } from '@shared/types';
+import { privateFetchOptions, privateSourceSong } from './localVoicevox';
 
 export async function buildSongKaraokeTimings(
   song: SongDetail,
   tasks: SolvedTask[],
-  fullLyrics: string
+  fullLyrics: string,
+  datasetId: DatasetId = 'original335'
 ): Promise<KaraokeLineTiming[]> {
   if (song.mode !== 'onomatopoeiaQuiz') return [];
-  const scoreUrl = song.sourceSong?.scoreUrl ?? song.baseScoreUrl;
+  const scoreUrl = datasetId === 'browserImport' ? privateSourceSong(song).scoreUrl : song.sourceSong?.scoreUrl ?? song.baseScoreUrl;
   if (!scoreUrl) return [];
-  const response = await fetch(scoreUrl);
+  const response = await fetch(scoreUrl, datasetId === 'browserImport' ? privateFetchOptions : undefined);
   if (!response.ok) throw new Error(`Karaoke score could not be loaded: ${response.status}`);
   const text = (await response.text()).replace(/^\uFEFF/, '');
   const generated = createMemorizationScore(

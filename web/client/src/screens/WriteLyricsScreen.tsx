@@ -10,16 +10,18 @@ import {
   parseQuestionVerbGroup,
   validateAndBuildSolvedTask
 } from '@shared/gameLogic';
-import type { OnomatopoeiaEntry, SolvedTask, SongDetail, VerbEntry } from '@shared/types';
+import type { DatasetId, OnomatopoeiaEntry, SolvedTask, SongDetail, VerbEntry } from '@shared/types';
 import { AssetButton } from '../components/AssetButton';
 import { ScreenShell } from '../components/ScreenShell';
 import { previewLyrics } from '../lib/api';
 import { assetUrl } from '../lib/assets';
 import { shuffle, takeShuffled } from '../lib/random';
 import { useLanguage } from '../lib/i18n';
+import { privateDatasetNotice, supportsEnglishForDataset } from '../lib/quizDatasets';
 
 type WriteLyricsScreenProps = {
   song: SongDetail;
+  datasetId: DatasetId;
   fixedOnomatopoeiaEntries?: OnomatopoeiaEntry[];
   onComplete: (tasks: SolvedTask[], fullLyrics: string, inputTexts: string[]) => void;
   onCancel: () => void;
@@ -70,8 +72,9 @@ function prepareOnomatopoeiaOptions(entries: OnomatopoeiaEntry[], correctAnswer:
   };
 }
 
-export function WriteLyricsScreen({ song, fixedOnomatopoeiaEntries, onComplete, onCancel }: WriteLyricsScreenProps) {
+export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, onComplete, onCancel }: WriteLyricsScreenProps) {
   const { language, t } = useLanguage();
+  const showEnglishLearningSupport = supportsEnglishForDataset(datasetId) && language === 'en';
   const [countdownStartedAt] = useState(() => Date.now());
   const [started, setStarted] = useState(false);
   const [problemStartedAt, setProblemStartedAt] = useState(() => Date.now());
@@ -137,7 +140,7 @@ export function WriteLyricsScreen({ song, fixedOnomatopoeiaEntries, onComplete, 
     }
 
     try {
-      const lyrics = await previewLyrics(song.id, nextTasks);
+      const lyrics = await previewLyrics(song.id, nextTasks, datasetId);
       onComplete(nextTasks, lyrics, nextInputTexts);
     } catch (previewError) {
       setError(previewError instanceof Error ? previewError.message : String(previewError));
@@ -172,7 +175,7 @@ export function WriteLyricsScreen({ song, fixedOnomatopoeiaEntries, onComplete, 
         question: currentOnomatopoeia.questionText ?? currentOnomatopoeia.word,
         selected: t('unanswered'),
         correctAnswer: currentOnomatopoeia.answer,
-        explanation: language === 'en'
+        explanation: showEnglishLearningSupport
           ? currentOnomatopoeia.englishMeaning ?? t('translationUnavailable')
           : currentOnomatopoeia.explanation,
         answerForRecord: onomatopoeiaTimeoutAnswer
@@ -182,7 +185,7 @@ export function WriteLyricsScreen({ song, fixedOnomatopoeiaEntries, onComplete, 
     if (currentProblem) {
       advance(makeTimedOutTask(currentProblem), 'タイムアップ');
     }
-  }, [started, feedback, remainingSeconds, problemCount, song.mode, currentOnomatopoeia, currentProblem, language, t]);
+  }, [started, feedback, remainingSeconds, problemCount, song.mode, currentOnomatopoeia, currentProblem, showEnglishLearningSupport, t]);
 
   const submitFreeText = () => {
     if (!currentProblem) {
@@ -224,7 +227,7 @@ export function WriteLyricsScreen({ song, fixedOnomatopoeiaEntries, onComplete, 
       question: currentOnomatopoeia.questionText ?? currentOnomatopoeia.word,
       selected: answer,
       correctAnswer: currentOnomatopoeia.answer,
-      explanation: language === 'en'
+      explanation: showEnglishLearningSupport
         ? currentOnomatopoeia.englishMeaning ?? t('translationUnavailable')
         : currentOnomatopoeia.explanation,
       answerForRecord: answer
@@ -285,8 +288,10 @@ export function WriteLyricsScreen({ song, fixedOnomatopoeiaEntries, onComplete, 
       <section className="game-hud">
         <span>{Math.min(currentIndex + 1, problemCount)} / {problemCount}</span>
         <strong className={remainingSeconds <= 3 ? 'danger-time' : ''}>{remainingSeconds}</strong>
+        {datasetId === 'browserImport' ? <button className="small-button" onClick={onCancel}>教材設定へ戻る</button> : null}
       </section>
       <section className="game-card">
+        {datasetId === 'browserImport' ? <p className="private-quiz-notice">{privateDatasetNotice}</p> : null}
         {isCardOnomatopoeiaProblem && currentOnomatopoeia?.questionText ? (
           <section className="game-question-card">
             <p className="game-question-prompt">{makeQuestionDisplayText(currentIndex, t('fillBlank'))}</p>

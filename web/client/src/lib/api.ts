@@ -1,4 +1,5 @@
 import type {
+  DatasetId,
   SongDetail,
   SongInfo,
   SynthesisErrorResponse,
@@ -7,6 +8,7 @@ import type {
 } from '@shared/types';
 import { fetchStaticSongDetail, fetchStaticSongs, previewStaticLyrics } from './staticSongs';
 import { checkDirectVoicevox, synthesizeDirectVoicevox } from './directVoicevox';
+import { assertKnownDataset, assertPublicDataset } from './quizDatasets';
 
 const directSynthesisMessage = 'ローカルVOICEVOXへ接続できませんでした。ブラウザのローカルネットワーク権限とVOICEVOXのCORS設定を確認してください。';
 const synthesisTimeoutMessage = '歌声生成の応答がありませんでした。VOICEVOX未接続、またはブラウザからローカルVOICEVOXへ接続できない可能性があります。';
@@ -72,10 +74,11 @@ export async function fetchSongDetail(songId: string): Promise<SongDetail> {
   }
 }
 
-export async function checkVoicevox(baseUrl: string): Promise<VoicevoxVersionResponse> {
+export async function checkVoicevox(baseUrl: string, datasetId: DatasetId): Promise<VoicevoxVersionResponse> {
+  assertKnownDataset(datasetId);
   try {
-    if (isGitHubPagesHost()) {
-      const version = await checkDirectVoicevox(baseUrl);
+    if (datasetId === 'browserImport' || isGitHubPagesHost()) {
+      const version = await checkDirectVoicevox(baseUrl, datasetId);
       return {
         ok: true,
         version,
@@ -97,12 +100,13 @@ export async function checkVoicevox(baseUrl: string): Promise<VoicevoxVersionRes
   }
 }
 
-export async function previewLyrics(songId: string, solvedTasks: SynthesisRequest['solvedTasks']): Promise<string> {
+export async function previewLyrics(songId: string, solvedTasks: SynthesisRequest['solvedTasks'], datasetId: DatasetId): Promise<string> {
+  assertPublicDataset(datasetId);
   try {
     const response = await fetch(apiUrl('/api/parody/preview'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ songId, solvedTasks })
+      body: JSON.stringify({ songId, solvedTasks, datasetId })
     });
     if (!response.ok) {
       return previewStaticLyrics(songId, solvedTasks);
@@ -117,10 +121,14 @@ export async function previewLyrics(songId: string, solvedTasks: SynthesisReques
   }
 }
 
-export async function synthesizeSong(request: SynthesisRequest, song: SongDetail): Promise<Blob> {
-  if (isGitHubPagesHost()) {
+export async function synthesizeSong(request: SynthesisRequest, song: SongDetail, datasetId: DatasetId): Promise<Blob> {
+  assertKnownDataset(datasetId);
+  if (request.datasetId !== undefined && request.datasetId !== datasetId) throw new Error('教材の種類が一致しません。');
+  // Private material uses direct loopback synthesis on every hosting environment.
+  // Errors propagate to the UI; there is no server or cloud fallback.
+  if (datasetId === 'browserImport' || isGitHubPagesHost()) {
     try {
-      return await synthesizeDirectVoicevox(song, request.solvedTasks, request.voicevoxBaseUrl ?? 'http://localhost:50021');
+      return await synthesizeDirectVoicevox(song, request.solvedTasks, request.voicevoxBaseUrl ?? 'http://localhost:50021', datasetId);
     } catch (error) {
       if (isAbortError(error)) {
         throw new Error(synthesisTimeoutMessage);
@@ -136,7 +144,7 @@ export async function synthesizeSong(request: SynthesisRequest, song: SongDetail
     const response = await fetch(apiUrl('/api/synthesis'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(request),
+      body: JSON.stringify({ ...request, datasetId }),
       signal: createTimeoutSignal(120_000)
     });
     if (!response.ok) {

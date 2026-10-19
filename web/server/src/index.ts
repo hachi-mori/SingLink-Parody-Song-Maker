@@ -14,6 +14,10 @@ import type { ScoreJson } from '../../shared/src/vvproj';
 import type { SynthesisErrorResponse, SynthesisRequest } from '../../shared/src/types';
 import { getConfig } from './config';
 import { assetsDir } from './paths';
+import {
+  isAllowedLocalOrigin,
+  normalizeLocalVoicevoxBaseUrl
+} from './security';
 import { getSongDetail, listSongs, resolveMemorizationSourceScore, resolveSong } from './songRepository';
 import { getVoicevoxVersion, synthesizeSongScore } from './voicevox';
 
@@ -26,6 +30,7 @@ const app = Fastify({
 });
 
 const synthesisSchema = z.object({
+  datasetId: z.literal('original335').optional(),
   songId: z.string().min(1),
   sourceSongId: z.string().min(1).optional(),
   solvedTasks: z.array(z.object({
@@ -45,12 +50,15 @@ const synthesisSchema = z.object({
 });
 
 const previewSchema = synthesisSchema.pick({
+  datasetId: true,
   songId: true,
   solvedTasks: true
 });
 
 await app.register(cors, {
-  origin: true
+  origin: (origin, callback) => {
+    callback(null, isAllowedLocalOrigin(origin, config.allowedOrigins));
+  }
 });
 
 await fs.mkdir(assetsDir, { recursive: true });
@@ -70,7 +78,14 @@ app.get('/api/health', async () => {
 
 app.get('/api/voicevox/version', async (request) => {
   const query = request.query as { baseUrl?: string };
-  const baseUrl = query.baseUrl ?? config.voicevoxBaseUrl;
+  const baseUrl = normalizeLocalVoicevoxBaseUrl(query.baseUrl ?? config.voicevoxBaseUrl);
+  if (!baseUrl) {
+    return {
+      ok: false,
+      baseUrl: config.voicevoxBaseUrl,
+      message: 'VOICEVOX URL must point to the local engine'
+    };
+  }
   try {
     const version = await getVoicevoxVersion(baseUrl);
     return {
@@ -134,6 +149,13 @@ app.post('/api/synthesis', async (request, reply) => {
   }
 
   const body: SynthesisRequest = parsed.data;
+  const voicevoxBaseUrl = normalizeLocalVoicevoxBaseUrl(body.voicevoxBaseUrl ?? config.voicevoxBaseUrl);
+  if (!voicevoxBaseUrl) {
+    return reply.code(400).send({
+      ok: false,
+      message: 'VOICEVOX URL must point to the local engine'
+    } satisfies SynthesisErrorResponse);
+  }
   const resolved = await resolveSong(body.songId);
   if (!resolved) {
     return reply.code(404).send({ ok: false, message: '曲が見つかりません' } satisfies SynthesisErrorResponse);
@@ -161,7 +183,7 @@ app.post('/api/synthesis', async (request, reply) => {
     }
     const wav = await synthesizeSongScore(
       score,
-      body.voicevoxBaseUrl ?? config.voicevoxBaseUrl,
+      voicevoxBaseUrl,
       body.solvedTasks,
       resolved.info.title,
       phraseRanges
@@ -172,11 +194,10 @@ app.post('/api/synthesis', async (request, reply) => {
       .header('Content-Disposition', `attachment; filename*=UTF-8''singlink_${encodedTitle}.wav`)
       .send(wav);
   } catch (error) {
-    request.log.error(error);
+    request.log.error({ err: error }, 'Voice synthesis failed');
     return reply.code(500).send({
       ok: false,
-      message: '歌声合成に失敗しました。VOICEVOX の起動状態と曲データを確認してください。',
-      detail: error instanceof Error ? error.message : String(error)
+      message: '歌声合成に失敗しました。VOICEVOX の起動状態と曲データを確認してください。'
     } satisfies SynthesisErrorResponse);
   }
 });

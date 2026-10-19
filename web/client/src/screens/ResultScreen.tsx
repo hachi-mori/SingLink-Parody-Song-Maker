@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Download, Pause, Play, RotateCcw } from 'lucide-react';
-import type { KaraokeLineTiming, SolvedTask, SongDetail } from '@shared/types';
+import type { DatasetId, KaraokeLineTiming, SolvedTask, SongDetail } from '@shared/types';
 import { getKaraokeLineProgress } from '@shared/memorizationScore';
 import { AssetButton } from '../components/AssetButton';
 import { ScreenShell } from '../components/ScreenShell';
@@ -10,9 +10,12 @@ import type { GeneratedResult } from '../lib/generatedResult';
 import { hasGeneratedAudio } from '../lib/generatedResult';
 import { useLanguage } from '../lib/i18n';
 import { showsEnglishLearningSupport } from '@shared/languageMode';
+import { privateDatasetNotice, savesHistoryForDataset, supportsEnglishForDataset } from '../lib/quizDatasets';
+import { privateFetchOptions, privateSourceSong } from '../lib/localVoicevox';
 
 type ResultScreenProps = {
   song: SongDetail;
+  datasetId: DatasetId;
   tasks: SolvedTask[];
   fullLyrics: string;
   result: GeneratedResult;
@@ -50,9 +53,9 @@ function usePrefersReducedMotion(): boolean {
   return reduced;
 }
 
-export function ResultScreen({ song, tasks, fullLyrics, result, demoDisclosure, demoCredits, onTitle, onHistory }: ResultScreenProps) {
+export function ResultScreen({ song, datasetId, tasks, fullLyrics, result, demoDisclosure, demoCredits, onTitle, onHistory }: ResultScreenProps) {
   const { language, t } = useLanguage();
-  const showEnglishLearningSupport = showsEnglishLearningSupport(language);
+  const showEnglishLearningSupport = supportsEnglishForDataset(datasetId) && showsEnglishLearningSupport(language);
   const prefersReducedMotion = usePrefersReducedMotion();
   const audioContextRef = useRef<AudioContext | undefined>(undefined);
   const voiceBufferRef = useRef<AudioBuffer | undefined>(undefined);
@@ -95,7 +98,7 @@ export function ResultScreen({ song, tasks, fullLyrics, result, demoDisclosure, 
 
   const decodeBlob = async (context: AudioContext, blob: Blob) => context.decodeAudioData(await blob.arrayBuffer());
   const decodeUrl = async (context: AudioContext, url: string) => {
-    const response = await fetch(url);
+    const response = await fetch(url, datasetId === 'browserImport' ? privateFetchOptions : undefined);
     if (!response.ok) throw new Error(t('accompanimentError', { detail: response.statusText }));
     return context.decodeAudioData(await response.arrayBuffer());
   };
@@ -103,7 +106,8 @@ export function ResultScreen({ song, tasks, fullLyrics, result, demoDisclosure, 
   const ensureBuffers = async (context: AudioContext) => {
     if (!generatedAudio) throw new Error(t('skippedAudioError'));
     voiceBufferRef.current ??= await decodeBlob(context, result.blob);
-    if (song.instUrl && !instBufferRef.current) instBufferRef.current = await decodeUrl(context, song.instUrl);
+    const instUrl = datasetId === 'browserImport' ? privateSourceSong(song).instUrl : song.instUrl;
+    if (instUrl && !instBufferRef.current) instBufferRef.current = await decodeUrl(context, instUrl);
   };
 
   const playbackDuration = () => Math.max(voiceBufferRef.current?.duration ?? 0, instBufferRef.current?.duration ?? 0);
@@ -182,7 +186,6 @@ export function ResultScreen({ song, tasks, fullLyrics, result, demoDisclosure, 
     } catch (error) {
       setPlaybackState('idle');
       setPlayError(error instanceof Error ? error.message : t('playbackError'));
-      console.error(error);
     }
   };
 
@@ -240,17 +243,18 @@ export function ResultScreen({ song, tasks, fullLyrics, result, demoDisclosure, 
 
   return (
     <ScreenShell background={assetUrl('assets/texture/assets/result_sunny.gif')} fit="cover">
-      <section className="result-layout">
+      <section className={`result-layout${showEnglishLearningSupport ? '' : ' result-layout--japanese-only'}`}>
         <img className="result-character" src={assetUrl('assets/texture/assets/zunda_singing.gif')} alt="" aria-hidden="true" />
         <div className="result-card">
+          {datasetId === 'browserImport' ? <p className="dataset-privacy-notice">{privateDatasetNotice}</p> : null}
           {isDemo ? (
             <aside className="demo-disclosure" aria-label={t('demoLabel')}>
               <strong>{t('demoLabel')}</strong>
               <p>{demoDisclosure ?? t('demoDisclosure')}</p>
             </aside>
           ) : null}
-          <p className="result-song-source">{isDemo ? t('demoEyebrow') : t('songSourceEyebrow')}</p>
-          <h1>{t('songMadeWith', { song: song.sourceSong?.title ?? song.trackName ?? song.title })}</h1>
+          <p className="result-song-source">{datasetId === 'browserImport' ? 'インポート教材・同じPC内で処理' : isDemo ? t('demoEyebrow') : t('songSourceEyebrow')}</p>
+          <h1>{datasetId === 'browserImport' ? 'クイズの結果' : t('songMadeWith', { song: song.sourceSong?.title ?? song.trackName ?? song.title })}</h1>
           <div className="lyrics-box karaoke-lyrics" aria-live="polite">
             {lines.map((line, lineIndex) => {
               const timing = timings[lineIndex];
@@ -306,12 +310,12 @@ export function ResultScreen({ song, tasks, fullLyrics, result, demoDisclosure, 
               </button>
               <button onClick={() => void restart()}><RotateCcw />{t('restart')}</button>
               <button onClick={() => downloadBlob(result.blob, result.fileName)}><Download />{t('download')}</button>
-              {!isDemo ? <button onClick={onHistory}>{t('history')}</button> : null}
+              {!isDemo && savesHistoryForDataset(datasetId) ? <button onClick={onHistory}>{t('history')}</button> : null}
             </div>
           ) : (
             <div className="result-notice">
               <strong>{t('audioSkipped')}</strong>
-              <p>{result.message}</p>
+              <p>{result.status === 'skipped' ? result.message : ''}</p>
               <p>{t('lyricsStillAvailable')}</p>
             </div>
           )}
