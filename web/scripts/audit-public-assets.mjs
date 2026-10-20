@@ -10,6 +10,11 @@ const distributionRoot = resolve(webRoot, 'dist/client/assets');
 const expectedPublicAssets = [
   'texture',
   'demo',
+  'sfx/click_004.ogg',
+  'sfx/confirmation_003.ogg',
+  'sfx/error_001.ogg',
+  'sfx/License.txt',
+  'sfx/SOURCES.md',
   'dict/cards_text_data.json',
   'dict/cards_singing_readings.json',
   'dict/cards_english_data.json',
@@ -35,7 +40,7 @@ const requiredDictionaryFiles = [
   'dict/cards_singing_readings.json',
   'dict/cards_english_data.json'
 ];
-const managedAssetRoots = ['texture', 'demo', 'dict', 'score', 'inst'];
+const managedAssetRoots = ['texture', 'demo', 'sfx', 'dict', 'score', 'inst'];
 const forbiddenPathFragments = ['local-only', 'legacy-web-assets', 'book'];
 // Reviewed original curriculum. JSON canonicalization ignores checkout line endings.
 // Any curriculum change requires explicitly reviewing and updating these fingerprints.

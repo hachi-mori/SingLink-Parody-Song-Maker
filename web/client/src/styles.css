@@ -359,7 +359,7 @@ button:disabled {
   text-shadow: 0 2px 0 rgba(255, 251, 235, 0.8);
 }
 
-.game-hud span,
+.game-hud > span,
 .game-hud strong {
   min-width: clamp(110px, 11vw, 190px);
   display: inline-flex;
@@ -376,6 +376,10 @@ button:disabled {
   font-size: clamp(14px, 1.6vw, 20px);
   text-shadow: none;
 }
+
+.sound-effects-root { display: contents; }
+.sound-toggle { min-height: 44px; white-space: nowrap; }
+.game-hud-actions { display: flex; flex-direction: column; gap: 6px; }
 
 .danger-time {
   color: #d51e1e;
@@ -884,6 +888,10 @@ button:disabled {
 
 .result-navigation {
   margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
 }
 
 .result-title-button {
@@ -1438,9 +1446,10 @@ button:disabled {
     gap: 8px;
   }
 
-  .game-hud span,
+  .game-hud > span,
   .game-hud strong {
-    min-width: 80px;
+    min-width: 68px;
+    padding-inline: 8px;
   }
 
   .game-hud .small-button {
@@ -1448,7 +1457,7 @@ button:disabled {
   }
 
   .game-card {
-    padding-top: 86px;
+    padding-top: 130px;
     gap: 18px;
   }
 

@@ -2,6 +2,7 @@ import { RefreshCw } from 'lucide-react';
 import type { DatasetId, QuizDataset, SongInfo, SourceSongInfo, VoicevoxVersionResponse } from '@shared/types';
 import { AssetButton } from '../components/AssetButton';
 import { ScreenShell } from '../components/ScreenShell';
+import { SoundToggle } from '../components/SoundToggle';
 import { assetUrl } from '../lib/assets';
 import { useLanguage } from '../lib/i18n';
 
@@ -97,6 +98,7 @@ export function TitleScreen(props: TitleScreenProps) {
             <button className="credit-link" onClick={props.onOpenCredit}>{t('credits')}</button>
           </nav>
 
+          <SoundToggle />
           <div className="title-settings">
             <section className="dataset-import-panel" aria-label="教材の読み込み">
               <label htmlFor="dataset-file">教材を読み込む</label>

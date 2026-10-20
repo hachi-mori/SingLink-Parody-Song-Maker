@@ -19,6 +19,8 @@ import { shuffle, takeShuffled } from '../lib/random';
 import { useLanguage } from '../lib/i18n';
 import { supportsEnglishForDataset } from '../lib/quizDatasets';
 import { createQuestionGate } from '../lib/questionGate';
+import { SoundToggle } from '../components/SoundToggle';
+import { useSoundEffects } from '../lib/soundEffectsContext';
 
 type WriteLyricsScreenProps = {
   song: SongDetail;
@@ -90,6 +92,7 @@ function prepareOnomatopoeiaOptions(entries: OnomatopoeiaEntry[], correctAnswer:
 
 export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, onComplete, onCancel }: WriteLyricsScreenProps) {
   const { language, t } = useLanguage();
+  const { play: playSound } = useSoundEffects();
   const showEnglishLearningSupport = supportsEnglishForDataset(datasetId) && language === 'en';
   const [countdownStartedAt] = useState(() => Date.now());
   const [started, setStarted] = useState(false);
@@ -202,7 +205,10 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
         : currentOnomatopoeia.explanation,
       answerForRecord: timeUp ? onomatopoeiaTimeoutAnswer : answer!
     }, timeUp ? deadline : now);
-    if (accepted) setFeedback(accepted.value);
+    if (accepted) {
+      setFeedback(accepted.value);
+      playSound(accepted.value.correct ? 'correct' : 'incorrect');
+    }
   };
 
   useEffect(() => {
@@ -236,6 +242,7 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
     }
     if (index !== verbOptions.correctIndex) {
       setError('ざんねん！ 問題のグループに合う動詞を選んでね');
+      playSound('incorrect');
       return;
     }
     const result = buildVerbSolvedTask(currentProblem, entry);
@@ -243,6 +250,7 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
       setError(result.message);
       return;
     }
+    playSound('correct');
     advance(result.task, entry.word);
   };
 
@@ -308,7 +316,10 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
       <section className="game-hud" inert={feedback?.active}>
         <span>{Math.min(currentIndex + 1, problemCount)} / {problemCount}</span>
         <strong className={remainingSeconds <= 3 ? 'danger-time' : ''}>{remainingSeconds}</strong>
-        <button className="small-button" onClick={onCancel} disabled={feedback?.active}>{t('backToTitle')}</button>
+        <div className="game-hud-actions">
+          <button className="small-button" onClick={onCancel} disabled={feedback?.active}>{t('backToTitle')}</button>
+          <SoundToggle />
+        </div>
       </section>
       <section className="game-card" ref={gameCardRef} inert={feedback?.active} onKeyDownCapture={preventRepeatedActivation}>
         {isCardOnomatopoeiaProblem && currentOnomatopoeia?.questionText ? (
@@ -336,7 +347,7 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
         {song.mode === 'verbQuiz' ? (
           <div className="choice-grid">
             {(verbOptions?.options ?? []).map((entry, index) => (
-              <button key={`${entry.word}-${entry.reading}-${index}`} onClick={() => submitVerb(entry, index)}>
+              <button data-sfx="off" key={`${entry.word}-${entry.reading}-${index}`} onClick={() => submitVerb(entry, index)}>
                 <small>{entry.reading}</small>
                 <span>{index + 1} {entry.word}</span>
               </button>
@@ -347,7 +358,7 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
         {song.mode === 'onomatopoeiaQuiz' ? (
           <div className="choice-grid">
             {(onomatopoeiaOptions?.options ?? []).map((answer, index) => (
-              <button key={`${answer}-${index}`} disabled={answerLocked} onClick={() => submitOnomatopoeia(answer)}>
+              <button data-sfx="off" key={`${answer}-${index}`} disabled={answerLocked} onClick={() => submitOnomatopoeia(answer)}>
                 <span>{index + 1} {answer}</span>
               </button>
             ))}

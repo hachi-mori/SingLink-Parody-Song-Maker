@@ -11,6 +11,7 @@ import { useLanguage } from '../lib/i18n';
 import { savesHistoryForDataset } from '../lib/quizDatasets';
 import { privateFetchOptions, privateSourceSong } from '../lib/localVoicevox';
 import { buildResultLines } from '../lib/resultLines';
+import { SoundToggle } from '../components/SoundToggle';
 
 type ResultScreenProps = {
   song: SongDetail;
@@ -322,6 +323,7 @@ export function ResultScreen({ song, datasetId, tasks, fullLyrics, result, demoD
           ) : null}
           <div className="result-navigation">
             <button onClick={onTitle} className="result-title-button"><ArrowLeft aria-hidden="true" />{t('backToTitle')}</button>
+            <SoundToggle />
           </div>
         </div>
       </section>

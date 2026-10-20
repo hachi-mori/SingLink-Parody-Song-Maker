@@ -8,6 +8,11 @@ const destinationRoot = resolve(webRoot, 'dist/client/assets');
 const publicAssets = [
   'texture',
   'demo',
+  'sfx/click_004.ogg',
+  'sfx/confirmation_003.ogg',
+  'sfx/error_001.ogg',
+  'sfx/License.txt',
+  'sfx/SOURCES.md',
   'dict/cards_text_data.json',
   'dict/cards_singing_readings.json',
   'dict/cards_english_data.json',
@@ -23,7 +28,7 @@ const publicAssets = [
   'inst/幸せなら手をたたこう.wav',
   'inst/雪.wav'
 ];
-const managedAssetRoots = ['texture', 'demo', 'dict', 'score', 'inst'];
+const managedAssetRoots = ['texture', 'demo', 'sfx', 'dict', 'score', 'inst'];
 
 for (const directoryName of managedAssetRoots) {
   await rm(resolve(destinationRoot, directoryName), { recursive: true, force: true });
