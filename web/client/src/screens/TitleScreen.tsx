@@ -40,6 +40,7 @@ export function TitleScreen(props: TitleScreenProps) {
 
   return (
     <ScreenShell background={assetUrl('assets/texture/assets/title_background.png')} fit="cover">
+      <SoundToggle />
       <section className="title-layout">
         <div className="title-main">
           <img className="title-logo" src={assetUrl('assets/texture/assets/title_logo_trimmed.png')} alt="シングリンク" />
@@ -98,7 +99,6 @@ export function TitleScreen(props: TitleScreenProps) {
             <button className="credit-link" onClick={props.onOpenCredit}>{t('credits')}</button>
           </nav>
 
-          <SoundToggle />
           <div className="title-settings">
             <section className="dataset-import-panel" aria-label="教材の読み込み">
               <label htmlFor="dataset-file">教材を読み込む</label>

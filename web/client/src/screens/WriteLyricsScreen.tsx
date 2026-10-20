@@ -313,13 +313,11 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
 
   return (
     <ScreenShell background={assetUrl('assets/texture/assets/game_background2.gif')} fit="cover">
+      <div className="sound-toggle-slot" inert={feedback?.active}><SoundToggle /></div>
       <section className="game-hud" inert={feedback?.active}>
         <span>{Math.min(currentIndex + 1, problemCount)} / {problemCount}</span>
         <strong className={remainingSeconds <= 3 ? 'danger-time' : ''}>{remainingSeconds}</strong>
-        <div className="game-hud-actions">
-          <button className="small-button" onClick={onCancel} disabled={feedback?.active}>{t('backToTitle')}</button>
-          <SoundToggle />
-        </div>
+        <button className="small-button" onClick={onCancel} disabled={feedback?.active}>{t('backToTitle')}</button>
       </section>
       <section className="game-card" ref={gameCardRef} inert={feedback?.active} onKeyDownCapture={preventRepeatedActivation}>
         {isCardOnomatopoeiaProblem && currentOnomatopoeia?.questionText ? (

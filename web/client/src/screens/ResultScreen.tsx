@@ -244,6 +244,7 @@ export function ResultScreen({ song, datasetId, tasks, fullLyrics, result, demoD
 
   return (
     <ScreenShell>
+      <SoundToggle />
       <section className={`result-layout${generatedAudio ? '' : ' result-layout--no-audio'}`}>
         <div className="result-stage" aria-hidden="true">
           <div className="result-scene">
@@ -323,7 +324,6 @@ export function ResultScreen({ song, datasetId, tasks, fullLyrics, result, demoD
           ) : null}
           <div className="result-navigation">
             <button onClick={onTitle} className="result-title-button"><ArrowLeft aria-hidden="true" />{t('backToTitle')}</button>
-            <SoundToggle />
           </div>
         </div>
       </section>
