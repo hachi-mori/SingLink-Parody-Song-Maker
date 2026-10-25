@@ -6,7 +6,6 @@ import {
   findVerbEntries,
   makeQuestionDisplayText,
   makeTimedOutTask,
-  onomatopoeiaQuestionsPerGame,
   parseQuestionVerbGroup,
   validateAndBuildSolvedTask
 } from '@shared/gameLogic';
@@ -15,7 +14,8 @@ import { AssetButton } from '../components/AssetButton';
 import { ScreenShell } from '../components/ScreenShell';
 import { previewLyrics } from '../lib/api';
 import { assetUrl } from '../lib/assets';
-import { shuffle, takeShuffled } from '../lib/random';
+import { shuffle } from '../lib/random';
+import { prepareOnomatopoeiaOptions, selectOnomatopoeiaQuestions } from '../lib/quizSelection';
 import { useLanguage } from '../lib/i18n';
 import { supportsEnglishForDataset } from '../lib/quizDatasets';
 import { createQuestionGate } from '../lib/questionGate';
@@ -78,18 +78,6 @@ function prepareVerbOptions(entries: VerbEntry[], questionText: string, maxSylla
   };
 }
 
-function prepareOnomatopoeiaOptions(entries: OnomatopoeiaEntry[], correctAnswer: string): { options: string[]; correctIndex: number } | undefined {
-  const wrongAnswers = [...new Set(entries.map((entry) => entry.answer).filter((answer) => answer !== correctAnswer))];
-  if (wrongAnswers.length < 2) {
-    return undefined;
-  }
-  const options = shuffle([correctAnswer, ...takeShuffled(wrongAnswers, 2)]);
-  return {
-    options,
-    correctIndex: options.indexOf(correctAnswer)
-  };
-}
-
 export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, onComplete, onCancel }: WriteLyricsScreenProps) {
   const { language, t } = useLanguage();
   const { play: playSound } = useSoundEffects();
@@ -108,12 +96,10 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
   const gameCardRef = useRef<HTMLElement>(null);
   const feedbackTitleId = useId();
 
-  const onomatopoeiaProblems = useMemo(() => {
-    if (song.mode !== 'onomatopoeiaQuiz') {
-      return [];
-    }
-    return fixedOnomatopoeiaEntries ?? takeShuffled(song.onomatopoeiaEntries ?? [], onomatopoeiaQuestionsPerGame);
-  }, [song, fixedOnomatopoeiaEntries]);
+  const onomatopoeiaProblems = useMemo(
+    () => selectOnomatopoeiaQuestions(song, fixedOnomatopoeiaEntries),
+    [song, fixedOnomatopoeiaEntries]
+  );
 
   const problemCount = song.mode === 'onomatopoeiaQuiz' ? onomatopoeiaProblems.length : song.problems.length;
   const currentProblem = song.problems[currentIndex];
@@ -128,7 +114,7 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
     if (song.mode !== 'onomatopoeiaQuiz' || !currentOnomatopoeia) {
       return undefined;
     }
-    return prepareOnomatopoeiaOptions(song.onomatopoeiaEntries ?? [], currentOnomatopoeia.answer);
+    return prepareOnomatopoeiaOptions(song.onomatopoeiaEntries ?? [], currentOnomatopoeia);
   }, [song, currentOnomatopoeia]);
 
   const settlement = questionGate.current.get(currentIndex);
@@ -286,7 +272,7 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
     return (
       <ScreenShell background={assetUrl('assets/texture/assets/result_background.png')} fit="cover">
         <section className="countdown-screen">
-          <p>{song.title}</p>
+          <p>{song.experienceSet?.title ?? song.title}</p>
           <strong>{remaining > 0 ? remaining : 'START!'}</strong>
           <button className="small-button" onClick={onCancel}>{t('backToTitle')}</button>
         </section>
@@ -315,7 +301,7 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
     <ScreenShell background={assetUrl('assets/texture/assets/game_background2.gif')} fit="cover">
       <div className="sound-toggle-slot" inert={feedback?.active}><SoundToggle /></div>
       <section className="game-hud" inert={feedback?.active}>
-        <span>{Math.min(currentIndex + 1, problemCount)} / {problemCount}</span>
+        <span>{song.experienceSet ? `${song.experienceSet.title} · ` : ''}{Math.min(currentIndex + 1, problemCount)} / {problemCount}</span>
         <strong className={remainingSeconds <= 3 ? 'danger-time' : ''}>{remainingSeconds}</strong>
         <button className="small-button" onClick={onCancel} disabled={feedback?.active}>{t('backToTitle')}</button>
       </section>

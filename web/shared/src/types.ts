@@ -36,6 +36,9 @@ export type VerbEntry = {
 };
 
 export type OnomatopoeiaEntry = {
+  /** Present only on a validated, fixed experience set. */
+  id?: string;
+  choices?: string[];
   word: string;
   reading: string;
   answer: string;
@@ -47,6 +50,11 @@ export type OnomatopoeiaEntry = {
   englishExample?: string;
   translationReviewStatus?: 'reviewed' | 'needsReview';
   translationReviewNote?: string;
+};
+
+export type ExperienceSetInfo = {
+  setId: string;
+  title: string;
 };
 
 /** Imported data may use only loopback synthesis and browser-local history. */
@@ -108,6 +116,7 @@ export type SongDetail = SongInfo & {
   problems: TalkProblem[];
   verbEntries?: VerbEntry[];
   onomatopoeiaEntries?: OnomatopoeiaEntry[];
+  experienceSet?: ExperienceSetInfo;
   sourceSong?: SourceSongInfo;
 };
 

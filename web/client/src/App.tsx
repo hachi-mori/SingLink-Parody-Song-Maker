@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { defaultMemorizationSourceSongId } from '@shared/memorizationSongs';
-import type { DatasetId, OnomatopoeiaEntry, SolvedTask, SongDetail, SongInfo, VoicevoxVersionResponse } from '@shared/types';
+import type { DatasetId, SolvedTask, SongDetail, SongInfo, VoicevoxVersionResponse } from '@shared/types';
 import { fetchSongDetail, fetchSongs, checkVoicevox } from './lib/api';
 import { getStaticMemorizationSourceSongs } from './lib/staticSongs';
 import { TitleScreen } from './screens/TitleScreen';
@@ -16,7 +16,7 @@ import type { GeneratedResult } from './lib/generatedResult';
 import { useLanguage } from './lib/i18n';
 import { loadDemoBundle, type DemoBundle } from './lib/demo';
 import { completeFixedDemo, getFixedDemoQuestions, shouldCheckVoicevoxOnInitialLoad } from './lib/demoFlow';
-import { browserImportDataset, original335Dataset, readImportedDataset, supportsEnglishForDataset } from './lib/quizDatasets';
+import { browserImportDataset, original335Dataset, readImportedMaterial, supportsEnglishForDataset, type ImportedMaterial } from './lib/quizDatasets';
 
 type Screen = 'title' | 'write' | 'loading' | 'result' | 'howto' | 'credit' | 'history';
 
@@ -26,7 +26,8 @@ export function App() {
   const demoRequested = new URLSearchParams(window.location.search).get('demo') === '1';
   const [screen, setScreen] = useState<Screen>('title');
   const [songs, setSongs] = useState<SongInfo[]>([]);
-  const [importedEntries, setImportedEntries] = useState<OnomatopoeiaEntry[]>();
+  const [importedMaterial, setImportedMaterial] = useState<ImportedMaterial>();
+  const importedEntries = importedMaterial?.entries;
   const [selectedDatasetId, setSelectedDatasetId] = useState<DatasetId>('original335');
   const [activeDatasetId, setActiveDatasetId] = useState<DatasetId>('original335');
   const [selectedSongId, setSelectedSongId] = useState('');
@@ -45,7 +46,12 @@ export function App() {
   const demoRequestedRef = useRef(false);
   const importGenerationRef = useRef(0);
   const connectionGenerationRef = useRef(0);
-  const datasets = importedEntries ? [original335Dataset, browserImportDataset] : [original335Dataset];
+  const generationRetryRef = useRef<object | undefined>(undefined);
+  useEffect(() => () => { generationRetryRef.current = undefined; }, []);
+  const datasets = importedEntries ? [original335Dataset, {
+    ...browserImportDataset,
+    label: importedMaterial?.experienceSet?.title ?? browserImportDataset.label
+  }] : [original335Dataset];
 
   useLayoutEffect(() => {
     const main = document.querySelector<HTMLElement>('main');
@@ -68,7 +74,37 @@ export function App() {
     if (generation === connectionGenerationRef.current) setVoicevoxStatus(status);
   }, [voicevoxBaseUrl, selectedDatasetId]);
 
+  const cancelGenerationRetry = () => {
+    generationRetryRef.current = undefined;
+    setLoading(false);
+  };
+
+  const retrySong = async () => {
+    if (generationRetryRef.current || !songDetail || generatedResult?.status !== 'skipped') return;
+    const request = {};
+    generationRetryRef.current = request;
+    connectionGenerationRef.current += 1;
+    setLoading(true);
+    try {
+      const status = await checkVoicevox(voicevoxBaseUrl, activeDatasetId);
+      if (generationRetryRef.current !== request) return;
+      setVoicevoxStatus(status);
+      setGeneratedResult(undefined);
+      setScreen('loading');
+    } catch {
+      if (generationRetryRef.current === request) {
+        setGeneratedResult({ status: 'skipped', message: t('refreshFailed') });
+      }
+    } finally {
+      if (generationRetryRef.current === request) {
+        generationRetryRef.current = undefined;
+        setLoading(false);
+      }
+    }
+  };
+
   const clearRound = () => {
+    cancelGenerationRetry();
     setSongDetail(undefined);
     setSolvedTasks([]);
     setFullLyrics('');
@@ -85,10 +121,10 @@ export function App() {
     setLoading(true);
     setTitleError('');
     try {
-      const entries = await readImportedDataset(file);
+      const material = await readImportedMaterial(file);
       if (generation !== importGenerationRef.current) return;
       clearRound();
-      setImportedEntries(entries);
+      setImportedMaterial(material);
       setSelectedDatasetId('browserImport');
       setSelectedSongId(songs.find((song) => song.mode === 'onomatopoeiaQuiz')?.id ?? '');
       setLanguage('ja');
@@ -107,7 +143,7 @@ export function App() {
   const clearImportedDataset = () => {
     importGenerationRef.current += 1;
     clearRound();
-    setImportedEntries(undefined);
+    setImportedMaterial(undefined);
     setSelectedDatasetId('original335');
     setTitleError('');
     setLoading(false);
@@ -191,7 +227,7 @@ export function App() {
       // Imported rounds use existing metadata and local question data. Only
       // synthesis may later send text to the strictly validated loopback engine.
       const detail: SongDetail = imported
-        ? { ...importedSong!, problems: [], onomatopoeiaEntries: importedEntries }
+        ? { ...importedSong!, problems: [], onomatopoeiaEntries: importedEntries, experienceSet: importedMaterial?.experienceSet }
         : await fetchSongDetail(selectedSongId);
       let selectedDetail: SongDetail = detail;
       if (detail.mode === 'onomatopoeiaQuiz') {
@@ -281,7 +317,9 @@ export function App() {
         demoDisclosure={demoInfo?.disclosure[language]}
         demoCredits={demoInfo?.credits}
         onHistory={() => setScreen('history')}
-        onTitle={() => setScreen('title')}
+        onTitle={() => { cancelGenerationRetry(); setScreen('title'); }}
+        onRetry={retrySong}
+        retrying={loading}
       />
     );
   }
@@ -307,6 +345,7 @@ export function App() {
       datasets={datasets}
       selectedDatasetId={selectedDatasetId}
       importedEntryCount={importedEntries?.length}
+      importedExperienceSet={importedMaterial?.experienceSet}
       importedSingingReadingCount={importedEntries?.filter((entry) => entry.singingReading).length}
       onImportDataset={importDataset}
       onClearImportedDataset={clearImportedDataset}

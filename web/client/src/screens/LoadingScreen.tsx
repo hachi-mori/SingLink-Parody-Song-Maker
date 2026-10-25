@@ -22,45 +22,56 @@ type LoadingScreenProps = {
   onBack: () => void;
 };
 
-export function LoadingScreen({ song, datasetId, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, voicevoxConnected, onDone, onBack }: LoadingScreenProps) {
+type PreparedAudio = Omit<Extract<GeneratedResult, { status: 'generated' }>, 'blobUrl' | 'historyWarning'>;
+
+export function LoadingScreen({ song, datasetId, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, voicevoxConnected, onDone }: LoadingScreenProps) {
   const { language, t } = useLanguage();
-  const [message, setMessage] = useState(() => t('preparingVoice'));
-  const [error, setError] = useState('');
-  const startedRef = useRef(false);
-  const doneRef = useRef(false);
+  const [requesting, setRequesting] = useState(false);
+  // Callback and language changes must not cancel an in-flight generation.
+  const currentUi = useRef({ onDone, language, t });
+  currentUi.current = { onDone, language, t };
 
   useEffect(() => {
-    if (startedRef.current) {
-      return undefined;
-    }
-    startedRef.current = true;
     let cancelled = false;
-    const skipWithMessage = (reason: string) => {
-      if (cancelled || doneRef.current) {
-        return;
-      }
-      doneRef.current = true;
-      onDone({
-        status: 'skipped',
-        message: reason
+    let completed = false;
+    let preparedAudio: PreparedAudio | undefined;
+    const historyWarning = () => currentUi.current.language === 'en'
+      ? 'History save could not be confirmed. You can still play and download this song.'
+      : '履歴への保存を確認できませんでした。再生・ダウンロードはできます。';
+    const finish = (result: GeneratedResult) => {
+      if (cancelled || completed) return;
+      completed = true;
+      window.clearTimeout(timeout);
+      currentUi.current.onDone(result);
+    };
+    const finishAudio = (warning?: string) => {
+      if (cancelled || completed || !preparedAudio) return;
+      finish({
+        ...preparedAudio,
+        blobUrl: URL.createObjectURL(preparedAudio.blob),
+        ...(warning ? { historyWarning: warning } : {})
       });
     };
-    const skipTimer = window.setTimeout(() => {
-      skipWithMessage(t('generationTimeout'));
+    const timeout = window.setTimeout(() => {
+      if (preparedAudio) finishAudio(historyWarning());
+      else finish({ status: 'skipped', message: currentUi.current.t('generationTimeout') });
     }, 180_000);
+    setRequesting(false);
 
     const run = async () => {
+      // StrictMode cleans up its first effect before this microtask runs.
+      if (cancelled || completed) return;
       try {
         if (datasetId === 'browserImport' && tasks.filter((task) => task.singingReading).length !== 4) {
-      skipWithMessage('歌うための読みがないので、歌声はありません。');
+          finish({ status: 'skipped', message: '歌うための読みがないので、歌声はありません。' });
           return;
         }
         if (!voicevoxConnected) {
-          skipWithMessage(t('generationOffline'));
+          finish({ status: 'skipped', message: currentUi.current.t('generationOffline') });
           return;
         }
 
-        setMessage(t('requestingVoice'));
+        setRequesting(true);
         const [blob, karaokeTimings] = await Promise.all([synthesizeSong({
           datasetId,
           songId: song.id,
@@ -69,76 +80,52 @@ export function LoadingScreen({ song, datasetId, tasks, fullLyrics, inputTexts, 
           fullLyrics,
           voicevoxBaseUrl
         }, song, datasetId), buildSongKaraokeTimings(song, tasks, fullLyrics, datasetId)]);
-
-        if (cancelled || doneRef.current) {
-          return;
-        }
+        if (cancelled || completed) return;
 
         const fileName = buildGeneratedFileName(song.title);
+        preparedAudio = { status: 'generated', source: 'live', blob, fileName, karaokeTimings };
+        let warning: string | undefined;
         if (savesHistoryForDataset(datasetId)) {
-          const id = crypto.randomUUID();
-          await saveGeneratedTrack({
-            datasetId,
-            id,
-            songTitle: song.title,
-            fileName,
-            createdAt: new Date().toISOString(),
-            lyrics: fullLyrics,
-            userInputs: inputTexts,
-            voicevoxBaseUrl,
-            wavBlob: blob
-          }, datasetId);
+          try {
+            await saveGeneratedTrack({
+              datasetId,
+              id: crypto.randomUUID(),
+              songTitle: song.title,
+              fileName,
+              createdAt: new Date().toISOString(),
+              lyrics: fullLyrics,
+              userInputs: inputTexts,
+              voicevoxBaseUrl,
+              wavBlob: blob
+            }, datasetId);
+          } catch {
+            // Storage is optional: a successful synthesis remains playable.
+            warning = historyWarning();
+          }
         }
-
-        if (cancelled || doneRef.current) {
-          return;
-        }
-        doneRef.current = true;
-        onDone({
-          status: 'generated',
-          source: 'live',
-          blob,
-          blobUrl: URL.createObjectURL(blob),
-          fileName,
-          karaokeTimings
-        });
+        finishAudio(warning);
       } catch (synthesisError) {
-        skipWithMessage(language === 'en'
-          ? t('generationSkippedFallback')
-          : synthesisError instanceof Error ? synthesisError.message : String(synthesisError));
+        finish({
+          status: 'skipped',
+          message: currentUi.current.language === 'en'
+            ? currentUi.current.t('generationSkippedFallback')
+            : synthesisError instanceof Error ? synthesisError.message : String(synthesisError)
+        });
       }
     };
 
-    void run();
+    void Promise.resolve().then(run);
     return () => {
       cancelled = true;
-      window.clearTimeout(skipTimer);
+      window.clearTimeout(timeout);
     };
-  }, [song, datasetId, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, voicevoxConnected, onDone, language, t]);
-
-  const skipVoice = () => {
-    if (doneRef.current) {
-      return;
-    }
-    doneRef.current = true;
-    onDone({
-      status: 'skipped',
-      message: error || t('generationSkippedFallback')
-    });
-  };
+  }, [song, datasetId, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, voicevoxConnected]);
 
   return (
     <ScreenShell background={assetUrl('assets/texture/assets/loding_background.gif')} fit="cover">
       <section className="loading-panel">
-        <h1>{message}</h1>
-        {!error ? <div className="loading-dots"><span /><span /><span /></div> : null}
-        {error ? (
-          <>
-            <p className="error-text">{error}</p>
-            <button onClick={skipVoice}>{t('skipVoice')}</button>
-            <button onClick={onBack}>{t('backToQuiz')}</button>
-          </>
-        ) : null}
+        <h1>{requesting ? t('requestingVoice') : t('preparingVoice')}</h1>
+        <div className="loading-dots"><span /><span /><span /></div>
       </section>
     </ScreenShell>
   );
