@@ -1,5 +1,5 @@
 import { RefreshCw } from 'lucide-react';
-import type { DatasetId, QuizDataset, SongInfo, SourceSongInfo, VoicevoxVersionResponse } from '@shared/types';
+import type { DatasetId, ExperienceSetInfo, QuizDataset, SongInfo, SourceSongInfo, VoicevoxVersionResponse } from '@shared/types';
 import { AssetButton } from '../components/AssetButton';
 import { ScreenShell } from '../components/ScreenShell';
 import { SoundToggle } from '../components/SoundToggle';
@@ -11,6 +11,7 @@ type TitleScreenProps = {
   datasets: QuizDataset[];
   selectedDatasetId: DatasetId;
   importedEntryCount?: number;
+  importedExperienceSet?: ExperienceSetInfo;
   importedSingingReadingCount?: number;
   onImportDataset: (file: File) => Promise<void>;
   onClearImportedDataset: () => void;
@@ -114,7 +115,11 @@ export function TitleScreen(props: TitleScreenProps) {
                 }}
               />
               {props.importedEntryCount !== undefined ? <>
-                <p role="status">{`${props.importedEntryCount}問を読み込みました`}</p>
+                <p role="status">{props.importedExperienceSet
+                  ? props.importedExperienceSet.title + '：4問を読み込みました'
+                  : props.importedEntryCount + '問を読み込みました'}</p>
+                {props.importedExperienceSet ? <p>問題と選択肢は固定です。切替は別のJSONを選んでください。</p> : null}
+                <p>ページを更新したら、教材を読み直してください。</p>
                 <p>{`歌える問題：${props.importedSingingReadingCount ?? 0} / ${props.importedEntryCount}問`}</p>
                 {props.importedSingingReadingCount !== props.importedEntryCount ? <p>歌えない問題もあります</p> : null}
                 <button className="small-button" onClick={props.onClearImportedDataset}>もとの教材にもどす</button>

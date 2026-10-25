@@ -23,6 +23,8 @@ type ResultScreenProps = {
   demoCredits?: string[];
   onTitle: () => void;
   onHistory: () => void;
+  onRetry?: () => void;
+  retrying?: boolean;
 };
 
 type PlaybackState = 'idle' | 'playing' | 'paused' | 'ended';
@@ -56,7 +58,7 @@ function usePrefersReducedMotion(): boolean {
   return reduced;
 }
 
-export function ResultScreen({ song, datasetId, tasks, fullLyrics, result, demoDisclosure, demoCredits, onTitle, onHistory }: ResultScreenProps) {
+export function ResultScreen({ song, datasetId, tasks, fullLyrics, result, demoDisclosure, demoCredits, onTitle, onHistory, onRetry, retrying = false }: ResultScreenProps) {
   const { t } = useLanguage();
   const prefersReducedMotion = usePrefersReducedMotion();
   const audioContextRef = useRef<AudioContext | undefined>(undefined);
@@ -316,8 +318,10 @@ export function ResultScreen({ song, datasetId, tasks, fullLyrics, result, demoD
             <div className="result-notice">
               <strong>{t('audioSkipped')}</strong>
               <p>{result.status === 'skipped' ? result.message : ''}</p>
+              {onRetry ? <button onClick={onRetry} disabled={retrying}>{retrying ? '接続を確認中…' : '歌を作り直す'}</button> : null}
             </div>
           )}
+          {generatedAudio && result.historyWarning ? <p className="result-notice" role="status">{result.historyWarning}</p> : null}
           {playError ? <p className="error-text" role="alert">{playError}</p> : null}
           {isDemo && demoCredits?.length ? (
             <p className="demo-credits">{demoCredits.join(' / ')}</p>

@@ -8,6 +8,7 @@ export type GeneratedResult =
       fileName: string;
       karaokeTimings: KaraokeLineTiming[];
       source: 'live' | 'demo';
+      historyWarning?: string;
     }
   | {
       status: 'skipped';

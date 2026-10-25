@@ -1,4 +1,4 @@
-import type { DatasetId, OnomatopoeiaEntry, QuizDataset } from '@shared/types';
+import type { DatasetId, ExperienceSetInfo, OnomatopoeiaEntry, QuizDataset } from '@shared/types';
 
 export const original335Dataset: QuizDataset = {
   id: 'original335',
@@ -47,7 +47,7 @@ export function assertPublicDataset(datasetId: DatasetId): void {
 
 function invalidFile(): never {
   // Never include a filename, JSON parser error or any teaching text in errors.
-  throw new Error('教材JSONの形式が正しくありません。4〜1000件の異なる答えと、意味・穴埋め問題または答えを含む例文を確認してください。');
+  throw new Error('教材JSONの形式が正しくありません。通常教材は4〜1000件、体験セットは4問・各3択と正解・例文・歌唱読みを確認してください。');
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -97,7 +97,42 @@ function parseEntry(value: unknown): OnomatopoeiaEntry {
   return { word: answer, reading, answer, explanation, questionText, displayText, singingReading };
 }
 
-export function parseImportedDataset(text: string): OnomatopoeiaEntry[] {
+export type ImportedMaterial = {
+  entries: OnomatopoeiaEntry[];
+  experienceSet?: ExperienceSetInfo;
+};
+
+function readIdentifier(value: unknown): string {
+  const identifier = readText(value, 80);
+  if (!/^[a-zA-Z0-9][a-zA-Z0-9_-]*$/u.test(identifier)) invalidFile();
+  return identifier;
+}
+
+function parseExperienceSet(value: Record<string, unknown>): ImportedMaterial {
+  if (value.format !== 'singlink-experience-set' || value.version !== 1
+    || !Array.isArray(value.entries) || value.entries.length !== 4
+    || value.records !== undefined) invalidFile();
+  const experienceSet = { setId: readIdentifier(value.setId), title: readText(value.title, 120) };
+  const entries = value.entries.map((raw) => {
+    if (!isRecord(raw)) invalidFile();
+    const entry = parseEntry(raw);
+    // A fixed set needs an unambiguous blank and the matching complete lyric.
+    const questionText = readText(raw.questionText);
+    if (questionText.split('○○').length !== 2
+      || readText(raw.displayText) !== questionText.replace('○○', entry.answer)) invalidFile();
+    const singingReading = readText(raw.singingReading);
+    const id = readIdentifier(raw.id);
+    if (!Array.isArray(raw.choices) || raw.choices.length !== 3) invalidFile();
+    const choices = raw.choices.map((choice) => readText(choice, importLimits.answerCharacters));
+    if (new Set(choices).size !== 3 || choices.filter((choice) => choice === entry.answer).length !== 1) invalidFile();
+    return { ...entry, id, choices, singingReading };
+  });
+  if (new Set(entries.map((entry) => entry.answer)).size !== 4
+    || new Set(entries.map((entry) => entry.id)).size !== 4) invalidFile();
+  return { entries, experienceSet };
+}
+
+export function parseImportedMaterial(text: string): ImportedMaterial {
   if (new TextEncoder().encode(text).byteLength > importLimits.bytes) {
     throw new Error('教材ファイルは2 MiB以下にしてください。');
   }
@@ -108,6 +143,11 @@ export function parseImportedDataset(text: string): OnomatopoeiaEntry[] {
     invalidFile();
   }
   if (!isRecord(value)) invalidFile();
+  // Only these root markers opt into the strict fixed-set contract. Other
+  // format metadata belongs to legacy imports and remains ignored.
+  const hasFixedSetMarker = Object.hasOwn(value, 'setId')
+    || (typeof value.format === 'string' && value.format.trim().startsWith('singlink-experience-set'));
+  if (hasFixedSetMarker) return parseExperienceSet(value);
   const legacy = Array.isArray(value.records);
   const rows = legacy ? value.records : value.entries;
   if (!Array.isArray(rows) || rows.length < importLimits.minEntries || rows.length > importLimits.maxEntries) invalidFile();
@@ -116,10 +156,15 @@ export function parseImportedDataset(text: string): OnomatopoeiaEntry[] {
   if (readings && Object.keys(readings).length > importLimits.maxEntries) invalidFile();
   const entries = rows.map((row) => legacy ? parseLegacyEntry(row, readings) : parseEntry(row));
   if (new Set(entries.map((entry) => entry.answer)).size !== entries.length) invalidFile();
-  return entries;
+  return { entries };
 }
 
-export async function readImportedDataset(file: Pick<File, 'name' | 'type' | 'size' | 'text'>): Promise<OnomatopoeiaEntry[]> {
+/** Kept for callers that only need the parsed entries. */
+export function parseImportedDataset(text: string): OnomatopoeiaEntry[] {
+  return parseImportedMaterial(text).entries;
+}
+
+export async function readImportedMaterial(file: Pick<File, 'name' | 'type' | 'size' | 'text'>): Promise<ImportedMaterial> {
   if (!Number.isSafeInteger(file.size) || file.size < 1 || file.size > importLimits.bytes) {
     throw new Error('空でない2 MiB以下の教材JSONを選んでください。');
   }
@@ -133,5 +178,10 @@ export async function readImportedDataset(file: Pick<File, 'name' | 'type' | 'si
   } catch {
     throw new Error('教材ファイルを読み込めませんでした。現在の教材は変更していません。');
   }
-  return parseImportedDataset(text);
+  return parseImportedMaterial(text);
+}
+
+/** Kept for existing import integrations. */
+export async function readImportedDataset(file: Pick<File, 'name' | 'type' | 'size' | 'text'>): Promise<OnomatopoeiaEntry[]> {
+  return (await readImportedMaterial(file)).entries;
 }
