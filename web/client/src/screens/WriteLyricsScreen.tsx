@@ -300,57 +300,59 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
   return (
     <ScreenShell background={assetUrl('assets/texture/assets/game_background2.gif')} fit="cover">
       <div className="sound-toggle-slot" inert={feedback?.active}><SoundToggle /></div>
-      <section className="game-hud" inert={feedback?.active}>
-        <span>{song.experienceSet ? `${song.experienceSet.title} · ` : ''}{Math.min(currentIndex + 1, problemCount)} / {problemCount}</span>
-        <strong className={remainingSeconds <= 3 ? 'danger-time' : ''}>{remainingSeconds}</strong>
-        <button className="small-button" onClick={onCancel} disabled={feedback?.active}>{t('backToTitle')}</button>
-      </section>
-      <section className="game-card" ref={gameCardRef} inert={feedback?.active} onKeyDownCapture={preventRepeatedActivation}>
-        {isCardOnomatopoeiaProblem && currentOnomatopoeia?.questionText ? (
-          <section className="game-question-card">
-            <p className="game-question-prompt">{makeQuestionDisplayText(currentIndex, t('fillBlank'))}</p>
-            <p className="game-question-example">{currentOnomatopoeia.questionText}</p>
-          </section>
-        ) : (
-          <h1>{makeQuestionDisplayText(currentIndex, topic)}</h1>
-        )}
+      <div className="game-layout">
+        <section className="game-hud" inert={feedback?.active}>
+          <span>{song.experienceSet ? `${song.experienceSet.title} · ` : ''}{Math.min(currentIndex + 1, problemCount)} / {problemCount}</span>
+          <strong className={remainingSeconds <= 3 ? 'danger-time' : ''}>{remainingSeconds}</strong>
+          <button className="small-button" onClick={onCancel} disabled={feedback?.active}>{t('backToTitle')}</button>
+        </section>
+        <section className="game-card" ref={gameCardRef} inert={feedback?.active} onKeyDownCapture={preventRepeatedActivation}>
+          {isCardOnomatopoeiaProblem && currentOnomatopoeia?.questionText ? (
+            <section className="game-question-card">
+              <p className="game-question-prompt">{makeQuestionDisplayText(currentIndex, t('fillBlank'))}</p>
+              <p className="game-question-example">{currentOnomatopoeia.questionText}</p>
+            </section>
+          ) : (
+            <h1>{makeQuestionDisplayText(currentIndex, topic)}</h1>
+          )}
 
-        {song.mode === 'freeText' ? (
-          <form
-            className="answer-form"
-            onSubmit={(event) => {
-              event.preventDefault();
-              submitFreeText();
-            }}
-          >
-            <input value={input} onChange={(event) => setInput(event.target.value)} autoFocus placeholder={t('answerPlaceholder')} />
-            <button type="submit">{t('submit')}</button>
-          </form>
-        ) : null}
+          {song.mode === 'freeText' ? (
+            <form
+              className="answer-form"
+              onSubmit={(event) => {
+                event.preventDefault();
+                submitFreeText();
+              }}
+            >
+              <input value={input} onChange={(event) => setInput(event.target.value)} autoFocus placeholder={t('answerPlaceholder')} />
+              <button type="submit">{t('submit')}</button>
+            </form>
+          ) : null}
 
-        {song.mode === 'verbQuiz' ? (
-          <div className="choice-grid">
-            {(verbOptions?.options ?? []).map((entry, index) => (
-              <button data-sfx="off" key={`${entry.word}-${entry.reading}-${index}`} onClick={() => submitVerb(entry, index)}>
-                <small>{entry.reading}</small>
-                <span>{index + 1} {entry.word}</span>
-              </button>
-            ))}
-          </div>
-        ) : null}
+          {song.mode === 'verbQuiz' ? (
+            <div className="choice-grid">
+              {(verbOptions?.options ?? []).map((entry, index) => (
+                <button data-sfx="off" key={`${entry.word}-${entry.reading}-${index}`} onClick={() => submitVerb(entry, index)}>
+                  <small>{entry.reading}</small>
+                  <span>{index + 1} {entry.word}</span>
+                </button>
+              ))}
+            </div>
+          ) : null}
 
-        {song.mode === 'onomatopoeiaQuiz' ? (
-          <div className="choice-grid">
-            {(onomatopoeiaOptions?.options ?? []).map((answer, index) => (
-              <button data-sfx="off" key={`${answer}-${index}`} disabled={answerLocked} onClick={() => submitOnomatopoeia(answer)}>
-                <span>{index + 1} {answer}</span>
-              </button>
-            ))}
-          </div>
-        ) : null}
+          {song.mode === 'onomatopoeiaQuiz' ? (
+            <div className="choice-grid">
+              {(onomatopoeiaOptions?.options ?? []).map((answer, index) => (
+                <button data-sfx="off" key={`${answer}-${index}`} disabled={answerLocked} onClick={() => submitOnomatopoeia(answer)}>
+                  <span>{index + 1} {answer}</span>
+                </button>
+              ))}
+            </div>
+          ) : null}
 
-        {error ? <p className="error-text">{error}</p> : null}
-      </section>
+          {error ? <p className="error-text">{error}</p> : null}
+        </section>
+      </div>
 
       {feedback?.active ? (
         <section
