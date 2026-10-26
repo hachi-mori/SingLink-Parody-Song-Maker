@@ -32,6 +32,51 @@ function setup(options: { decode?: () => Promise<AudioBuffer>; fetchAudio?: () =
 }
 
 describe('sound effects', () => {
+  it.each([['incorrect', 'correct'], ['correct', 'incorrect']] as const)(
+    'replaces %s feedback immediately when the next accepted answer is %s', async (previous, next) => {
+      const { player, sources, setTime, gains } = setup();
+      player.unlock();
+      await player.play(previous);
+      expect(sources).toHaveLength(1);
+      setTime(100);
+      await player.play(next);
+      expect(sources[0].stop).toHaveBeenCalledOnce();
+      expect(sources).toHaveLength(2);
+      expect(gains.at(-1)!.gain.value).toBe(soundEffects[next].gain);
+    }
+  );
+
+  it('stops contradictory feedback even if decoding the new sound fails', async () => {
+    let calls = 0;
+    let failCorrect!: (reason: Error) => void;
+    const pendingCorrect = new Promise<AudioBuffer>((_resolve, reject) => { failCorrect = reject; });
+    const { player, sources, setTime } = setup({
+      decode: () => ++calls === 2 ? pendingCorrect : Promise.resolve({ duration: 0.32 } as AudioBuffer)
+    });
+    player.unlock();
+    await player.play('incorrect');
+    setTime(100);
+    const next = player.play('correct');
+    expect(sources[0].stop).toHaveBeenCalledOnce();
+    failCorrect(new Error('Synthetic decode failure'));
+    await next;
+    expect(sources).toHaveLength(1);
+  });
+
+  it('does not play a pending incorrect sound after a newer correct answer', async () => {
+    let resolveDecode!: (value: AudioBuffer) => void;
+    const decoded = new Promise<AudioBuffer>(resolve => { resolveDecode = resolve; });
+    const { player, sources, setTime, gains } = setup({ decode: () => decoded });
+    player.unlock();
+    const previous = player.play('incorrect');
+    setTime(100);
+    const next = player.play('correct');
+    resolveDecode({ duration: 0.32 } as AudioBuffer);
+    await Promise.all([previous, next]);
+    expect(sources).toHaveLength(1);
+    expect(gains.at(-1)!.gain.value).toBe(soundEffects.correct.gain);
+  });
+
   it('preloads only three local files and never plays before a gesture', async () => {
     const { player, sources, fetchAudio } = setup();
     player.preload();

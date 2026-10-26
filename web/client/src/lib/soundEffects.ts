@@ -35,6 +35,7 @@ export class SoundEffectsPlayer {
   private generation = 0;
   private lastRequest = -Infinity;
   private feedbackUntil = -Infinity;
+  private lastFeedback?: SoundEffect;
 
   constructor(private environment: SoundEnvironment = browserEnvironment) {}
 
@@ -102,9 +103,15 @@ export class SoundEffectsPlayer {
       const requestedAt = this.environment.now();
       if (!this.enabled || !this.context || !this.output) return;
       if (name === 'button' && (requestedAt < this.feedbackUntil || requestedAt - this.lastRequest < 100)) return;
-      if (name !== 'button' && requestedAt < this.feedbackUntil) return;
+      if (name !== 'button' && name === this.lastFeedback && requestedAt < this.feedbackUntil) return;
       this.lastRequest = requestedAt;
-      if (name !== 'button') this.feedbackUntil = requestedAt + 400;
+      if (name !== 'button') {
+        // A newly accepted opposite answer supersedes the previous feedback,
+        // including while its audio is still decoding or cannot be played.
+        this.lastFeedback = name;
+        this.feedbackUntil = requestedAt + 400;
+        this.stopActive();
+      }
       const generation = ++this.generation;
       await this.resumeReady;
       const buffer = await this.decode(name);
