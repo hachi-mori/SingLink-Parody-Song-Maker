@@ -129,7 +129,7 @@ export function LoadingScreen({ song, datasetId, tasks, fullLyrics, inputTexts, 
   }, [song, datasetId, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, voicevoxConnected, voicevoxChecking]);
 
   return (
-    <ScreenShell background={assetUrl('assets/texture/assets/loding_background.gif')} fit="cover">
+    <ScreenShell background={assetUrl('assets/texture/assets/loding_background.gif')} fit="cover" centered>
       <section className="loading-panel">
         <h1>{voicevoxChecking ? t('voicevoxChecking') : requesting ? t('requestingVoice') : t('preparingVoice')}</h1>
         <div className="loading-dots"><span /><span /><span /></div>
