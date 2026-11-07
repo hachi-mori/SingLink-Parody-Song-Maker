@@ -193,9 +193,25 @@ describe('App experience-set import and selection lifecycle', () => {
     expectFixedQuestion(a);
     await click(element<HTMLButtonElement>('.choice-grid button:nth-child(2)'));
     expect(element('.feedback-panel h2').textContent).toBe('せいかい！');
+    expect(host.querySelector('.feedback-answer-selected')).toBeNull();
+    expect(element('.feedback-answer-correct p').textContent).toBe(a.entries[0]!.explanation);
     await click(button('つぎへ'));
     expectFixedQuestion(a, 1);
     expect(api.fetchSongDetail).not.toHaveBeenCalled();
+  });
+
+  it('pairs each wrong and correct answer with its own meaning in the immediate feedback', async () => {
+    const a = fixedSet('A');
+    const [correct, selected] = a.entries;
+    correct!.choices[0] = selected!.answer;
+    await importFile(a);
+    await startQuiz();
+    await click(element<HTMLButtonElement>('.choice-grid button:nth-child(1)'));
+    expect(element('.feedback-label').textContent).toBe('もんだい:');
+    expect(element('.feedback-answer-selected strong').textContent).toBe(selected!.answer);
+    expect(element('.feedback-answer-selected p').textContent).toBe(selected!.explanation);
+    expect(element('.feedback-answer-correct strong').textContent).toBe(correct!.answer);
+    expect(element('.feedback-answer-correct p').textContent).toBe(correct!.explanation);
   });
 
   it('replaces A with B and starts B at question one without A answers or round state', async () => {
@@ -205,6 +221,7 @@ describe('App experience-set import and selection lifecycle', () => {
     await startQuiz();
     await click(element<HTMLButtonElement>('.choice-grid button:nth-child(1)'));
     expect(element('.feedback-panel h2').textContent).toBe('ふせいかい');
+    expect(element('.feedback-answer-selected p').textContent).toBe('この教材には意味の説明がありません。');
     await click(button('つぎへ'));
     expectFixedQuestion(a, 1);
     await click(button('タイトルへ'));

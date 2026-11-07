@@ -593,10 +593,48 @@ button:disabled {
   line-height: 1.28;
 }
 
-.feedback-panel small {
-  max-width: 880px;
+.feedback-answers {
+  display: grid;
+  gap: 10px;
+  width: min(100%, 640px);
+  text-align: start;
+}
+
+.feedback-answer {
+  display: grid;
+  gap: 4px;
+  padding: 8px 14px;
+  border-inline-start: 5px solid;
+  border-radius: 12px;
+  overflow-wrap: anywhere;
+}
+
+.feedback-answer-selected {
+  background: #f5e5dc;
+  border-color: #9b4938;
+}
+
+.feedback-answer-correct {
+  background: #e7f0df;
+  border-color: #497044;
+}
+
+.feedback-answer-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.75em;
+  font-size: clamp(16px, 1.8vw, 22px);
+  font-weight: 700;
+}
+
+.feedback-answer-heading strong {
+  font-size: clamp(24px, 3vw, 38px);
+}
+
+.feedback-panel .feedback-answer p {
   color: var(--brown);
-  font-size: clamp(21px, 2vw, 28px);
+  font-size: clamp(18px, 2vw, 26px);
   line-height: 1.45;
 }
 
