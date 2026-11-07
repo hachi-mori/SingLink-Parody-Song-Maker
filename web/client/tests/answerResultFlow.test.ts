@@ -179,6 +179,9 @@ describe('accepted quiz answers stay aligned with generated lyric badges', () =>
     await startRound();
     await act(async () => { vi.setSystemTime(Date.now()+60_000); correctChoice(0).click(); });
     expect(host.querySelector('.feedback-panel h2')?.textContent).toBe('タイムアップ！');
+    expect(host.querySelector('.feedback-answer-selected strong')?.textContent).toBe('こたえなし');
+    expect(host.querySelector('.feedback-answer-selected p')).toBeNull();
+    expect(host.querySelector('.feedback-answer-correct p')?.textContent).toBe(fixture.entries[0]!.explanation);
     await click(button('つぎへ'));
     for(let index=1;index<4;index++) { await click(correctChoice(index)); await click(button('つぎへ')); }
     expect(resultCorrectness()).toEqual([false,true,true,true]);

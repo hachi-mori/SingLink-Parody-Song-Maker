@@ -40,6 +40,7 @@ type AnswerFeedback = {
   timeUp: boolean;
   question: string;
   selected: string;
+  selectedExplanation?: string;
   correctAnswer: string;
   explanation: string;
   answerForRecord: string;
@@ -179,12 +180,18 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
     const deadline = problemStartedAt + timeLimit * 1000;
     const timeUp = now >= deadline;
     if (answer === undefined && !timeUp) return;
+    const selectedEntry = !timeUp && answer !== currentOnomatopoeia.answer
+      ? (fixedOnomatopoeiaEntries ?? song.onomatopoeiaEntries)?.find((entry) => entry.answer === answer)
+      : undefined;
     const accepted = questionGate.current.settle(currentIndex, {
       active: true,
       correct: !timeUp && answer === currentOnomatopoeia.answer,
       timeUp,
       question: currentOnomatopoeia.questionText ?? currentOnomatopoeia.word,
       selected: timeUp ? t('unanswered') : answer!,
+      selectedExplanation: showEnglishLearningSupport && selectedEntry
+        ? selectedEntry.englishMeaning ?? t('translationUnavailable')
+        : selectedEntry?.explanation,
       correctAnswer: currentOnomatopoeia.answer,
       explanation: showEnglishLearningSupport
         ? currentOnomatopoeia.englishMeaning ?? t('translationUnavailable')
@@ -208,7 +215,7 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
     if (currentProblem) {
       advance(makeTimedOutTask(currentProblem), 'タイムアップ');
     }
-  }, [started, feedback, remainingSeconds, problemCount, song.mode, currentOnomatopoeia, currentProblem, showEnglishLearningSupport, t]);
+  }, [started, feedback, remainingSeconds, problemCount, song.mode, song.onomatopoeiaEntries, fixedOnomatopoeiaEntries, currentOnomatopoeia, currentProblem, showEnglishLearningSupport, t]);
 
   const submitFreeText = () => {
     if (!currentProblem) {
@@ -370,9 +377,24 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
             <div className="judge-mark">{feedback.correct ? '○' : '×'}</div>
             <h2 id={feedbackTitleId}>{feedback.timeUp ? t('timeUp') : feedback.correct ? t('correct') : t('incorrect')}</h2>
             <p><span className="feedback-label">{t('prompt')}:</span> {feedback.question}</p>
-            <p><span className="feedback-label">{t('yourAnswer')}:</span> {feedback.selected}</p>
-            <p><span className="feedback-label">{t('correctAnswer')}:</span> {feedback.correctAnswer}</p>
-            <small>{feedback.explanation}</small>
+            <div className="feedback-answers">
+              {!feedback.correct && (
+                <div className="feedback-answer feedback-answer-selected">
+                  <div className="feedback-answer-heading">
+                    <span>{t('yourAnswer')}</span>
+                    <strong>{feedback.selected}</strong>
+                  </div>
+                  {!feedback.timeUp && <p>{feedback.selectedExplanation || t('answerMeaningUnavailable')}</p>}
+                </div>
+              )}
+              <div className="feedback-answer feedback-answer-correct">
+                <div className="feedback-answer-heading">
+                  <span>{t('correctAnswer')}</span>
+                  <strong>{feedback.correctAnswer}</strong>
+                </div>
+                <p>{feedback.explanation}</p>
+              </div>
+            </div>
             <button ref={nextButtonRef} onClick={advanceFeedback}>{t('next')}</button>
           </div>
         </section>
