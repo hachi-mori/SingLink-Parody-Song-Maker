@@ -17,7 +17,7 @@ type LoadingScreenProps = {
   fullLyrics: string;
   inputTexts: string[];
   voicevoxBaseUrl: string;
-  voicevoxConnected: boolean;
+  voicevoxConnected: boolean | undefined;
   onDone: (result: GeneratedResult) => void;
   onBack: () => void;
 };
@@ -67,7 +67,10 @@ export function LoadingScreen({ song, datasetId, tasks, fullLyrics, inputTexts, 
           return;
         }
         if (!voicevoxConnected) {
-          finish({ status: 'skipped', message: currentUi.current.t('generationOffline') });
+          finish({
+            status: 'skipped',
+            message: currentUi.current.t(voicevoxConnected === undefined ? 'generationVoicevoxUnchecked' : 'generationOffline')
+          });
           return;
         }
 

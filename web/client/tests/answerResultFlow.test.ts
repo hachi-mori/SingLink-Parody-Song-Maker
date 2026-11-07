@@ -108,6 +108,7 @@ async function startRound(value: unknown = fixture) {
     Object.defineProperty(input, 'files', { configurable: true, value: [file] });
     input.dispatchEvent(new Event('change', { bubbles: true }));
   });
+  await click(button('VOICEVOXに接続'));
   await click(button('スタート'));
   await act(async () => { await vi.advanceTimersByTimeAsync(3000); });
 }

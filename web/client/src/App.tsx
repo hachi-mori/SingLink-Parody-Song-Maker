@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { defaultMemorizationSourceSongId } from '@shared/memorizationSongs';
-import type { DatasetId, SolvedTask, SongDetail, SongInfo, VoicevoxVersionResponse } from '@shared/types';
-import { fetchSongDetail, fetchSongs, checkVoicevox } from './lib/api';
+import type { DatasetId, SolvedTask, SongDetail, SongInfo } from '@shared/types';
+import { fetchSongDetail, fetchSongs, checkVoicevox, type VoicevoxCheckResult } from './lib/api';
+import { usesDirectVoicevox } from './lib/localVoicevox';
 import { getStaticMemorizationSourceSongs } from './lib/staticSongs';
 import { TitleScreen } from './screens/TitleScreen';
 import { WriteLyricsScreen } from './screens/WriteLyricsScreen';
@@ -15,7 +16,7 @@ import { assetUrl } from './lib/assets';
 import type { GeneratedResult } from './lib/generatedResult';
 import { useLanguage } from './lib/i18n';
 import { loadDemoBundle, type DemoBundle } from './lib/demo';
-import { completeFixedDemo, getFixedDemoQuestions, shouldCheckVoicevoxOnInitialLoad } from './lib/demoFlow';
+import { completeFixedDemo, getFixedDemoQuestions } from './lib/demoFlow';
 import { browserImportDataset, original335Dataset, readImportedMaterial, supportsEnglishForDataset, type ImportedMaterial } from './lib/quizDatasets';
 
 type Screen = 'title' | 'write' | 'loading' | 'result' | 'howto' | 'credit' | 'history';
@@ -34,7 +35,8 @@ export function App() {
   const [selectedSourceSongId, setSelectedSourceSongId] = useState(defaultMemorizationSourceSongId);
   const [songDetail, setSongDetail] = useState<SongDetail>();
   const [voicevoxBaseUrl, setVoicevoxBaseUrl] = useState('http://localhost:50021');
-  const [voicevoxStatus, setVoicevoxStatus] = useState<VoicevoxVersionResponse>();
+  const [voicevoxStatus, setVoicevoxStatus] = useState<VoicevoxCheckResult>();
+  const [checkingVoicevox, setCheckingVoicevox] = useState(false);
   const [loading, setLoading] = useState(false);
   const [titleError, setTitleError] = useState('');
   const [solvedTasks, setSolvedTasks] = useState<SolvedTask[]>([]);
@@ -68,11 +70,22 @@ export function App() {
     };
   }, [screen]);
 
-  const refreshVoicevox = useCallback(async () => {
+  const resetVoicevoxCheck = () => {
+    connectionGenerationRef.current += 1;
+    setCheckingVoicevox(false);
+    setVoicevoxStatus(undefined);
+  };
+
+  const refreshVoicevox = async (baseUrl: string) => {
     const generation = ++connectionGenerationRef.current;
-    const status = await checkVoicevox(voicevoxBaseUrl, selectedDatasetId);
-    if (generation === connectionGenerationRef.current) setVoicevoxStatus(status);
-  }, [voicevoxBaseUrl, selectedDatasetId]);
+    setVoicevoxBaseUrl(baseUrl);
+    setVoicevoxStatus(undefined);
+    setCheckingVoicevox(true);
+    const status = await checkVoicevox(baseUrl, selectedDatasetId);
+    if (generation !== connectionGenerationRef.current) return;
+    setVoicevoxStatus(status);
+    setCheckingVoicevox(false);
+  };
 
   const cancelGenerationRetry = () => {
     generationRetryRef.current = undefined;
@@ -83,12 +96,21 @@ export function App() {
     if (generationRetryRef.current || !songDetail || generatedResult?.status !== 'skipped') return;
     const request = {};
     generationRetryRef.current = request;
-    connectionGenerationRef.current += 1;
+    resetVoicevoxCheck();
     setLoading(true);
     try {
       const status = await checkVoicevox(voicevoxBaseUrl, activeDatasetId);
       if (generationRetryRef.current !== request) return;
       setVoicevoxStatus(status);
+      if (!status.ok) {
+        setGeneratedResult({
+          status: 'skipped',
+          message: status.failure === 'permissionDenied'
+            ? t('voicevoxPermissionDenied')
+            : `${t('voicevoxConnectionFailed')} ${t('voicevoxConnectionHelp')}`
+        });
+        return;
+      }
       setGeneratedResult(undefined);
       setScreen('loading');
     } catch {
@@ -128,9 +150,8 @@ export function App() {
       setSelectedDatasetId('browserImport');
       setSelectedSongId(songs.find((song) => song.mode === 'onomatopoeiaQuiz')?.id ?? '');
       setLanguage('ja');
-      connectionGenerationRef.current += 1;
+      resetVoicevoxCheck();
       setVoicevoxBaseUrl('http://localhost:50021');
-      setVoicevoxStatus(undefined);
     } catch (error) {
       if (generation === importGenerationRef.current) {
         setTitleError(error instanceof Error ? error.message : '教材を読み込めませんでした。現在の教材は変更していません。');
@@ -143,6 +164,7 @@ export function App() {
   const clearImportedDataset = () => {
     importGenerationRef.current += 1;
     clearRound();
+    resetVoicevoxCheck();
     setImportedMaterial(undefined);
     setSelectedDatasetId('original335');
     setTitleError('');
@@ -198,11 +220,6 @@ export function App() {
       setSelectedSongId(songs.find((song) => song.mode === 'onomatopoeiaQuiz')?.id ?? '');
     }
   }, [selectedDatasetId, selectedSongId, songs]);
-
-  useEffect(() => {
-    if (!shouldCheckVoicevoxOnInitialLoad(window.location.search)) return;
-    void refreshVoicevox();
-  }, [refreshVoicevox]);
 
   useEffect(() => {
     if (demoRequestedRef.current || !demoRequested) return;
@@ -296,7 +313,7 @@ export function App() {
         fullLyrics={fullLyrics}
         inputTexts={inputTexts}
         voicevoxBaseUrl={voicevoxBaseUrl}
-        voicevoxConnected={voicevoxStatus?.ok !== false}
+        voicevoxConnected={voicevoxStatus?.ok ?? (usesDirectVoicevox(activeDatasetId) ? undefined : true)}
         onBack={() => setScreen('write')}
         onDone={(result) => {
           setGeneratedResult(result);
@@ -355,16 +372,21 @@ export function App() {
       sourceSelectionEnabled={songs.find((song) => song.id === selectedSongId)?.mode === 'onomatopoeiaQuiz'}
       voicevoxBaseUrl={voicevoxBaseUrl}
       voicevoxStatus={voicevoxStatus}
+      checkingVoicevox={checkingVoicevox}
       loading={loading}
       error={titleError}
       onSelectSong={setSelectedSongId}
       onSelectDataset={(datasetId) => {
         clearRound();
+        resetVoicevoxCheck();
         setSelectedDatasetId(datasetId);
         if (!supportsEnglishForDataset(datasetId)) setLanguage('ja');
       }}
       onSelectSourceSong={setSelectedSourceSongId}
-      onBaseUrlChange={setVoicevoxBaseUrl}
+      onBaseUrlChange={(baseUrl) => {
+        resetVoicevoxCheck();
+        setVoicevoxBaseUrl(baseUrl);
+      }}
       onCheckVoicevox={refreshVoicevox}
       onStart={startGame}
       onOpenHowTo={() => setScreen('howto')}
