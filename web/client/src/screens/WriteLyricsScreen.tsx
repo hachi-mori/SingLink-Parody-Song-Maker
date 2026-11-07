@@ -94,6 +94,7 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
   const [feedback, setFeedback] = useState<Readonly<AnswerFeedback>>();
   const questionGate = useRef(createQuestionGate<AnswerFeedback>());
   const nextButtonRef = useRef<HTMLButtonElement>(null);
+  const feedbackPanelRef = useRef<HTMLDivElement>(null);
   const gameCardRef = useRef<HTMLElement>(null);
   const feedbackTitleId = useId();
 
@@ -124,7 +125,12 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
 
   useEffect(() => {
     if (feedback?.active) {
-      nextButtonRef.current?.focus();
+      const panel = feedbackPanelRef.current;
+      if (panel && panel.scrollHeight > panel.clientHeight) {
+        panel.focus({ preventScroll: true });
+      } else {
+        nextButtonRef.current?.focus({ preventScroll: true });
+      }
     } else if (started && !answerLocked) {
       gameCardRef.current?.querySelector<HTMLElement>('input:not(:disabled), button:not(:disabled)')?.focus();
     }
@@ -277,7 +283,7 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
   if (!started) {
     const remaining = Math.max(0, countdownSeconds - Math.floor((Date.now() - countdownStartedAt) / 1000));
     return (
-      <ScreenShell background={assetUrl('assets/texture/assets/result_background.png')} fit="cover">
+      <ScreenShell background={assetUrl('assets/texture/assets/result_background.png')} fit="cover" centered>
         <section className="countdown-screen">
           <p>{song.experienceSet?.title ?? song.title}</p>
           <strong>{remaining > 0 ? remaining : 'START!'}</strong>
@@ -307,57 +313,62 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
   return (
     <ScreenShell background={assetUrl('assets/texture/assets/game_background2.gif')} fit="cover">
       <div className="sound-toggle-slot" inert={feedback?.active}><SoundToggle /></div>
-      <section className="game-hud" inert={feedback?.active}>
-        <span>{song.experienceSet ? `${song.experienceSet.title} · ` : ''}{Math.min(currentIndex + 1, problemCount)} / {problemCount}</span>
-        <strong className={remainingSeconds <= 3 ? 'danger-time' : ''}>{remainingSeconds}</strong>
-        <button className="small-button" onClick={onCancel} disabled={feedback?.active}>{t('backToTitle')}</button>
-      </section>
-      <section className="game-card" ref={gameCardRef} inert={feedback?.active} onKeyDownCapture={preventRepeatedActivation}>
-        {isCardOnomatopoeiaProblem && currentOnomatopoeia?.questionText ? (
-          <section className="game-question-card">
-            <p className="game-question-prompt">{makeQuestionDisplayText(currentIndex, t('fillBlank'))}</p>
-            <p className="game-question-example">{currentOnomatopoeia.questionText}</p>
-          </section>
-        ) : (
-          <h1>{makeQuestionDisplayText(currentIndex, topic)}</h1>
-        )}
+      <div className="game-layout">
+        <section className="game-hud" inert={feedback?.active}>
+          <span>
+            {song.experienceSet ? <small>{song.experienceSet.title}</small> : null}
+            <span className="game-progress">{Math.min(currentIndex + 1, problemCount)} / {problemCount}</span>
+          </span>
+          <strong className={remainingSeconds <= 3 ? 'danger-time' : ''}>{remainingSeconds}</strong>
+          <button className="small-button" onClick={onCancel} disabled={feedback?.active}>{t('backToTitle')}</button>
+        </section>
+        <section className="game-card" ref={gameCardRef} inert={feedback?.active} onKeyDownCapture={preventRepeatedActivation}>
+          {isCardOnomatopoeiaProblem && currentOnomatopoeia?.questionText ? (
+            <section className="game-question-card">
+              <p className="game-question-prompt">{makeQuestionDisplayText(currentIndex, t('fillBlank'))}</p>
+              <p className="game-question-example">{currentOnomatopoeia.questionText}</p>
+            </section>
+          ) : (
+            <h1>{makeQuestionDisplayText(currentIndex, topic)}</h1>
+          )}
 
-        {song.mode === 'freeText' ? (
-          <form
-            className="answer-form"
-            onSubmit={(event) => {
-              event.preventDefault();
-              submitFreeText();
-            }}
-          >
-            <input value={input} onChange={(event) => setInput(event.target.value)} autoFocus placeholder={t('answerPlaceholder')} />
-            <button type="submit">{t('submit')}</button>
-          </form>
-        ) : null}
+          {song.mode === 'freeText' ? (
+            <form
+              className="answer-form"
+              onSubmit={(event) => {
+                event.preventDefault();
+                submitFreeText();
+              }}
+            >
+              <input value={input} onChange={(event) => setInput(event.target.value)} autoFocus placeholder={t('answerPlaceholder')} />
+              <button type="submit">{t('submit')}</button>
+            </form>
+          ) : null}
 
-        {song.mode === 'verbQuiz' ? (
-          <div className="choice-grid">
-            {(verbOptions?.options ?? []).map((entry, index) => (
-              <button data-sfx="off" key={`${entry.word}-${entry.reading}-${index}`} onClick={() => submitVerb(entry, index)}>
-                <small>{entry.reading}</small>
-                <span>{index + 1} {entry.word}</span>
-              </button>
-            ))}
-          </div>
-        ) : null}
+          {song.mode === 'verbQuiz' ? (
+            <div className="choice-grid">
+              {(verbOptions?.options ?? []).map((entry, index) => (
+                <button data-sfx="off" key={`${entry.word}-${entry.reading}-${index}`} onClick={() => submitVerb(entry, index)}>
+                  <small>{entry.reading}</small>
+                  <span>{index + 1} {entry.word}</span>
+                </button>
+              ))}
+            </div>
+          ) : null}
 
-        {song.mode === 'onomatopoeiaQuiz' ? (
-          <div className="choice-grid">
-            {(onomatopoeiaOptions?.options ?? []).map((answer, index) => (
-              <button data-sfx="off" key={`${answer}-${index}`} disabled={answerLocked} onClick={() => submitOnomatopoeia(answer)}>
-                <span>{index + 1} {answer}</span>
-              </button>
-            ))}
-          </div>
-        ) : null}
+          {song.mode === 'onomatopoeiaQuiz' ? (
+            <div className="choice-grid">
+              {(onomatopoeiaOptions?.options ?? []).map((answer, index) => (
+                <button data-sfx="off" key={`${answer}-${index}`} disabled={answerLocked} onClick={() => submitOnomatopoeia(answer)}>
+                  <span>{index + 1} {answer}</span>
+                </button>
+              ))}
+            </div>
+          ) : null}
 
-        {error ? <p className="error-text">{error}</p> : null}
-      </section>
+          {error ? <p className="error-text">{error}</p> : null}
+        </section>
+      </div>
 
       {feedback?.active ? (
         <section
@@ -373,7 +384,7 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
             }
           }}
         >
-          <div className="feedback-panel">
+          <div className="feedback-panel" ref={feedbackPanelRef} tabIndex={-1}>
             <div className="judge-mark">{feedback.correct ? '○' : '×'}</div>
             <h2 id={feedbackTitleId}>{feedback.timeUp ? t('timeUp') : feedback.correct ? t('correct') : t('incorrect')}</h2>
             <p><span className="feedback-label">{t('prompt')}:</span> {feedback.question}</p>

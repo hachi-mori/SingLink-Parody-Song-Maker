@@ -102,7 +102,8 @@ function expectFixedQuestion(value: ReturnType<typeof fixedSet>, index = 0) {
   expect(element('.game-question-example').textContent).toBe(expected.questionText);
   expect([...host.querySelectorAll('.choice-grid button')].map((choice) => choice.textContent?.trim()))
     .toEqual(expected.choices.map((choice, position) => `${position + 1} ${choice}`));
-  expect(element('.game-hud').textContent).toContain(`${value.title} · ${index + 1} / 4`);
+  expect(element('.game-hud small').textContent).toBe(value.title);
+  expect(element('.game-progress').textContent).toBe(`${index + 1} / 4`);
 }
 function expectImportedTitle(value: ReturnType<typeof fixedSet>) {
   const datasets = element<HTMLSelectElement>('#dataset-select');
