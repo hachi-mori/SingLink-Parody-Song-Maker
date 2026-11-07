@@ -370,9 +370,8 @@ button:disabled {
   min-height: 100svh;
   display: flex;
   flex-direction: column;
-  justify-content: safe center;
   align-items: center;
-  gap: clamp(14px, 3vh, 30px);
+  gap: clamp(16px, 4svh, 40px);
   padding: var(--sound-corner-space) var(--screen-gutter) var(--screen-bottom);
 }
 
@@ -462,10 +461,11 @@ button:disabled {
 .game-card {
   width: min(1540px, 100%);
   min-width: 0;
+  margin-block: auto;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   justify-items: center;
-  gap: clamp(20px, 4vw, 44px);
+  gap: clamp(20px, min(10svh - 20px, 8vw), 64px);
   text-align: center;
 }
 
@@ -1541,7 +1541,6 @@ button:disabled {
 }
 
 @media (max-height: 540px) {
-  .game-card { gap: 16px; }
   .game-question-card { padding-block: 14px; }
   .choice-grid button { min-height: 72px; }
   .judge-mark {
@@ -1595,10 +1594,6 @@ button:disabled {
   .game-hud .small-button {
     grid-column: 2;
     padding: 10px;
-  }
-
-  .game-card {
-    gap: 18px;
   }
 
   .game-card h1 {
