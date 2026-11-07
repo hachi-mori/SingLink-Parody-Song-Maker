@@ -232,18 +232,13 @@ async function synthesizeSegment(segment: SynthesisSegment, baseUrl: string, dat
   return wavResponse.arrayBuffer();
 }
 
-export async function checkDirectVoicevox(baseUrlRaw: string, datasetId: DatasetId): Promise<string> {
+export async function checkDirectVoicevox(baseUrlRaw: string, datasetId: DatasetId, signal?: AbortSignal): Promise<Response> {
   const baseUrl = voicevoxBaseUrlForDataset(baseUrlRaw, datasetId);
-  const response = await fetch(`${baseUrl}/version`, {
+  return fetch(`${baseUrl}/version`, {
     cache: 'no-store',
-    signal: timeoutSignal(5_000),
+    signal,
     ...(datasetId === 'browserImport' ? privateFetchOptions : {})
   });
-  if (!response.ok) {
-    throw new Error(`VOICEVOXに接続できませんでした: ${response.status}`);
-  }
-  const version = await response.json() as unknown;
-  return typeof version === 'string' ? version : String(version);
 }
 
 export async function synthesizeDirectVoicevox(

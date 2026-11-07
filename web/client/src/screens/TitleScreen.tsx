@@ -1,5 +1,6 @@
 import { RefreshCw } from 'lucide-react';
-import type { DatasetId, ExperienceSetInfo, QuizDataset, SongInfo, SourceSongInfo, VoicevoxVersionResponse } from '@shared/types';
+import type { DatasetId, ExperienceSetInfo, QuizDataset, SongInfo, SourceSongInfo } from '@shared/types';
+import type { VoicevoxCheckResult } from '../lib/api';
 import { AssetButton } from '../components/AssetButton';
 import { ScreenShell } from '../components/ScreenShell';
 import { SoundToggle } from '../components/SoundToggle';
@@ -20,14 +21,15 @@ type TitleScreenProps = {
   selectedSourceSongId: string;
   sourceSelectionEnabled: boolean;
   voicevoxBaseUrl: string;
-  voicevoxStatus?: VoicevoxVersionResponse;
+  voicevoxStatus?: VoicevoxCheckResult;
+  checkingVoicevox: boolean;
   loading: boolean;
   error?: string;
   onSelectSong: (songId: string) => void;
   onSelectDataset: (datasetId: DatasetId) => void;
   onSelectSourceSong: (songId: string) => void;
   onBaseUrlChange: (baseUrl: string) => void;
-  onCheckVoicevox: () => void;
+  onCheckVoicevox: (baseUrl: string) => void;
   onStart: () => void;
   onOpenHowTo: () => void;
   onOpenCredit: () => void;
@@ -37,7 +39,10 @@ type TitleScreenProps = {
 export function TitleScreen(props: TitleScreenProps) {
   const { t } = useLanguage();
   const privateMode = props.selectedDatasetId === 'browserImport';
-  const statusClass = props.voicevoxStatus?.ok ? 'status-ok' : 'status-warn';
+  const status = props.voicevoxStatus;
+  const statusClass = status?.ok ? 'status-ok' : 'status-warn';
+  const alternateUrl = 'http://127.0.0.1:50021';
+  const failure = status?.failure;
 
   return (
     <ScreenShell background={assetUrl('assets/texture/assets/title_background.png')} fit="cover">
@@ -94,7 +99,7 @@ export function TitleScreen(props: TitleScreenProps) {
           </div>
 
           <nav className="title-actions" aria-label={t('titleMenu')}>
-            <AssetButton imageSrc={assetUrl('assets/texture/assets/button/start.png')} label={t('start')} onClick={props.onStart} disabled={props.loading} />
+            <AssetButton imageSrc={assetUrl('assets/texture/assets/button/start.png')} label={t('start')} onClick={props.onStart} disabled={props.loading || props.checkingVoicevox} />
             <AssetButton imageSrc={assetUrl('assets/texture/assets/button/howtoplay.png')} label={t('howTo')} onClick={props.onOpenHowTo} />
             <button className="history-button" onClick={props.onOpenHistory}>{t('savedSongs')}</button>
             <button className="credit-link" onClick={props.onOpenCredit}>{t('credits')}</button>
@@ -126,24 +131,36 @@ export function TitleScreen(props: TitleScreenProps) {
               </> : null}
             </section>
             <section className="voicevox-panel" aria-label="VOICEVOXの接続">
-              <div className={statusClass} role="status">{props.voicevoxStatus
-                ? props.voicevoxStatus.ok
-                  ? t('voicevoxConnected', { version: props.voicevoxStatus.version ? ` (${props.voicevoxStatus.version})` : '' })
-                  : 'VOICEVOXにつながっていません'
-                : 'VOICEVOXをまだ確認していません'}</div>
+              <div className={statusClass} role="status">
+                {props.checkingVoicevox ? t('voicevoxChecking') : !status ? t('voicevoxLocalNotChecked') : status.ok
+                  ? t('voicevoxConnected', { version: status.version ? ` (${status.version})` : '' })
+                  : <>
+                    {failure === 'permissionDenied' ? t('voicevoxPermissionDenied') : t('voicevoxConnectionFailed')}
+                    {failure === 'httpError' && <div>{t('voicevoxHttpError', { status: String(status.httpStatus) })}</div>}
+                    {failure === 'timeout' && <div>{t('voicevoxTimeout')}</div>}
+                    {failure === 'invalidResponse' && <div>{t('voicevoxInvalidResponse')}</div>}
+                    {failure === 'invalidUrl'
+                      ? <div>{t(privateMode ? 'voicevoxPrivateUrl' : 'voicevoxInvalidUrl')}</div>
+                      : failure !== 'permissionDenied' && <div>{t('voicevoxConnectionHelp')}</div>}
+                  </>}
+              </div>
               <label>
                 <span>{t('voicevoxUrl')}</span>
                 <input
                   value={props.voicevoxBaseUrl}
                   disabled={props.loading}
                   onChange={(event) => props.onBaseUrlChange(event.target.value)}
-                  onBlur={props.onCheckVoicevox}
                 />
               </label>
-              <button className="small-button" onClick={props.onCheckVoicevox} disabled={props.loading}>
+              <button className="small-button" onClick={() => props.onCheckVoicevox(props.voicevoxBaseUrl)} disabled={props.loading || props.checkingVoicevox}>
                 <RefreshCw size={16} aria-hidden="true" />
-                つながるか確認
+                {t(status ? 'recheck' : 'voicevoxConnect')}
               </button>
+              {status?.ok === false && failure !== 'permissionDenied' && props.voicevoxBaseUrl.replace(/\/$/u, '') !== alternateUrl && (
+                <button className="small-button" onClick={() => props.onCheckVoicevox(alternateUrl)} disabled={props.loading || props.checkingVoicevox}>
+                  {t('voicevoxTryIpv4')}
+                </button>
+              )}
             </section>
           </div>
         </div>

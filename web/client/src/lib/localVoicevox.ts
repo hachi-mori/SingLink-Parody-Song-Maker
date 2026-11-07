@@ -3,6 +3,10 @@ import type { DatasetId, SongDetail } from '@shared/types';
 import { assetUrl } from './assets';
 import { assertKnownDataset } from './quizDatasets';
 
+export function usesDirectVoicevox(datasetId: DatasetId): boolean {
+  return datasetId === 'browserImport' || window.location.hostname.endsWith('.github.io');
+}
+
 /** Check the raw spelling as well as the origin: reject aliases, credentials,
  * nonstandard numeric IPs, paths, queries, fragments and encoded hostnames. */
 export function voicevoxBaseUrlForDataset(raw: string, datasetId: DatasetId): string {

@@ -12,10 +12,6 @@ export type DemoCompletion = {
   nextScreen: 'result';
 };
 
-export function shouldCheckVoicevoxOnInitialLoad(search: string): boolean {
-  return new URLSearchParams(search).get('demo') !== '1';
-}
-
 export function getFixedDemoQuestions(demo: DemoFlowData): OnomatopoeiaEntry[] {
   return demo.questions;
 }

@@ -22,7 +22,7 @@ VOICEVOX 0.25.1で実音声確認済みです。アプリ実行にOpenAI APIキ�
 
 タイトルの「固定問題デモを遊ぶ」は、順序固定の自作4問に答えた後、プロジェクト内の「幸せなら手をたたこう」の楽譜で事前生成したずんだもんの替え歌と、同曲の伴奏を結果画面で再生します。実行時のVOICEVOX接続は不要です。回答内容はクイズ表示に使われますが、再生する歌唱は入力に応じて生成し直さない固定サンプルです。`http://127.0.0.1:5173/?demo=1` でも同じ問題フローを開始します。画面には、通常モードがクイズ回答からリアルタイム生成することとの違いを明記しています。
 
-公開審査用の最短導線は [GitHub Pagesの固定4問デモ](https://hachi-mori.github.io/SingLink-Parody-Song-Maker/openai-build-week/?demo=1) です。タイトルの[公開ページ](https://hachi-mori.github.io/SingLink-Parody-Song-Maker/openai-build-week/)から「固定問題デモを遊ぶ」を押しても開始できます。Pagesではこの事前生成デモを再生できますが、通常モードの回答由来歌声を生成するにはローカルFastifyとVOICEVOXが必要です。
+公開審査用の最短導線は [GitHub Pagesの固定4問デモ](https://hachi-mori.github.io/SingLink-Parody-Song-Maker/openai-build-week/?demo=1) です。タイトルの[公開ページ](https://hachi-mori.github.io/SingLink-Parody-Song-Maker/openai-build-week/)から「固定問題デモを遊ぶ」を押しても開始できます。公開版で回答から歌声を生成する場合は、[公開版からVOICEVOXに接続する](#公開版からvoicevoxに接続する)を参照してください。
 
 ## インストールと起動
 
@@ -88,7 +88,18 @@ Browser :5173 -> /api proxy -> Fastify :5174 -> VOICEVOX :50021
 Browser -> /assets/demo（VOICEVOXへの実行時通信なし）
 ```
 
-静的配置向けにブラウザからVOICEVOXへ直接接続するコードもあります。両経路は `createMemorizationScore` と `buildMemorizationSynthesisPlan` を共有します。GitHub Pagesだけではリアルタイム生成を保証できませんが、事前生成デモはVOICEVOXなしで再生できます。リアルタイム生成の正式な審査経路はFastifyとVOICEVOXを含むローカル起動です。
+GitHub Pagesではブラウザから同じPCのVOICEVOXへ直接接続します。両経路は `createMemorizationScore` と `buildMemorizationSynthesisPlan` を共有します。リアルタイム生成の審査経路はFastifyとVOICEVOXを含むローカル起動です。
+
+### 公開版からVOICEVOXに接続する
+
+1. SingLinkを使うPCでVOICEVOXを起動します。
+2. 同じPCのブラウザで [VOICEVOXのバージョン確認ページ](http://127.0.0.1:50021/version) を開き、バージョン番号が表示されることを確認します。
+3. VOICEVOX EngineのCORS設定で `https://hachi-mori.github.io` を許可します。エンジンをコマンドから起動する場合は `--allow_origin https://hachi-mori.github.io` を指定できます。詳しくは [VOICEVOX Engineの説明](https://github.com/VOICEVOX/voicevox_engine#readme) を参照してください。
+4. Chrome / EdgeでSingLinkを開きます。以前にアクセスを拒否した場合は、アドレスバー左側のサイト設定で「ローカルネットワーク」または「ループバックネットワーク」へのアクセスを許可します。初回の許可ダイアログは次の操作で表示される場合があります。
+5. SingLinkのタイトル画面で「VOICEVOXに接続」を押し、ブラウザからアクセスの許可を求められたら「許可」を選びます。「VOICEVOXにつながりました」と表示されたらクイズを始めます。
+6. `localhost` でつながらない場合は「127.0.0.1を試す」を押します。失敗が続く場合は、手順2で起動を確認したうえで、ブラウザのサイト設定とVOICEVOXのCORS設定を見直してください。バージョン確認ページを直接開ける場合でも、SingLinkからの接続には両方の設定が必要です。
+
+公開版は、ページを開いたときやURL欄からフォーカスを外したときにはVOICEVOXを確認しません。先にクイズを終えた場合は、結果画面の「歌を作り直す」から接続を確認できます。
 
 ## 教材
 
@@ -204,7 +215,7 @@ Build Week提出版の確認範囲:
 
 ## GitHub Pages
 
-静的UI、教材、曲選択、クイズ、音声なし結果、事前生成デモを配信できます。Fastifyは動かず、ブラウザからローカルVOICEVOXへの接続も環境依存のため、Pages単体では回答に基づくリアルタイム生成を提供しません。`web/dist/client/` が静的配置対象です。
+静的UI、教材、曲選択、クイズ、音声なし結果、事前生成デモを配信できます。Fastifyは動きません。回答に基づくリアルタイム生成には、ブラウザから同じPCで起動したVOICEVOXに接続できることが必要です。`web/dist/client/` が静的配置対象です。
 
 ## クレジット
 

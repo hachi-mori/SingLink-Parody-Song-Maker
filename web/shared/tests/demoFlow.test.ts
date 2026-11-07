@@ -4,7 +4,6 @@ import type { GeneratedResult } from '../../client/src/lib/generatedResult';
 import {
   completeFixedDemo,
   getFixedDemoQuestions,
-  shouldCheckVoicevoxOnInitialLoad,
   type DemoFlowData
 } from '../../client/src/lib/demoFlow';
 
@@ -40,12 +39,6 @@ const demo: DemoFlowData = {
 };
 
 describe('固定問題デモフロー', () => {
-  it('デモ直リンクだけ初期VOICEVOX確認を省略する', () => {
-    expect(shouldCheckVoicevoxOnInitialLoad('')).toBe(true);
-    expect(shouldCheckVoicevoxOnInitialLoad('?mode=normal')).toBe(true);
-    expect(shouldCheckVoicevoxOnInitialLoad('?demo=1')).toBe(false);
-  });
-
   it('固定問題をmanifest順のまま返し、shuffleしない', () => {
     expect(getFixedDemoQuestions(demo)).toBe(questions);
     expect(getFixedDemoQuestions(demo).map((question) => question.answer))

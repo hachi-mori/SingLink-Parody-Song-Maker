@@ -147,6 +147,44 @@ afterEach(async () => {
 });
 
 describe('App experience-set import and selection lifecycle', () => {
+  it.each(['prompt', 'denied', 'granted'])('waits for a connection click even with %s permission', async (state) => {
+    const query = vi.fn().mockResolvedValue({ state });
+    vi.stubGlobal('navigator', { permissions: { query } });
+    await act(async () => { root!.unmount(); });
+    await mountApp();
+    const panel = element('.voicevox-panel');
+    expect(panel.textContent).toContain('VOICEVOXをまだ確認していません');
+    const input = element<HTMLInputElement>('.voicevox-panel input');
+    await act(async () => { input.focus(); input.blur(); });
+    expect(api.checkVoicevox).not.toHaveBeenCalled();
+    expect(query).not.toHaveBeenCalled();
+  });
+
+  it('shows pending and failure states and retries at 127.0.0.1 only on a click', async () => {
+    let finish!: (status: { ok: boolean; failure: string }) => void;
+    api.checkVoicevox.mockReturnValueOnce(new Promise(resolve => { finish = resolve; }));
+    await click(button('VOICEVOXに接続'));
+    expect(api.checkVoicevox).toHaveBeenCalledExactlyOnceWith('http://localhost:50021', 'original335');
+    expect(element('.voicevox-panel [role="status"]').textContent).toContain('VOICEVOXを確認しています');
+    await act(async () => { finish({ ok: false, failure: 'timeout' }); });
+    expect(element('.voicevox-panel [role="status"]').textContent).toContain('時間内に確認できませんでした');
+    api.checkVoicevox.mockResolvedValueOnce({ ok: true, version: '0.25.1' });
+    await click(button('127.0.0.1を試す'));
+    expect(api.checkVoicevox).toHaveBeenLastCalledWith('http://127.0.0.1:50021', 'original335');
+    expect(element<HTMLInputElement>('.voicevox-panel input').value).toBe('http://127.0.0.1:50021');
+    expect(element('.voicevox-panel [role="status"]').textContent).toContain('VOICEVOXにつながりました (0.25.1)');
+  });
+
+  it('discards a late check from a previously selected dataset', async () => {
+    let finish!: (status: { ok: boolean }) => void;
+    api.checkVoicevox.mockReturnValueOnce(new Promise(resolve => { finish = resolve; }));
+    await click(button('VOICEVOXに接続'));
+    await importFile(fixedSet('A'));
+    await act(async () => { finish({ ok: true }); });
+    expect(element('.voicevox-panel [role="status"]').textContent).toContain('VOICEVOXをまだ確認していません');
+    expect(api.checkVoicevox).toHaveBeenCalledExactlyOnceWith('http://localhost:50021', 'original335');
+  });
+
   it('loads a synthetic File through the real title and advances fixed questions and choices in the real quiz', async () => {
     const a = fixedSet('A');
     await importFile(a);

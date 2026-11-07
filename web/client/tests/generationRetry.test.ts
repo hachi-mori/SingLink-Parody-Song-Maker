@@ -44,7 +44,7 @@ function button(label: string) {
 async function click(target: HTMLButtonElement) {
   await act(async () => { target.click(); });
 }
-async function finishQuiz() {
+async function finishQuiz({ connect = true } = {}) {
   const text = JSON.stringify(fixture);
   const file = new File([text], 'synthetic-retry.json', { type: 'application/json' });
   Object.defineProperty(file, 'text', { value: async () => text });
@@ -53,6 +53,7 @@ async function finishQuiz() {
     Object.defineProperty(input, 'files', { configurable: true, value: [file] });
     input.dispatchEvent(new Event('change', { bubbles: true }));
   });
+  if (connect) await click(button('VOICEVOXに接続'));
   await click(button('スタート'));
   await act(async () => { await vi.advanceTimersByTimeAsync(3000); });
   for (let index = 0; index < 4; index++) {
@@ -145,16 +146,15 @@ describe('retrying audio for the same completed quiz', () => {
     expect(history.saveGeneratedTrack).not.toHaveBeenCalled();
   });
 
-  it('ignores an older import connection check after retry has confirmed a new connection', async () => {
-    const oldCheck = deferred<{ ok: boolean; message: string; baseUrl: string }>();
-    api.checkVoicevox.mockReturnValueOnce(oldCheck.promise);
-    await finishQuiz();
-    const regenerated = deferred<Blob>();
-    api.synthesizeSong.mockReturnValueOnce(regenerated.promise);
+  it('finishes an unchecked imported round without engine access, then connects on explicit retry', async () => {
+    api.synthesizeSong.mockReset().mockResolvedValue(audio);
+    await finishQuiz({ connect: false });
+    expect(api.checkVoicevox).not.toHaveBeenCalled();
+    expect(api.synthesizeSong).not.toHaveBeenCalled();
+    expect(host.querySelector('.result-notice')?.textContent).toContain('VOICEVOXをまだ確認していません');
     await click(button('歌を作り直す'));
-    await act(async () => { oldCheck.resolve({ ok: false, baseUrl: 'http://localhost:50021', message: 'Old synthetic offline result' }); });
-    await act(async () => { regenerated.resolve(audio); });
-    expect(api.synthesizeSong).toHaveBeenCalledTimes(2);
+    expect(api.checkVoicevox).toHaveBeenCalledExactlyOnceWith('http://localhost:50021', 'browserImport');
+    expect(api.synthesizeSong).toHaveBeenCalledTimes(1);
     expect(button('再生')).toBeTruthy();
     expect(history.saveGeneratedTrack).toHaveBeenCalledTimes(1);
   });
