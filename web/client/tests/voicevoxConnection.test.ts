@@ -19,6 +19,21 @@ afterEach(() => {
 });
 
 describe('explicit VOICEVOX connection on GitHub Pages', () => {
+  it.each(['prompt', 'denied', undefined])('does not fetch automatically when permission is %s', async state => {
+    query.mockResolvedValue({ state });
+    const result = await checkVoicevox(baseUrl, 'original335', 'automatic');
+    if (state === 'denied') expect(result).toMatchObject({ ok: false, failure: 'permissionDenied' });
+    else expect(result).toBeUndefined();
+    expect(fetchVersion).not.toHaveBeenCalled();
+  });
+
+  it('automatically checks only the permitted loopback endpoint and disallows redirects', async () => {
+    query.mockResolvedValue({ state: 'granted' });
+    await expect(checkVoicevox('https://external.invalid', 'original335', 'automatic')).resolves.toBeUndefined();
+    await expect(checkVoicevox(baseUrl, 'original335', 'automatic')).resolves.toMatchObject({ ok: true });
+    expect(fetchVersion).toHaveBeenCalledExactlyOnceWith(`${baseUrl}/version`, expect.objectContaining({ redirect: 'error' }));
+  });
+
   it.each(['prompt', 'granted'])('checks /version once when permission is %s', async state => {
     query.mockResolvedValue({ state });
     await expect(checkVoicevox(baseUrl, 'original335')).resolves.toMatchObject({ ok: true, version: '0.25.1' });

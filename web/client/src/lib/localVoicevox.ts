@@ -7,6 +7,16 @@ export function usesDirectVoicevox(datasetId: DatasetId): boolean {
   return datasetId === 'browserImport' || window.location.hostname.endsWith('.github.io');
 }
 
+export async function queryLoopbackPermission(): Promise<PermissionState | undefined> {
+  try {
+    // Some browsers have Permissions API but do not recognize this name yet.
+    const permission = await globalThis.navigator?.permissions?.query({ name: 'loopback-network' as PermissionName });
+    return permission?.state;
+  } catch {
+    return undefined;
+  }
+}
+
 /** Check the raw spelling as well as the origin: reject aliases, credentials,
  * nonstandard numeric IPs, paths, queries, fragments and encoded hostnames. */
 export function voicevoxBaseUrlForDataset(raw: string, datasetId: DatasetId): string {

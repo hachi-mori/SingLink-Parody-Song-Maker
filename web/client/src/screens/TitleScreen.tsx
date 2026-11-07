@@ -5,7 +5,7 @@ import { AssetButton } from '../components/AssetButton';
 import { ScreenShell } from '../components/ScreenShell';
 import { SoundToggle } from '../components/SoundToggle';
 import { assetUrl } from '../lib/assets';
-import { useLanguage } from '../lib/i18n';
+import { useLanguage, voicevoxFailureMessages } from '../lib/i18n';
 
 type TitleScreenProps = {
   songs: SongInfo[];
@@ -23,6 +23,7 @@ type TitleScreenProps = {
   voicevoxBaseUrl: string;
   voicevoxStatus?: VoicevoxCheckResult;
   checkingVoicevox: boolean;
+  checksVoicevoxOnStart: boolean;
   loading: boolean;
   error?: string;
   onSelectSong: (songId: string) => void;
@@ -99,10 +100,11 @@ export function TitleScreen(props: TitleScreenProps) {
           </div>
 
           <nav className="title-actions" aria-label={t('titleMenu')}>
-            <AssetButton imageSrc={assetUrl('assets/texture/assets/button/start.png')} label={t('start')} onClick={props.onStart} disabled={props.loading || props.checkingVoicevox} />
+            <AssetButton imageSrc={assetUrl('assets/texture/assets/button/start.png')} label={t('start')} onClick={props.onStart} disabled={props.loading} aria-describedby={props.checksVoicevoxOnStart ? 'voicevox-start-help' : undefined} />
             <AssetButton imageSrc={assetUrl('assets/texture/assets/button/howtoplay.png')} label={t('howTo')} onClick={props.onOpenHowTo} />
             <button className="history-button" onClick={props.onOpenHistory}>{t('savedSongs')}</button>
             <button className="credit-link" onClick={props.onOpenCredit}>{t('credits')}</button>
+            {props.checksVoicevoxOnStart && <p className="voicevox-start-help" id="voicevox-start-help">{t('voicevoxStartHelp')}</p>}
           </nav>
 
           <div className="title-settings">
@@ -134,15 +136,7 @@ export function TitleScreen(props: TitleScreenProps) {
               <div className={statusClass} role="status">
                 {props.checkingVoicevox ? t('voicevoxChecking') : !status ? t('voicevoxLocalNotChecked') : status.ok
                   ? t('voicevoxConnected', { version: status.version ? ` (${status.version})` : '' })
-                  : <>
-                    {failure === 'permissionDenied' ? t('voicevoxPermissionDenied') : t('voicevoxConnectionFailed')}
-                    {failure === 'httpError' && <div>{t('voicevoxHttpError', { status: String(status.httpStatus) })}</div>}
-                    {failure === 'timeout' && <div>{t('voicevoxTimeout')}</div>}
-                    {failure === 'invalidResponse' && <div>{t('voicevoxInvalidResponse')}</div>}
-                    {failure === 'invalidUrl'
-                      ? <div>{t(privateMode ? 'voicevoxPrivateUrl' : 'voicevoxInvalidUrl')}</div>
-                      : failure !== 'permissionDenied' && <div>{t('voicevoxConnectionHelp')}</div>}
-                  </>}
+                  : voicevoxFailureMessages(status, privateMode, t).map((message) => <div key={message}>{message}</div>)}
               </div>
               <label>
                 <span>{t('voicevoxUrl')}</span>

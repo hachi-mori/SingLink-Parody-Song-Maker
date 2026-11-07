@@ -236,6 +236,7 @@ export async function checkDirectVoicevox(baseUrlRaw: string, datasetId: Dataset
   const baseUrl = voicevoxBaseUrlForDataset(baseUrlRaw, datasetId);
   return fetch(`${baseUrl}/version`, {
     cache: 'no-store',
+    redirect: 'error',
     signal,
     ...(datasetId === 'browserImport' ? privateFetchOptions : {})
   });

@@ -44,7 +44,7 @@ function button(label: string) {
 async function click(target: HTMLButtonElement) {
   await act(async () => { target.click(); });
 }
-async function finishQuiz({ connect = true } = {}) {
+async function finishQuiz() {
   const text = JSON.stringify(fixture);
   const file = new File([text], 'synthetic-retry.json', { type: 'application/json' });
   Object.defineProperty(file, 'text', { value: async () => text });
@@ -53,7 +53,6 @@ async function finishQuiz({ connect = true } = {}) {
     Object.defineProperty(input, 'files', { configurable: true, value: [file] });
     input.dispatchEvent(new Event('change', { bubbles: true }));
   });
-  if (connect) await click(button('VOICEVOXに接続'));
   await click(button('スタート'));
   await act(async () => { await vi.advanceTimersByTimeAsync(3000); });
   for (let index = 0; index < 4; index++) {
@@ -146,14 +145,28 @@ describe('retrying audio for the same completed quiz', () => {
     expect(history.saveGeneratedTrack).not.toHaveBeenCalled();
   });
 
-  it('finishes an unchecked imported round without engine access, then connects on explicit retry', async () => {
+  it('waits for the check started with the quiz and then generates without a separate click', async () => {
     api.synthesizeSong.mockReset().mockResolvedValue(audio);
-    await finishQuiz({ connect: false });
-    expect(api.checkVoicevox).not.toHaveBeenCalled();
-    expect(api.synthesizeSong).not.toHaveBeenCalled();
-    expect(host.querySelector('.result-notice')?.textContent).toContain('VOICEVOXをまだ確認していません');
-    await click(button('歌を作り直す'));
+    const pending = deferred<{ ok: boolean; message: string; baseUrl: string }>();
+    api.checkVoicevox.mockReturnValueOnce(pending.promise);
+    await finishQuiz();
     expect(api.checkVoicevox).toHaveBeenCalledExactlyOnceWith('http://localhost:50021', 'browserImport');
+    expect(api.synthesizeSong).not.toHaveBeenCalled();
+    expect(host.querySelector('.loading-panel h1')?.textContent).toContain('VOICEVOXを確認しています');
+    await act(async () => { pending.resolve({ ok: true, baseUrl: 'http://localhost:50021', message: 'Synthetic connected status' }); });
+    expect(api.synthesizeSong).toHaveBeenCalledTimes(1);
+    expect(button('再生')).toBeTruthy();
+    expect(history.saveGeneratedTrack).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows the connection failure reason and retries without making the user repeat the quiz', async () => {
+    api.synthesizeSong.mockReset().mockResolvedValue(audio);
+    api.checkVoicevox.mockResolvedValueOnce({ ok: false, failure: 'permissionDenied' });
+    await finishQuiz();
+    expect(api.synthesizeSong).not.toHaveBeenCalled();
+    expect(host.querySelector('.result-notice')?.textContent).toContain('サイト設定');
+    await click(button('歌を作り直す'));
+    expect(api.checkVoicevox).toHaveBeenCalledTimes(2);
     expect(api.synthesizeSong).toHaveBeenCalledTimes(1);
     expect(button('再生')).toBeTruthy();
     expect(history.saveGeneratedTrack).toHaveBeenCalledTimes(1);
