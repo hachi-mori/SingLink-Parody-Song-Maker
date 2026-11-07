@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { languageStorageKey, resolveInitialLanguage, type AppLanguage } from '@shared/languageMode';
+import type { VoicevoxCheckResult } from './api';
 
 export type Language = AppLanguage;
 
@@ -11,6 +12,7 @@ const messages = {
     voicevoxChecking: 'Checking VOICEVOX...',
     voicevoxLocalNotChecked: 'VOICEVOX has not been checked.',
     voicevoxConnect: 'Connect to VOICEVOX',
+    voicevoxStartHelp: 'Starting the quiz also connects to VOICEVOX on this computer so the app can make the song.',
     voicevoxTryIpv4: 'Try 127.0.0.1',
     voicevoxConnectionFailed: 'Could not connect to VOICEVOX.',
     voicevoxConnectionHelp: 'Check that VOICEVOX is running, that your browser allows local network access, and that VOICEVOX allows this site in its CORS settings.',
@@ -126,6 +128,7 @@ const messages = {
     voicevoxLocalNotChecked: 'VOICEVOXをまだ確認していません',
     answerMeaningUnavailable: 'この教材には意味の説明がありません。',
     voicevoxConnect: 'VOICEVOXに接続',
+    voicevoxStartHelp: '歌声を作るため、スタートを押すとこのPCのVOICEVOXに接続します。',
     voicevoxTryIpv4: '127.0.0.1を試す',
     voicevoxConnectionFailed: 'VOICEVOXに接続できませんでした。',
     voicevoxConnectionHelp: 'VOICEVOXが起動しているか、ブラウザがローカルネットワークへのアクセスを許可しているか、VOICEVOXのCORS設定でこのサイトを許可しているかを確認してください。',
@@ -187,4 +190,23 @@ export function useLanguage(): LanguageContextValue {
   const context = useContext(LanguageContext);
   if (!context) throw new Error('useLanguage must be used inside LanguageProvider');
   return context;
+}
+
+export function voicevoxFailureMessages(status: VoicevoxCheckResult, privateMode: boolean, t: LanguageContextValue['t']): string[] {
+  if (status.failure === 'permissionDenied') return [t('voicevoxPermissionDenied')];
+  const messages = [t('voicevoxConnectionFailed')];
+  switch (status.failure) {
+    case 'httpError':
+      messages.push(t('voicevoxHttpError', { status: status.httpStatus ?? '' }));
+      break;
+    case 'timeout':
+      messages.push(t('voicevoxTimeout'));
+      break;
+    case 'invalidResponse':
+      messages.push(t('voicevoxInvalidResponse'));
+      break;
+    case 'invalidUrl':
+      return [...messages, t(privateMode ? 'voicevoxPrivateUrl' : 'voicevoxInvalidUrl')];
+  }
+  return [...messages, t('voicevoxConnectionHelp')];
 }

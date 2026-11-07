@@ -287,6 +287,14 @@ button:disabled {
   overflow-wrap: anywhere;
 }
 
+.voicevox-start-help {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--brown);
+  font-size: 14px;
+  text-align: center;
+}
+
 .asset-button {
   position: relative;
   width: clamp(170px, 16vw, 250px);

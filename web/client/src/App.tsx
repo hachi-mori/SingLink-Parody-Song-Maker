@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import { defaultMemorizationSourceSongId } from '@shared/memorizationSongs';
 import type { DatasetId, SolvedTask, SongDetail, SongInfo } from '@shared/types';
 import { fetchSongDetail, fetchSongs, checkVoicevox, type VoicevoxCheckResult } from './lib/api';
-import { usesDirectVoicevox } from './lib/localVoicevox';
+import { queryLoopbackPermission, usesDirectVoicevox } from './lib/localVoicevox';
 import { getStaticMemorizationSourceSongs } from './lib/staticSongs';
 import { TitleScreen } from './screens/TitleScreen';
 import { WriteLyricsScreen } from './screens/WriteLyricsScreen';
@@ -14,12 +14,13 @@ import { CreditsScreen } from './screens/CreditsScreen';
 import { HistoryScreen } from './screens/HistoryScreen';
 import { assetUrl } from './lib/assets';
 import type { GeneratedResult } from './lib/generatedResult';
-import { useLanguage } from './lib/i18n';
+import { useLanguage, voicevoxFailureMessages } from './lib/i18n';
 import { loadDemoBundle, type DemoBundle } from './lib/demo';
 import { completeFixedDemo, getFixedDemoQuestions } from './lib/demoFlow';
 import { browserImportDataset, original335Dataset, readImportedMaterial, supportsEnglishForDataset, type ImportedMaterial } from './lib/quizDatasets';
 
 type Screen = 'title' | 'write' | 'loading' | 'result' | 'howto' | 'credit' | 'history';
+const defaultVoicevoxBaseUrl = 'http://localhost:50021';
 
 export function App() {
   const { language, setLanguage, t } = useLanguage();
@@ -34,7 +35,7 @@ export function App() {
   const [selectedSongId, setSelectedSongId] = useState('');
   const [selectedSourceSongId, setSelectedSourceSongId] = useState(defaultMemorizationSourceSongId);
   const [songDetail, setSongDetail] = useState<SongDetail>();
-  const [voicevoxBaseUrl, setVoicevoxBaseUrl] = useState('http://localhost:50021');
+  const [voicevoxBaseUrl, setVoicevoxBaseUrl] = useState(defaultVoicevoxBaseUrl);
   const [voicevoxStatus, setVoicevoxStatus] = useState<VoicevoxCheckResult>();
   const [checkingVoicevox, setCheckingVoicevox] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -76,16 +77,38 @@ export function App() {
     setVoicevoxStatus(undefined);
   };
 
-  const refreshVoicevox = async (baseUrl: string) => {
+  const refreshVoicevox = useCallback(async (baseUrl: string, datasetId: DatasetId, mode?: 'automatic') => {
     const generation = ++connectionGenerationRef.current;
     setVoicevoxBaseUrl(baseUrl);
     setVoicevoxStatus(undefined);
     setCheckingVoicevox(true);
-    const status = await checkVoicevox(baseUrl, selectedDatasetId);
-    if (generation !== connectionGenerationRef.current) return;
-    setVoicevoxStatus(status);
-    setCheckingVoicevox(false);
-  };
+    try {
+      const status = mode === 'automatic'
+        ? await checkVoicevox(baseUrl, datasetId, mode)
+        : await checkVoicevox(baseUrl, datasetId);
+      if (generation === connectionGenerationRef.current) setVoicevoxStatus(status);
+    } catch {
+      if (generation === connectionGenerationRef.current) {
+        setVoicevoxStatus({ ok: false, baseUrl, message: '', failure: 'networkError' });
+      }
+    } finally {
+      if (generation === connectionGenerationRef.current) setCheckingVoicevox(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (demoRequested || !usesDirectVoicevox('original335')) return;
+    let cancelled = false;
+    const generation = connectionGenerationRef.current;
+    void queryLoopbackPermission().then((permission) => {
+      if (cancelled || generation !== connectionGenerationRef.current) return;
+      if (permission === 'granted') void refreshVoicevox(defaultVoicevoxBaseUrl, 'original335', 'automatic');
+      if (permission === 'denied') {
+        setVoicevoxStatus({ ok: false, baseUrl: defaultVoicevoxBaseUrl, message: '', failure: 'permissionDenied' });
+      }
+    });
+    return () => { cancelled = true; };
+  }, [demoRequested, refreshVoicevox]);
 
   const cancelGenerationRetry = () => {
     generationRetryRef.current = undefined;
@@ -105,9 +128,7 @@ export function App() {
       if (!status.ok) {
         setGeneratedResult({
           status: 'skipped',
-          message: status.failure === 'permissionDenied'
-            ? t('voicevoxPermissionDenied')
-            : `${t('voicevoxConnectionFailed')} ${t('voicevoxConnectionHelp')}`
+          message: voicevoxFailureMessages(status, activeDatasetId === 'browserImport', t).join(' ')
         });
         return;
       }
@@ -151,7 +172,7 @@ export function App() {
       setSelectedSongId(songs.find((song) => song.mode === 'onomatopoeiaQuiz')?.id ?? '');
       setLanguage('ja');
       resetVoicevoxCheck();
-      setVoicevoxBaseUrl('http://localhost:50021');
+      setVoicevoxBaseUrl(defaultVoicevoxBaseUrl);
     } catch (error) {
       if (generation === importGenerationRef.current) {
         setTitleError(error instanceof Error ? error.message : '教材を読み込めませんでした。現在の教材は変更していません。');
@@ -241,6 +262,9 @@ export function App() {
       if (imported && (!importedSong || !importedEntries)) {
         throw new Error('教材を読み込み、オノマトペクイズを選んでください。');
       }
+      if (usesDirectVoicevox(selectedDatasetId) && !checkingVoicevox && !voicevoxStatus?.ok) {
+        void refreshVoicevox(voicevoxBaseUrl, selectedDatasetId);
+      }
       // Imported rounds use existing metadata and local question data. Only
       // synthesis may later send text to the strictly validated loopback engine.
       const detail: SongDetail = imported
@@ -313,6 +337,10 @@ export function App() {
         fullLyrics={fullLyrics}
         inputTexts={inputTexts}
         voicevoxBaseUrl={voicevoxBaseUrl}
+        voicevoxChecking={checkingVoicevox}
+        voicevoxFailureMessage={voicevoxStatus?.ok === false
+          ? voicevoxFailureMessages(voicevoxStatus, activeDatasetId === 'browserImport', t).join(' ')
+          : undefined}
         voicevoxConnected={voicevoxStatus?.ok ?? (usesDirectVoicevox(activeDatasetId) ? undefined : true)}
         onBack={() => setScreen('write')}
         onDone={(result) => {
@@ -373,6 +401,7 @@ export function App() {
       voicevoxBaseUrl={voicevoxBaseUrl}
       voicevoxStatus={voicevoxStatus}
       checkingVoicevox={checkingVoicevox}
+      checksVoicevoxOnStart={usesDirectVoicevox(selectedDatasetId) && !checkingVoicevox && !voicevoxStatus?.ok}
       loading={loading}
       error={titleError}
       onSelectSong={setSelectedSongId}
@@ -387,7 +416,7 @@ export function App() {
         resetVoicevoxCheck();
         setVoicevoxBaseUrl(baseUrl);
       }}
-      onCheckVoicevox={refreshVoicevox}
+      onCheckVoicevox={(baseUrl) => { void refreshVoicevox(baseUrl, selectedDatasetId); }}
       onStart={startGame}
       onOpenHowTo={() => setScreen('howto')}
       onOpenCredit={() => setScreen('credit')}

@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+// @vitest-environment-options {"url":"https://hachi-mori.github.io/SingLink-Parody-Song-Maker/"}
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
@@ -147,17 +148,40 @@ afterEach(async () => {
 });
 
 describe('App experience-set import and selection lifecycle', () => {
-  it.each(['prompt', 'denied', 'granted'])('waits for a connection click even with %s permission', async (state) => {
+  it.each(['prompt', 'denied', undefined])('makes no connection on reload or blur when permission is %s', async (state) => {
     const query = vi.fn().mockResolvedValue({ state });
     vi.stubGlobal('navigator', { permissions: { query } });
     await act(async () => { root!.unmount(); });
     await mountApp();
     const panel = element('.voicevox-panel');
-    expect(panel.textContent).toContain('VOICEVOXをまだ確認していません');
+    expect(panel.textContent).toContain(state === 'denied' ? 'アクセスをブロックしています' : 'VOICEVOXをまだ確認していません');
     const input = element<HTMLInputElement>('.voicevox-panel input');
     await act(async () => { input.focus(); input.blur(); });
     expect(api.checkVoicevox).not.toHaveBeenCalled();
-    expect(query).not.toHaveBeenCalled();
+    expect(query).toHaveBeenCalledExactlyOnceWith({ name: 'loopback-network' });
+  });
+
+  it('automatically checks a granted connection on reload and does not recheck on Start', async () => {
+    vi.stubGlobal('navigator', { permissions: { query: vi.fn().mockResolvedValue({ state: 'granted' }) } });
+    api.checkVoicevox.mockResolvedValueOnce({ ok: true, version: '0.25.1' });
+    await act(async () => { root!.unmount(); });
+    await mountApp();
+    expect(api.checkVoicevox).toHaveBeenCalledExactlyOnceWith('http://localhost:50021', 'original335', 'automatic');
+    expect(element('.voicevox-panel [role="status"]').textContent).toContain('VOICEVOXにつながりました (0.25.1)');
+    await select('#song-select', songInfo.id);
+    await startQuiz();
+    expect(api.checkVoicevox).toHaveBeenCalledTimes(1);
+  });
+
+  it('explains the connection on Start and begins the quiz while the check is pending', async () => {
+    let finish!: (status: { ok: boolean }) => void;
+    api.checkVoicevox.mockReturnValueOnce(new Promise(resolve => { finish = resolve; }));
+    await select('#song-select', songInfo.id);
+    expect(element('#voicevox-start-help').textContent).toContain('スタートを押すとこのPCのVOICEVOXに接続');
+    expect(api.checkVoicevox).not.toHaveBeenCalled();
+    await startQuiz();
+    expect(api.checkVoicevox).toHaveBeenCalledExactlyOnceWith('http://localhost:50021', 'original335');
+    await act(async () => { finish({ ok: true }); });
   });
 
   it('shows pending and failure states and retries at 127.0.0.1 only on a click', async () => {

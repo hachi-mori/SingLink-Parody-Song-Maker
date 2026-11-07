@@ -9,20 +9,10 @@ import type {
 import { fetchStaticSongDetail, fetchStaticSongs, previewStaticLyrics } from './staticSongs';
 import { checkDirectVoicevox, synthesizeDirectVoicevox } from './directVoicevox';
 import { assertKnownDataset, assertPublicDataset } from './quizDatasets';
-import { usesDirectVoicevox, voicevoxBaseUrlForDataset } from './localVoicevox';
+import { queryLoopbackPermission, usesDirectVoicevox, voicevoxBaseUrlForDataset } from './localVoicevox';
 
 export type VoicevoxCheckFailure = 'permissionDenied' | 'timeout' | 'httpError' | 'invalidResponse' | 'invalidUrl' | 'networkError';
 export type VoicevoxCheckResult = VoicevoxVersionResponse & { failure?: VoicevoxCheckFailure; httpStatus?: number };
-
-async function queryLoopbackPermission(): Promise<PermissionState | undefined> {
-  try {
-    // Some browsers have Permissions API but do not recognize this name yet.
-    const permission = await globalThis.navigator?.permissions?.query({ name: 'loopback-network' as PermissionName });
-    return permission?.state;
-  } catch {
-    return undefined;
-  }
-}
 
 const directSynthesisMessage = 'ローカルVOICEVOXへ接続できませんでした。ブラウザのローカルネットワーク権限とVOICEVOXのCORS設定を確認してください。';
 const synthesisTimeoutMessage = '歌声生成の応答がありませんでした。VOICEVOX未接続、またはブラウザからローカルVOICEVOXへ接続できない可能性があります。';
@@ -84,7 +74,9 @@ export async function fetchSongDetail(songId: string): Promise<SongDetail> {
   }
 }
 
-export async function checkVoicevox(baseUrl: string, datasetId: DatasetId): Promise<VoicevoxCheckResult> {
+export function checkVoicevox(baseUrl: string, datasetId: DatasetId): Promise<VoicevoxCheckResult>;
+export function checkVoicevox(baseUrl: string, datasetId: DatasetId, mode: 'automatic'): Promise<VoicevoxCheckResult | undefined>;
+export async function checkVoicevox(baseUrl: string, datasetId: DatasetId, mode?: 'automatic'): Promise<VoicevoxCheckResult | undefined> {
   assertKnownDataset(datasetId);
   const direct = usesDirectVoicevox(datasetId);
   const failed = (failure: VoicevoxCheckFailure, httpStatus?: number): VoicevoxCheckResult =>
@@ -102,6 +94,7 @@ export async function checkVoicevox(baseUrl: string, datasetId: DatasetId): Prom
 
   const permission = loopback ? await queryLoopbackPermission() : undefined;
   if (permission === 'denied') return failed('permissionDenied');
+  if (mode === 'automatic' && permission !== 'granted') return undefined;
 
   const controller = new AbortController();
   // Leave time to answer the browser prompt on a first connection.

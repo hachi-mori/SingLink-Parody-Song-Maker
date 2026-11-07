@@ -18,20 +18,23 @@ type LoadingScreenProps = {
   inputTexts: string[];
   voicevoxBaseUrl: string;
   voicevoxConnected: boolean | undefined;
+  voicevoxChecking?: boolean;
+  voicevoxFailureMessage?: string;
   onDone: (result: GeneratedResult) => void;
   onBack: () => void;
 };
 
 type PreparedAudio = Omit<Extract<GeneratedResult, { status: 'generated' }>, 'blobUrl' | 'historyWarning'>;
 
-export function LoadingScreen({ song, datasetId, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, voicevoxConnected, onDone }: LoadingScreenProps) {
+export function LoadingScreen({ song, datasetId, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, voicevoxConnected, voicevoxChecking, voicevoxFailureMessage, onDone }: LoadingScreenProps) {
   const { language, t } = useLanguage();
   const [requesting, setRequesting] = useState(false);
   // Callback and language changes must not cancel an in-flight generation.
-  const currentUi = useRef({ onDone, language, t });
-  currentUi.current = { onDone, language, t };
+  const currentUi = useRef({ onDone, language, t, voicevoxFailureMessage });
+  currentUi.current = { onDone, language, t, voicevoxFailureMessage };
 
   useEffect(() => {
+    if (voicevoxChecking) return;
     let cancelled = false;
     let completed = false;
     let preparedAudio: PreparedAudio | undefined;
@@ -69,7 +72,8 @@ export function LoadingScreen({ song, datasetId, tasks, fullLyrics, inputTexts, 
         if (!voicevoxConnected) {
           finish({
             status: 'skipped',
-            message: currentUi.current.t(voicevoxConnected === undefined ? 'generationVoicevoxUnchecked' : 'generationOffline')
+            message: currentUi.current.voicevoxFailureMessage
+              ?? currentUi.current.t(voicevoxConnected === undefined ? 'generationVoicevoxUnchecked' : 'generationOffline')
           });
           return;
         }
@@ -122,12 +126,12 @@ export function LoadingScreen({ song, datasetId, tasks, fullLyrics, inputTexts, 
       cancelled = true;
       window.clearTimeout(timeout);
     };
-  }, [song, datasetId, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, voicevoxConnected]);
+  }, [song, datasetId, tasks, fullLyrics, inputTexts, voicevoxBaseUrl, voicevoxConnected, voicevoxChecking]);
 
   return (
     <ScreenShell background={assetUrl('assets/texture/assets/loding_background.gif')} fit="cover">
       <section className="loading-panel">
-        <h1>{requesting ? t('requestingVoice') : t('preparingVoice')}</h1>
+        <h1>{voicevoxChecking ? t('voicevoxChecking') : requesting ? t('requestingVoice') : t('preparingVoice')}</h1>
         <div className="loading-dots"><span /><span /><span /></div>
       </section>
     </ScreenShell>
