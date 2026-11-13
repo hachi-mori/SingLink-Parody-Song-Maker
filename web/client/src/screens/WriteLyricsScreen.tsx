@@ -197,7 +197,9 @@ export function WriteLyricsScreen({ song, datasetId, fixedOnomatopoeiaEntries, o
       selected: timeUp ? t('unanswered') : answer!,
       selectedExplanation: showEnglishLearningSupport && selectedEntry
         ? selectedEntry.englishMeaning ?? t('translationUnavailable')
-        : selectedEntry?.explanation,
+        : (answer && currentOnomatopoeia.choiceExplanations && Object.hasOwn(currentOnomatopoeia.choiceExplanations, answer)
+          ? currentOnomatopoeia.choiceExplanations[answer]
+          : selectedEntry?.explanation),
       correctAnswer: currentOnomatopoeia.answer,
       explanation: showEnglishLearningSupport
         ? currentOnomatopoeia.englishMeaning ?? t('translationUnavailable')

@@ -125,7 +125,15 @@ function parseExperienceSet(value: Record<string, unknown>): ImportedMaterial {
     if (!Array.isArray(raw.choices) || raw.choices.length !== 3) invalidFile();
     const choices = raw.choices.map((choice) => readText(choice, importLimits.answerCharacters));
     if (new Set(choices).size !== 3 || choices.filter((choice) => choice === entry.answer).length !== 1) invalidFile();
-    return { ...entry, id, choices, singingReading };
+    let choiceExplanations: Record<string, string> | undefined;
+    if (raw.choiceExplanations !== undefined) {
+      if (!isRecord(raw.choiceExplanations)
+        || Object.keys(raw.choiceExplanations).length !== choices.length
+        || choices.some((choice) => !Object.hasOwn(raw.choiceExplanations as object, choice))) invalidFile();
+      const meanings = raw.choiceExplanations;
+      choiceExplanations = Object.fromEntries(choices.map((choice) => [choice, readText(meanings[choice])]));
+    }
+    return { ...entry, id, choices, singingReading, ...(choiceExplanations ? { choiceExplanations } : {}) };
   });
   if (new Set(entries.map((entry) => entry.answer)).size !== 4
     || new Set(entries.map((entry) => entry.id)).size !== 4) invalidFile();

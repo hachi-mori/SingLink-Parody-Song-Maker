@@ -136,6 +136,19 @@ async function answerRound(expected: boolean[], method: InputMethod = 'click') {
 }
 
 describe('accepted quiz answers stay aligned with generated lyric badges', () => {
+  it.each(['おお', 'かか'])('shows imported meanings for an incorrect choice %s in every question', async selected => {
+    const value = { ...fixture, entries: fixture.entries.map(entry => ({
+      ...entry, choiceExplanations: { [entry.answer]: entry.explanation, おお: '架空の誤答の意味A', かか: '架空の誤答の意味B' }
+    })) };
+    await startRound(value);
+    for (let index = 0; index < 4; index++) {
+      await click(currentChoices().find(choice => choice.textContent?.trim().endsWith(selected))!);
+      expect(host.querySelector('.feedback-answer-selected p')?.textContent).toBe(selected === 'おお' ? '架空の誤答の意味A' : '架空の誤答の意味B');
+      expect(host.querySelector('.feedback-answer-correct p')?.textContent).toBe('架空の意味');
+      await click(button('つぎへ'));
+    }
+  });
+
   it.each(['click', 'Enter', ' '] as const)('keeps C/B/A/A all correct through App and ResultScreen (%s)', async method => {
     await startRound();
     await answerRound([true, true, true, true], method);

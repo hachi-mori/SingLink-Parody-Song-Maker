@@ -48,6 +48,24 @@ describe('versioned fixed experience sets', () => {
     expect(random).not.toHaveBeenCalled();
   });
 
+  it('imports meanings for choices outside the four answers and preserves legacy sets', () => {
+    const value = fixture();
+    const choiceExplanations = { おお: '架空の誤答の意味', ああ: '架空の正解の意味', かか: '別の架空の意味' };
+    Object.assign(value.entries[0]!, { choiceExplanations });
+    expect(parseImportedMaterial(JSON.stringify(value)).entries[0]?.choiceExplanations).toEqual(choiceExplanations);
+    expect(parseImportedMaterial(JSON.stringify(fixture())).entries[0]?.choiceExplanations).toBeUndefined();
+  });
+
+  it.each([null, [], {}, { おお: '意味' }, { おお: '', ああ: '意味', かか: '意味' },
+    { おお: 123, ああ: '意味', かか: '意味' },
+    { おお: 'x'.repeat(2001), ああ: '意味', かか: '意味' },
+    { おお: '意味', ああ: '意味', かか: '意味', 余分: '意味' }
+  ])('rejects incomplete or invalid choice meanings: %j', (choiceExplanations) => {
+    const value = fixture();
+    Object.assign(value.entries[0]!, { choiceExplanations });
+    expect(() => parseImportedMaterial(JSON.stringify(value))).toThrow();
+  });
+
   it('returns fresh selections, so a caller cannot reorder the stored set', () => {
     const material = parseImportedMaterial(JSON.stringify(fixture()));
     selectOnomatopoeiaQuestions(asSong(material)).reverse();

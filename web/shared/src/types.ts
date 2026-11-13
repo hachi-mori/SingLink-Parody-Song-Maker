@@ -39,6 +39,7 @@ export type OnomatopoeiaEntry = {
   /** Present only on a validated, fixed experience set. */
   id?: string;
   choices?: string[];
+  choiceExplanations?: Record<string, string>;
   word: string;
   reading: string;
   answer: string;
